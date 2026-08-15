@@ -1,0 +1,1500 @@
+[
+  {
+    "reference": "ISS-800",
+    "title": "Discussion: Certificate Management behaviour",
+    "body": "Maria Gomez commented on a discussion about Certificate Management behaviour in Gateway Integration.",
+    "date": "2026-02-04",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "COMMENTER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-801",
+    "title": "Discussion: Policy Rollback behaviour",
+    "body": "Grace Liu commented on a discussion about Policy Rollback behaviour in Policy Engine.",
+    "date": "2026-02-23",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "COMMENTER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-802",
+    "title": "Discussion: Provider Failover behaviour",
+    "body": "Jordan Lee commented on a discussion about Provider Failover behaviour in Gateway Integration.",
+    "date": "2026-04-13",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "COMMENTER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-803",
+    "title": "Discussion: Refund Reversal behaviour",
+    "body": "Omar Haddad commented on a discussion about Refund Reversal behaviour in Refund Orchestration.",
+    "date": "2026-03-10",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "COMMENTER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-804",
+    "title": "Discussion: Retry Logic behaviour",
+    "body": "Maria Gomez commented on a discussion about Retry Logic behaviour in Transaction Processor.",
+    "date": "2026-04-01",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "COMMENTER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-805",
+    "title": "Discussion: Session Recovery behaviour",
+    "body": "Daniel Kim commented on a discussion about Session Recovery behaviour in Session Management.",
+    "date": "2026-03-26",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "COMMENTER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-806",
+    "title": "Discussion: Token Rotation behaviour",
+    "body": "Grace Liu commented on a discussion about Token Rotation behaviour in Session Management.",
+    "date": "2026-03-13",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "COMMENTER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-807",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-03-10",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-808",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-03-27",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-809",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-04-06",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-810",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-03-31",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-811",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-02-28",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-812",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-04-04",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-813",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-02-16",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-814",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-03-07",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-815",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-02-07",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-816",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-03-22",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-817",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-03-17",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-818",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-04-12",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-819",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-02-04",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-820",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-02-04",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-821",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-03-17",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-822",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-03-04",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-823",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-02-17",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-824",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-03-12",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-825",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-02-24",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-826",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-03-10",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-827",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-04-07",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-828",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-04-07",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-829",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-02-03",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-830",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-04-08",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-831",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-02-28",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-832",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-03-07",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-833",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-02-23",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-834",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-02-27",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-835",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-04-05",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-836",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-02-21",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-837",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-03-02",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-838",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-01-31",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-839",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-04-12",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-840",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-02-10",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-841",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-02-08",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-842",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-04-08",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-843",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-03-04",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-844",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-04-13",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-845",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-02-08",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-846",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-04-10",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-847",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-03-22",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-848",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-02-09",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-849",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-02-16",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-850",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-03-15",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-851",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-02-13",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-852",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-04-11",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-853",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-03-27",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-854",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-03-29",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-855",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-03-13",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-856",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-03-06",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-857",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-02-03",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-858",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-04-07",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-859",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-03-26",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-860",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-03-12",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-861",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-02-26",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-862",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-03-20",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-863",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-04-10",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-864",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-02-05",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-865",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-03-28",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-866",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-04-15",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-867",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-03-24",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-868",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-04-05",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-869",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-03-26",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-870",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-02-05",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-871",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-03-12",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-872",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-02-24",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-873",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-02-05",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-874",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-02-03",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-875",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-04-15",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-876",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-02-15",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-877",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-02-14",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-878",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-04-05",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-879",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-03-11",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-880",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-03-29",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-881",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-03-13",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-882",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-03-19",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-883",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-03-12",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-884",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-03-28",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-885",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-03-23",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-886",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-03-31",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-887",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-03-12",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-888",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-03-16",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-889",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-02-23",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-890",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-03-20",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-891",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-03-23",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-892",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-02-15",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-893",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-02-14",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-894",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-04-06",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-895",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-02-19",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-896",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-02-17",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-897",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-02-28",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-898",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-04-10",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-899",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-04-05",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-900",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-04-15",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-901",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-03-27",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-902",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-03-21",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-903",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-03-03",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-904",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-03-15",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-905",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-03-19",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISSUE-77",
+    "title": "Discussion: incident recovery ordering",
+    "body": "Jordan Lee commented on the ordering of steps during gateway recovery and asked whether the drain step could be automated.",
+    "date": "2024-08-05",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "COMMENTER"
+      }
+    ],
+    "file_paths": []
+  }
+]

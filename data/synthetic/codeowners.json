@@ -1,0 +1,37 @@
+{
+  "reference": "CODEOWNERS",
+  "title": "CODEOWNERS",
+  "date": "2026-08-15",
+  "entries": [
+    {
+      "system_id": "system_payment_gateway",
+      "path": "/services/payment_gateway/",
+      "engineer_id": "eng_jordan_lee",
+      "source_reference": "CODEOWNERS"
+    },
+    {
+      "system_id": "system_refund_engine",
+      "path": "/services/refund_engine/",
+      "engineer_id": "eng_priya_nair",
+      "source_reference": "CODEOWNERS"
+    },
+    {
+      "system_id": "system_billing_integration",
+      "path": "/services/billing_integration/",
+      "engineer_id": "eng_tom_becker",
+      "source_reference": "CODEOWNERS"
+    },
+    {
+      "system_id": "system_authentication",
+      "path": "/services/authentication/",
+      "engineer_id": "eng_sofia_ruiz",
+      "source_reference": "CODEOWNERS"
+    },
+    {
+      "system_id": "system_authorization",
+      "path": "/services/authorization/",
+      "engineer_id": "eng_daniel_kim",
+      "source_reference": "CODEOWNERS"
+    }
+  ]
+}

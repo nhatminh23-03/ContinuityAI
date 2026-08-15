@@ -170,3 +170,90 @@ owner; Alex has the strongest demonstrated coverage. Alex unavailable → Incide
 `DEGRADED → CRITICAL_GAP`, Provider Failover `COVERED → DEGRADED`, Retry Logic stays `COVERED`,
 system risk 74 → 93 (HIGH → CRITICAL). Maria returns HIGH overlap, Jordan MEDIUM. Manager selects Maria, plan
 generates `DRAFT`, manager approves. Use this scenario in tests, fixtures, screenshots, and demo.
+
+## The rules, as implemented
+
+Previously this file omitted the readiness thresholds and the risk rules, so the document everyone
+is told to load instead of the specifications did not contain the rules the backend is built on.
+They are below. Authoritative source remains `PRD.md` sections 16.2, 17.1 and 17.2; where this
+summary and the code disagree, `backend/tests/test_continuity_engine.py` is the tie-breaker because
+it pins the frozen numbers.
+
+### Readiness — `app/continuity/readiness.py`
+
+Computed per `(engineer, capability)` from that pair's evidence. Never written directly, never set by
+the AI layer.
+
+| Level | Condition |
+|---|---|
+| `VALIDATED` | 2+ independent executions, across 2+ artifact types among the strong evidence, at least one still fresh, no conflicts |
+| `PRACTICED` | 1+ independent execution that has not gone stale, plus at least one supporting item |
+| `ASSISTED` | 2+ items including assisted execution, a contribution, or authored documentation. Also where a stale independent execution lands |
+| `EXPOSED` | Any qualifying evidence, none of it execution |
+| `NONE` | No qualifying evidence |
+
+The `EXPOSED → ASSISTED → PRACTICED` progression is about **independence**, never volume: the rules
+read `independent_execution_count`, not `total`. Twenty reviews stay `EXPOSED`.
+`PRACTICED → VALIDATED` is repetition **and** source diversity — two incidents from the same pager
+rotation are one kind of proof.
+
+### Exposure and risk class — `app/continuity/exposure.py`
+
+Adequate coverage means readiness of `PRACTICED` or better **and** evidence that is not stale.
+
+| Adequate engineers | CRITICAL capability | HIGH capability | MEDIUM / LOW |
+|---|---|---|---|
+| 0 | `CRITICAL_GAP` / CRITICAL | `CRITICAL_GAP` / HIGH | `DEGRADED` / MODERATE |
+| 1 | `DEGRADED` / HIGH | `DEGRADED` / MODERATE | `COVERED` / MODERATE |
+| 2+ | `COVERED` / LOW if any is VALIDATED, else MODERATE | same | same |
+
+Fewer than two evidence records, or no adequate coverage with every coverage at LOW confidence,
+returns `INSUFFICIENT_EVIDENCE` with a null index and null class.
+
+`DEGRADED` means coverage exists but resilience does not. `CRITICAL_GAP` means no adequate coverage
+remains. Keeping them separate is what lets the simulation *create* a gap (decision CI-03). Risk
+class scales with criticality (DEC-07).
+
+### Continuity Risk Index — `app/continuity/exposure.py`
+
+Class anchor, plus modifiers, clamped to the class band. The class is authoritative; the index is a
+derived comparison number and never a probability.
+
+| Class | Band | Anchor |
+|---|---|---|
+| LOW | 0-39 | 20 |
+| MODERATE | 40-59 | 50 |
+| HIGH | 60-79 | 70 |
+| CRITICAL | 80-100 | 90 |
+
+| Modifier | Delta |
+|---|---|
+| `SOLE_ADEQUATE_ENGINEER` | +1 |
+| `BEST_ALTERNATIVE_ASSISTED` | +1 |
+| `BEST_ALTERNATIVE_EXPOSED_OR_NONE` | +3 |
+| `SECOND_PRACTICED_ENGINEER` | -5 |
+| `SECOND_VALIDATED_ENGINEER` | -8 |
+| `RUNBOOK_MISSING` / `RUNBOOK_INCOMPLETE` / `RUNBOOK_CURRENT` | +5 / +3 / -3 |
+
+Coverage modifiers are mutually exclusive: with two or more adequate engineers the second one *is*
+the backup, so `SECOND_*` applies and `BEST_ALTERNATIVE_*` does not. `HIGH_OPERATIONAL_DEPENDENCY`
+from the PRD table is not implemented (RECOMMENDATIONS.md R-08).
+
+Worked example — Incident Recovery: CRITICAL capability, one adequate engineer (Alex VALIDATED),
+best alternative ASSISTED (Maria), runbook not assessed. Class HIGH, anchor 70, +1 sole adequate,
++1 best alternative assisted = **72**.
+
+### Aggregation — `app/continuity/aggregation.py`
+
+System index is the **maximum** across its capabilities, and the class is that capability's class.
+Severe gaps are never averaged away (PRD section 17.3); breadth is communicated through the counts
+and the fired rules. System exposure is the worst capability exposure, ordering
+`CRITICAL_GAP > DEGRADED > INSUFFICIENT_EVIDENCE > COVERED`. System evidence confidence is the
+minimum across capabilities that are degraded or worse. Platforms get no index of their own
+(decision CI-10) — only the highest system index, total critical gaps, and drift.
+
+### Where the numbers come from
+
+Nothing in `fixtures/` is asserted. `python -m scripts.seed_demo` derives every readiness value from
+the committed artifact corpus, and `python -m scripts.refresh_fixtures --check` fails if a fixture
+has drifted from what the engine produces.

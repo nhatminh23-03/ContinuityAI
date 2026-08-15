@@ -9,15 +9,15 @@
       "name": "Maria Gomez",
       "technical_overlap": "HIGH",
       "strengths": [
-        "Production deployment",
-        "Infrastructure recovery",
-        "Assisted Payment Gateway recovery"
+        "Demonstrated Monitoring",
+        "Demonstrated Provider Failover",
+        "Assisted Incident Recovery"
       ],
       "gaps": [
-        "Independent Payment Gateway recovery",
-        "Provider failover execution"
+        "No qualifying independent evidence for Incident Recovery",
+        "No qualifying independent evidence for Certificate Management"
       ],
-      "evidence_confidence": "HIGH",
+      "evidence_confidence": "MEDIUM",
       "supporting_evidence_ids": [
         "evidence_inc_230",
         "evidence_pr_402"
@@ -28,15 +28,16 @@
       "name": "Jordan Lee",
       "technical_overlap": "MEDIUM",
       "strengths": [
-        "Payment Gateway development",
-        "Retry architecture"
+        "Demonstrated Retry Logic",
+        "Assisted Monitoring"
       ],
       "gaps": [
-        "Independent production recovery",
-        "Provider failover execution"
+        "No qualifying independent evidence for Incident Recovery",
+        "No qualifying independent evidence for Provider Failover"
       ],
       "evidence_confidence": "MEDIUM",
       "supporting_evidence_ids": [
+        "evidence_issue_77",
         "evidence_pr_391"
       ]
     }

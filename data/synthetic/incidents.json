@@ -1,0 +1,856 @@
+[
+  {
+    "reference": "INC-184",
+    "title": "P1 Payment Gateway Provider Failure",
+    "body": "Card transactions began failing at 19:04. Alex Chen was paged, traced the fault to a stalled connection pool in the gateway integration layer, restarted the affected workers, and restored transaction routing without escalation. Root cause recorded as a connection leak under sustained retry pressure.",
+    "date": "2026-05-14",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-221",
+    "title": "P1 Payment Gateway transaction routing stall",
+    "body": "A partial outage left roughly 12 percent of authorisations unrouted. Alex Chen diagnosed a misapplied routing weight, corrected it, and confirmed transaction routing had recovered. Handled single-handedly during the out-of-hours window.",
+    "date": "2026-03-02",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-230",
+    "title": "P2 Payment Gateway degraded authorisations",
+    "body": "Authorisation latency tripled for eleven minutes. Maria Gomez joined the response and assisted with gateway recovery, working through the checks with the lead responder rather than driving the restoration.",
+    "date": "2026-04-18",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "ASSISTING_RESPONDER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-300",
+    "title": "P1 Authentication \u2014 Auth Monitoring failure",
+    "body": "Daniel Kim was paged, diagnosed the fault in Identity Operations, and carried out Auth Monitoring to restore service. Completed without escalation or a second responder.",
+    "date": "2026-07-05",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-301",
+    "title": "P1 Authentication \u2014 Auth Monitoring failure",
+    "body": "Lena Novak was paged, diagnosed the fault in Identity Operations, and carried out Auth Monitoring to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-11",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-302",
+    "title": "P1 Authentication \u2014 Auth Monitoring failure",
+    "body": "Lena Novak was paged, diagnosed the fault in Identity Operations, and carried out Auth Monitoring to restore service. Completed without escalation or a second responder.",
+    "date": "2026-02-04",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-303",
+    "title": "P1 Payment Gateway \u2014 Certificate Management failure",
+    "body": "Alex Chen was paged, diagnosed the fault in Gateway Integration, and carried out Certificate Management to restore service. Completed without escalation or a second responder.",
+    "date": "2026-06-10",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-304",
+    "title": "P1 Payment Gateway \u2014 Certificate Management failure",
+    "body": "Alex Chen was paged, diagnosed the fault in Gateway Integration, and carried out Certificate Management to restore service. Completed without escalation or a second responder.",
+    "date": "2026-04-07",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-305",
+    "title": "P1 Authentication \u2014 Credential Verification failure",
+    "body": "Grace Liu was paged, diagnosed the fault in Login Flow, and carried out Credential Verification to restore service. Completed without escalation or a second responder.",
+    "date": "2026-07-11",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-306",
+    "title": "P1 Authentication \u2014 Credential Verification failure",
+    "body": "Grace Liu was paged, diagnosed the fault in Login Flow, and carried out Credential Verification to restore service. Completed without escalation or a second responder.",
+    "date": "2026-02-05",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-307",
+    "title": "P1 Authentication \u2014 Credential Verification failure",
+    "body": "Sofia Ruiz was paged, diagnosed the fault in Login Flow, and carried out Credential Verification to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-24",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-308",
+    "title": "P1 Authentication \u2014 Credential Verification failure",
+    "body": "Sofia Ruiz was paged, diagnosed the fault in Login Flow, and carried out Credential Verification to restore service. Completed without escalation or a second responder.",
+    "date": "2026-04-08",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-309",
+    "title": "P1 Authentication \u2014 Directory Sync failure",
+    "body": "Daniel Kim was paged, diagnosed the fault in Identity Operations, and carried out Directory Sync to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-12",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-310",
+    "title": "P1 Authentication \u2014 Directory Sync failure",
+    "body": "Grace Liu was paged, diagnosed the fault in Identity Operations, and carried out Directory Sync to restore service. Completed without escalation or a second responder.",
+    "date": "2026-07-03",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-311",
+    "title": "P1 Billing Integration \u2014 Export Recovery failure",
+    "body": "Lena Novak was paged, diagnosed the fault in Billing Exports, and carried out Export Recovery to restore service. Completed without escalation or a second responder.",
+    "date": "2026-06-29",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-312",
+    "title": "P1 Billing Integration \u2014 Export Recovery failure",
+    "body": "Tom Becker was paged, diagnosed the fault in Billing Exports, and carried out Export Recovery to restore service. Completed without escalation or a second responder.",
+    "date": "2026-07-13",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-313",
+    "title": "P1 Billing Integration \u2014 Export Recovery failure",
+    "body": "Tom Becker was paged, diagnosed the fault in Billing Exports, and carried out Export Recovery to restore service. Completed without escalation or a second responder.",
+    "date": "2026-04-10",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-314",
+    "title": "P1 Billing Integration \u2014 Export Scheduling failure",
+    "body": "Omar Haddad was paged, diagnosed the fault in Billing Exports, and carried out Export Scheduling to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-09",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-315",
+    "title": "P1 Billing Integration \u2014 Export Scheduling failure",
+    "body": "Tom Becker was paged, diagnosed the fault in Billing Exports, and carried out Export Scheduling to restore service. Completed without escalation or a second responder.",
+    "date": "2026-06-10",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-316",
+    "title": "P2 Billing Integration \u2014 degraded Invoice Generation",
+    "body": "Priya Nair joined the response and assisted with Invoice Generation in Invoice Sync, following the lead responder's direction rather than driving the restoration.",
+    "date": "2026-07-15",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "ASSISTING_RESPONDER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-317",
+    "title": "P1 Billing Integration \u2014 Invoice Generation failure",
+    "body": "Tom Becker was paged, diagnosed the fault in Invoice Sync, and carried out Invoice Generation to restore service. Completed without escalation or a second responder.",
+    "date": "2026-06-05",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-318",
+    "title": "P1 Refund Engine \u2014 Ledger Reconciliation failure",
+    "body": "Priya Nair was paged, diagnosed the fault in Refund Ledger, and carried out Ledger Reconciliation to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-29",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-319",
+    "title": "P1 Refund Engine \u2014 Ledger Reconciliation failure",
+    "body": "Priya Nair was paged, diagnosed the fault in Refund Ledger, and carried out Ledger Reconciliation to restore service. Completed without escalation or a second responder.",
+    "date": "2026-02-16",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-320",
+    "title": "P1 Refund Engine \u2014 Ledger Reconciliation failure",
+    "body": "Tom Becker was paged, diagnosed the fault in Refund Ledger, and carried out Ledger Reconciliation to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-16",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-321",
+    "title": "P1 Authentication \u2014 MFA Enrollment failure",
+    "body": "Daniel Kim was paged, diagnosed the fault in Login Flow, and carried out MFA Enrollment to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-05",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-322",
+    "title": "P1 Authentication \u2014 MFA Enrollment failure",
+    "body": "Grace Liu was paged, diagnosed the fault in Login Flow, and carried out MFA Enrollment to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-13",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-323",
+    "title": "P1 Payment Gateway \u2014 Monitoring failure",
+    "body": "Alex Chen was paged, diagnosed the fault in Gateway Operations, and carried out Monitoring to restore service. Completed without escalation or a second responder.",
+    "date": "2026-07-11",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-324",
+    "title": "P2 Payment Gateway \u2014 degraded Monitoring",
+    "body": "Jordan Lee joined the response and assisted with Monitoring in Gateway Operations, following the lead responder's direction rather than driving the restoration.",
+    "date": "2026-05-16",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "ASSISTING_RESPONDER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-325",
+    "title": "P1 Payment Gateway \u2014 Monitoring failure",
+    "body": "Lena Novak was paged, diagnosed the fault in Gateway Operations, and carried out Monitoring to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-23",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-326",
+    "title": "P1 Payment Gateway \u2014 Monitoring failure",
+    "body": "Lena Novak was paged, diagnosed the fault in Gateway Operations, and carried out Monitoring to restore service. Completed without escalation or a second responder.",
+    "date": "2026-03-15",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-327",
+    "title": "P1 Payment Gateway \u2014 Monitoring failure",
+    "body": "Maria Gomez was paged, diagnosed the fault in Gateway Operations, and carried out Monitoring to restore service. Completed without escalation or a second responder.",
+    "date": "2026-06-21",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-328",
+    "title": "P1 Payment Gateway \u2014 Monitoring failure",
+    "body": "Maria Gomez was paged, diagnosed the fault in Gateway Operations, and carried out Monitoring to restore service. Completed without escalation or a second responder.",
+    "date": "2026-02-13",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-329",
+    "title": "P1 Refund Engine \u2014 Partial Refund Handling failure",
+    "body": "Omar Haddad was paged, diagnosed the fault in Refund Orchestration, and carried out Partial Refund Handling to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-23",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-330",
+    "title": "P1 Refund Engine \u2014 Partial Refund Handling failure",
+    "body": "Priya Nair was paged, diagnosed the fault in Refund Orchestration, and carried out Partial Refund Handling to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-17",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-331",
+    "title": "P1 Billing Integration \u2014 Payment Reconciliation failure",
+    "body": "Priya Nair was paged, diagnosed the fault in Invoice Sync, and carried out Payment Reconciliation to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-09",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-332",
+    "title": "P1 Billing Integration \u2014 Payment Reconciliation failure",
+    "body": "Priya Nair was paged, diagnosed the fault in Invoice Sync, and carried out Payment Reconciliation to restore service. Completed without escalation or a second responder.",
+    "date": "2026-03-19",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-333",
+    "title": "P1 Billing Integration \u2014 Payment Reconciliation failure",
+    "body": "Tom Becker was paged, diagnosed the fault in Invoice Sync, and carried out Payment Reconciliation to restore service. Completed without escalation or a second responder.",
+    "date": "2026-07-15",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-334",
+    "title": "P1 Authorization \u2014 Policy Evaluation failure",
+    "body": "Daniel Kim was paged, diagnosed the fault in Policy Engine, and carried out Policy Evaluation to restore service. Completed without escalation or a second responder.",
+    "date": "2026-07-07",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-335",
+    "title": "P1 Authorization \u2014 Policy Evaluation failure",
+    "body": "Daniel Kim was paged, diagnosed the fault in Policy Engine, and carried out Policy Evaluation to restore service. Completed without escalation or a second responder.",
+    "date": "2026-03-28",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-336",
+    "title": "P1 Authorization \u2014 Policy Evaluation failure",
+    "body": "Sofia Ruiz was paged, diagnosed the fault in Policy Engine, and carried out Policy Evaluation to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-30",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-337",
+    "title": "P1 Authorization \u2014 Policy Rollback failure",
+    "body": "Daniel Kim was paged, diagnosed the fault in Policy Engine, and carried out Policy Rollback to restore service. Completed without escalation or a second responder.",
+    "date": "2026-07-12",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-338",
+    "title": "P1 Payment Gateway \u2014 Provider Failover failure",
+    "body": "Alex Chen was paged, diagnosed the fault in Gateway Integration, and carried out Provider Failover to restore service. Completed without escalation or a second responder.",
+    "date": "2026-07-13",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-339",
+    "title": "P1 Payment Gateway \u2014 Provider Failover failure",
+    "body": "Maria Gomez was paged, diagnosed the fault in Gateway Integration, and carried out Provider Failover to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-21",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-340",
+    "title": "P1 Refund Engine \u2014 Refund Batch Recovery failure",
+    "body": "Omar Haddad was paged, diagnosed the fault in Refund Ledger, and carried out Refund Batch Recovery to restore service. Completed without escalation or a second responder.",
+    "date": "2026-06-28",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-341",
+    "title": "P2 Refund Engine \u2014 degraded Refund Batch Recovery",
+    "body": "Tom Becker joined the response and assisted with Refund Batch Recovery in Refund Ledger, following the lead responder's direction rather than driving the restoration.",
+    "date": "2026-05-21",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "ASSISTING_RESPONDER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-342",
+    "title": "P1 Refund Engine \u2014 Refund Monitoring failure",
+    "body": "Lena Novak was paged, diagnosed the fault in Refund Ledger, and carried out Refund Monitoring to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-22",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-343",
+    "title": "P1 Refund Engine \u2014 Refund Monitoring failure",
+    "body": "Lena Novak was paged, diagnosed the fault in Refund Ledger, and carried out Refund Monitoring to restore service. Completed without escalation or a second responder.",
+    "date": "2026-03-30",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-344",
+    "title": "P1 Refund Engine \u2014 Refund Monitoring failure",
+    "body": "Omar Haddad was paged, diagnosed the fault in Refund Ledger, and carried out Refund Monitoring to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-23",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-345",
+    "title": "P2 Refund Engine \u2014 degraded Refund Reversal",
+    "body": "Priya Nair joined the response and assisted with Refund Reversal in Refund Orchestration, following the lead responder's direction rather than driving the restoration.",
+    "date": "2026-05-28",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "ASSISTING_RESPONDER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-346",
+    "title": "P1 Payment Gateway \u2014 Retry Logic failure",
+    "body": "Alex Chen was paged, diagnosed the fault in Transaction Processor, and carried out Retry Logic to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-10",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-347",
+    "title": "P1 Payment Gateway \u2014 Retry Logic failure",
+    "body": "Alex Chen was paged, diagnosed the fault in Transaction Processor, and carried out Retry Logic to restore service. Completed without escalation or a second responder.",
+    "date": "2026-03-11",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-348",
+    "title": "P1 Payment Gateway \u2014 Retry Logic failure",
+    "body": "Jordan Lee was paged, diagnosed the fault in Transaction Processor, and carried out Retry Logic to restore service. Completed without escalation or a second responder.",
+    "date": "2026-06-07",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-349",
+    "title": "P1 Payment Gateway \u2014 Retry Logic failure",
+    "body": "Jordan Lee was paged, diagnosed the fault in Transaction Processor, and carried out Retry Logic to restore service. Completed without escalation or a second responder.",
+    "date": "2026-02-28",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-350",
+    "title": "P1 Payment Gateway \u2014 Retry Logic failure",
+    "body": "Omar Haddad was paged, diagnosed the fault in Transaction Processor, and carried out Retry Logic to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-18",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-351",
+    "title": "P1 Authorization \u2014 Role Assignment failure",
+    "body": "Daniel Kim was paged, diagnosed the fault in Role Management, and carried out Role Assignment to restore service. Completed without escalation or a second responder.",
+    "date": "2026-05-14",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-352",
+    "title": "P1 Authorization \u2014 Role Assignment failure",
+    "body": "Grace Liu was paged, diagnosed the fault in Role Management, and carried out Role Assignment to restore service. Completed without escalation or a second responder.",
+    "date": "2026-06-03",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-353",
+    "title": "P2 Authentication \u2014 degraded Session Recovery",
+    "body": "Sofia Ruiz joined the response and assisted with Session Recovery in Session Management, following the lead responder's direction rather than driving the restoration.",
+    "date": "2026-05-26",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "ASSISTING_RESPONDER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-354",
+    "title": "P1 Billing Integration \u2014 Tax Calculation failure",
+    "body": "Priya Nair was paged, diagnosed the fault in Invoice Sync, and carried out Tax Calculation to restore service. Completed without escalation or a second responder.",
+    "date": "2026-07-09",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-355",
+    "title": "P1 Billing Integration \u2014 Tax Calculation failure",
+    "body": "Tom Becker was paged, diagnosed the fault in Invoice Sync, and carried out Tax Calculation to restore service. Completed without escalation or a second responder.",
+    "date": "2026-06-08",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-356",
+    "title": "P1 Billing Integration \u2014 Tax Calculation failure",
+    "body": "Tom Becker was paged, diagnosed the fault in Invoice Sync, and carried out Tax Calculation to restore service. Completed without escalation or a second responder.",
+    "date": "2026-03-26",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "INC-357",
+    "title": "P1 Authentication \u2014 Token Rotation failure",
+    "body": "Sofia Ruiz was paged, diagnosed the fault in Session Management, and carried out Token Rotation to restore service. Completed without escalation or a second responder.",
+    "date": "2026-06-03",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "RESOLVER"
+      }
+    ],
+    "file_paths": []
+  }
+]

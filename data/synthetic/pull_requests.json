@@ -1,0 +1,1804 @@
+[
+  {
+    "reference": "PR-402",
+    "title": "Harden gateway recovery health checks",
+    "body": "Maria Gomez authored this change to the gateway integration health probes so a half-open connection pool is detected before it affects incident recovery.",
+    "date": "2026-02-10",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/gateway/integration/health.py"
+    ]
+  },
+  {
+    "reference": "PR-500",
+    "title": "Auth Monitoring: correctness fix in Identity Operations",
+    "body": "Daniel Kim authored this change affecting Auth Monitoring in Identity Operations.",
+    "date": "2026-04-12",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/identity-operations/auth_monitoring.py"
+    ]
+  },
+  {
+    "reference": "PR-501",
+    "title": "Directory Sync: correctness fix in Identity Operations",
+    "body": "Daniel Kim authored this change affecting Directory Sync in Identity Operations.",
+    "date": "2026-02-06",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/identity-operations/directory_sync.py"
+    ]
+  },
+  {
+    "reference": "PR-502",
+    "title": "Directory Sync: correctness fix in Identity Operations",
+    "body": "Grace Liu authored this change affecting Directory Sync in Identity Operations.",
+    "date": "2026-02-23",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/identity-operations/directory_sync.py"
+    ]
+  },
+  {
+    "reference": "PR-503",
+    "title": "Export Recovery: correctness fix in Billing Exports",
+    "body": "Lena Novak authored this change affecting Export Recovery in Billing Exports.",
+    "date": "2026-02-19",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/billing-exports/export_recovery.py"
+    ]
+  },
+  {
+    "reference": "PR-504",
+    "title": "Export Scheduling: correctness fix in Billing Exports",
+    "body": "Omar Haddad authored this change affecting Export Scheduling in Billing Exports.",
+    "date": "2026-02-04",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/billing-exports/export_scheduling.py"
+    ]
+  },
+  {
+    "reference": "PR-505",
+    "title": "Export Scheduling: correctness fix in Billing Exports",
+    "body": "Tom Becker authored this change affecting Export Scheduling in Billing Exports.",
+    "date": "2026-03-12",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/billing-exports/export_scheduling.py"
+    ]
+  },
+  {
+    "reference": "PR-506",
+    "title": "Invoice Generation: correctness fix in Invoice Sync",
+    "body": "Tom Becker authored this change affecting Invoice Generation in Invoice Sync.",
+    "date": "2026-04-11",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/invoice-sync/invoice_generation.py"
+    ]
+  },
+  {
+    "reference": "PR-507",
+    "title": "Ledger Reconciliation: correctness fix in Refund Ledger",
+    "body": "Tom Becker authored this change affecting Ledger Reconciliation in Refund Ledger.",
+    "date": "2026-04-13",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/refund-ledger/ledger_reconciliation.py"
+    ]
+  },
+  {
+    "reference": "PR-508",
+    "title": "MFA Enrollment: correctness fix in Login Flow",
+    "body": "Daniel Kim authored this change affecting MFA Enrollment in Login Flow.",
+    "date": "2026-02-17",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/login-flow/mfa_enrollment.py"
+    ]
+  },
+  {
+    "reference": "PR-509",
+    "title": "MFA Enrollment: correctness fix in Login Flow",
+    "body": "Grace Liu authored this change affecting MFA Enrollment in Login Flow.",
+    "date": "2026-02-18",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/login-flow/mfa_enrollment.py"
+    ]
+  },
+  {
+    "reference": "PR-510",
+    "title": "Monitoring: correctness fix in Gateway Operations",
+    "body": "Alex Chen authored this change affecting Monitoring in Gateway Operations.",
+    "date": "2026-04-04",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/gateway-operations/monitoring.py"
+    ]
+  },
+  {
+    "reference": "PR-511",
+    "title": "Partial Refund Handling: correctness fix in Refund Orchestration",
+    "body": "Omar Haddad authored this change affecting Partial Refund Handling in Refund Orchestration.",
+    "date": "2026-02-19",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/refund-orchestration/partial_refund.py"
+    ]
+  },
+  {
+    "reference": "PR-512",
+    "title": "Partial Refund Handling: correctness fix in Refund Orchestration",
+    "body": "Priya Nair authored this change affecting Partial Refund Handling in Refund Orchestration.",
+    "date": "2026-03-06",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/refund-orchestration/partial_refund.py"
+    ]
+  },
+  {
+    "reference": "PR-513",
+    "title": "Payment Reconciliation: correctness fix in Invoice Sync",
+    "body": "Tom Becker authored this change affecting Payment Reconciliation in Invoice Sync.",
+    "date": "2026-03-06",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/invoice-sync/payment_reconciliation.py"
+    ]
+  },
+  {
+    "reference": "PR-514",
+    "title": "Policy Evaluation: correctness fix in Policy Engine",
+    "body": "Sofia Ruiz authored this change affecting Policy Evaluation in Policy Engine.",
+    "date": "2026-01-31",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/policy-engine/policy_evaluation.py"
+    ]
+  },
+  {
+    "reference": "PR-515",
+    "title": "Policy Rollback: correctness fix in Policy Engine",
+    "body": "Daniel Kim authored this change affecting Policy Rollback in Policy Engine.",
+    "date": "2026-02-04",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/policy-engine/policy_rollback.py"
+    ]
+  },
+  {
+    "reference": "PR-516",
+    "title": "Provider Failover: correctness fix in Gateway Integration",
+    "body": "Alex Chen authored this change affecting Provider Failover in Gateway Integration.",
+    "date": "2026-02-10",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/gateway-integration/provider_failover.py"
+    ]
+  },
+  {
+    "reference": "PR-517",
+    "title": "Provider Failover: correctness fix in Gateway Integration",
+    "body": "Maria Gomez authored this change affecting Provider Failover in Gateway Integration.",
+    "date": "2026-02-17",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/gateway-integration/provider_failover.py"
+    ]
+  },
+  {
+    "reference": "PR-518",
+    "title": "Refund Batch Recovery: correctness fix in Refund Ledger",
+    "body": "Omar Haddad authored this change affecting Refund Batch Recovery in Refund Ledger.",
+    "date": "2026-02-12",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/refund-ledger/refund_batch_recovery.py"
+    ]
+  },
+  {
+    "reference": "PR-519",
+    "title": "Refund Monitoring: correctness fix in Refund Ledger",
+    "body": "Omar Haddad authored this change affecting Refund Monitoring in Refund Ledger.",
+    "date": "2026-03-10",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/refund-ledger/refund_monitoring.py"
+    ]
+  },
+  {
+    "reference": "PR-520",
+    "title": "Retry Logic: correctness fix in Transaction Processor",
+    "body": "Omar Haddad authored this change affecting Retry Logic in Transaction Processor.",
+    "date": "2026-03-09",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/transaction-processor/retry_logic.py"
+    ]
+  },
+  {
+    "reference": "PR-521",
+    "title": "Role Assignment: correctness fix in Role Management",
+    "body": "Daniel Kim authored this change affecting Role Assignment in Role Management.",
+    "date": "2026-02-12",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/role-management/role_assignment.py"
+    ]
+  },
+  {
+    "reference": "PR-522",
+    "title": "Role Assignment: correctness fix in Role Management",
+    "body": "Grace Liu authored this change affecting Role Assignment in Role Management.",
+    "date": "2026-04-10",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/role-management/role_assignment.py"
+    ]
+  },
+  {
+    "reference": "PR-523",
+    "title": "Tax Calculation: correctness fix in Invoice Sync",
+    "body": "Priya Nair authored this change affecting Tax Calculation in Invoice Sync.",
+    "date": "2026-02-03",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/invoice-sync/tax_calculation.py"
+    ]
+  },
+  {
+    "reference": "PR-524",
+    "title": "Token Rotation: correctness fix in Session Management",
+    "body": "Sofia Ruiz authored this change affecting Token Rotation in Session Management.",
+    "date": "2026-03-09",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "services/session-management/token_rotation.py"
+    ]
+  },
+  {
+    "reference": "PR-525",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-06-26",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-526",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-05-22",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-527",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-07-12",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-528",
+    "title": "Update service README (Billing Integration)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-05-16",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-529",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-07-13",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-530",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-05-13",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-531",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-06-30",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-532",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-06-19",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-533",
+    "title": "Update service README (Billing Integration)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-07-16",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-534",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-06-01",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-535",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-05-24",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-536",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-07-13",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-537",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-06-28",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-538",
+    "title": "Update service README (Billing Integration)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-07-02",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-539",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-06-09",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-540",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-07-08",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-541",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-06-17",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-542",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-07-12",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-543",
+    "title": "Update service README (Billing Integration)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-07-11",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-544",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-06-26",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-545",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-05-21",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-546",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-06-10",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-547",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-06-06",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-548",
+    "title": "Update service README (Billing Integration)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-06-12",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-549",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-07-15",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-550",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-06-01",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-551",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-05-10",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-552",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-05-29",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-553",
+    "title": "Update service README (Billing Integration)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-06-05",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-554",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-06-27",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-555",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-05-17",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-556",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-06-07",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-557",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-06-05",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-558",
+    "title": "Update service README (Billing Integration)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-06-12",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-559",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-06-02",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-560",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-05-04",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-561",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-07-05",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-562",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-07-01",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-563",
+    "title": "Update service README (Billing Integration)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-06-29",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-564",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-05-04",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-565",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-05-23",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-566",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-05-24",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-567",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-05-12",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-568",
+    "title": "Update service README (Billing Integration)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-05-27",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-569",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-05-18",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-570",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-05-28",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-571",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-07-10",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-572",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-06-06",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-573",
+    "title": "Update service README (Billing Integration)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-07-08",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-574",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-06-05",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-575",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-06-15",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-576",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-07-16",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-577",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-06-23",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-578",
+    "title": "Update service README (Billing Integration)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-05-21",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-579",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-06-04",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-580",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-06-20",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-581",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-06-18",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-582",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-07-06",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-583",
+    "title": "Update service README (Billing Integration)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-07-03",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-584",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-06-11",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-585",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-06-22",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-586",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-05-31",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-587",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-06-16",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-588",
+    "title": "Update service README (Billing Integration)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-05-15",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-589",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-06-22",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-590",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-06-14",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-591",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-05-24",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-592",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-06-23",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-593",
+    "title": "Update service README (Billing Integration)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-06-11",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-594",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-06-16",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-595",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-05-31",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-596",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-05-24",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-597",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-05-23",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-598",
+    "title": "Update service README (Billing Integration)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-06-26",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-599",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-07-14",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-600",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-05-04",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-601",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-05-29",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-602",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-05-13",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-603",
+    "title": "Update service README (Billing Integration)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-05-05",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-604",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-07-06",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-605",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-05-18",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-606",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-05-09",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-607",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-06-26",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-608",
+    "title": "Update service README (Billing Integration)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-06-09",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-609",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-06-06",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-610",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-06-26",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-611",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-05-25",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-612",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-05-20",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-613",
+    "title": "Update service README (Billing Integration)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2026-06-01",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-614",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-05-15",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-615",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-06-27",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-616",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-07-05",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-617",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-06-02",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-618",
+    "title": "Update service README (Billing Integration)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-05-30",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-619",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-05-24",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-620",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-05-12",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-621",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-06-20",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-622",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2026-06-05",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "PR-623",
+    "title": "Update service README (Billing Integration)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-05-15",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  }
+]

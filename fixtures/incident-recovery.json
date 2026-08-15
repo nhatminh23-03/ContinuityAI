@@ -30,21 +30,24 @@
       "name": "Alex Chen",
       "readiness": "VALIDATED",
       "freshness": "FRESH",
-      "evidence_confidence": "HIGH"
+      "evidence_confidence": "HIGH",
+      "last_demonstrated_at": "2026-06-01"
     },
     {
       "engineer_id": "eng_maria_gomez",
       "name": "Maria Gomez",
       "readiness": "ASSISTED",
       "freshness": "FRESH",
-      "evidence_confidence": "MEDIUM"
+      "evidence_confidence": "MEDIUM",
+      "last_demonstrated_at": "2026-04-18"
     },
     {
       "engineer_id": "eng_jordan_lee",
       "name": "Jordan Lee",
       "readiness": "EXPOSED",
       "freshness": "AGING",
-      "evidence_confidence": "MEDIUM"
+      "evidence_confidence": "MEDIUM",
+      "last_demonstrated_at": "2024-08-05"
     }
   ]
 }

@@ -62,3 +62,8 @@ desktop.ini
 
 # --- Generated: synced copy of the shared fixtures ---
 frontend/public/fixtures/
+
+# --- Generated: evaluation output ---
+# data/org/, data/ground_truth/ and data/synthetic/ ARE committed: a clean clone must reproduce
+# the demo (PRD AC-15). Only derived reports are ignored.
+data/generated/

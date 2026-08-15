@@ -66,30 +66,58 @@ development log covering planning, implementation, testing, debugging, and docum
 
 ## Setup
 
-Prerequisites: Node 20+ and Python 3.11+ (3.9 will not work — the DTOs use `int | None` syntax).
+Prerequisites: Node 20+ and Python 3.10+ (the DTOs use `int | None`, so 3.9 will not work).
 
 **Backend** — http://localhost:8000, interactive docs at `/docs`:
 
 ```bash
-cd backend && python3.11 -m venv .venv && .venv/bin/pip install -r requirements.txt && .venv/bin/python -m uvicorn app.main:app --reload
+cd backend
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python -m uvicorn app.main:app --reload
 ```
+
+The database is created and seeded on first boot, so there is no separate setup step. Set
+`AUTO_SEED=false` to manage it yourself.
 
 **Frontend** — http://localhost:3000:
 
 ```bash
-cd frontend && npm install && npm run dev
+cd frontend && npm install
+cp .env.local.example .env.local     # NEXT_PUBLIC_USE_MOCKS=false points at the live backend
+npm run dev
 ```
 
-The frontend starts in fixture mode. To point it at the live backend, copy
-`frontend/.env.local.example` to `.env.local` and set `NEXT_PUBLIC_USE_MOCKS=false`.
+### Commands
 
-**Checks:**
+All from `backend/`, with `PYTHONPATH=.`:
+
+| Command | Purpose |
+|---|---|
+| `python -m scripts.seed_demo` | Rebuild the demo database from scratch. Deterministic and idempotent |
+| `python -m scripts.run_evaluation` | Compare inferred state against the hidden ground truth; writes `data/generated/evaluation_report.md` |
+| `python -m scripts.verify_golden_path` | Walk all ten endpoints and diff each response against its shared fixture |
+| `python -m scripts.refresh_fixtures --check` | Fail if any fixture has drifted from live output |
+| `python -m scripts.generate_synthetic_data` | Regenerate the artifact corpus from the hidden model |
+
+### Checks
 
 ```bash
-cd backend && .venv/bin/python -m pytest -q && cd ../frontend && npm run typecheck && npm run build
+cd backend && .venv/bin/python -m pytest -q                 # 101 tests
+cd ../frontend && npm run typecheck && npm run build
 ```
 
-*TODO before submission:* the deterministic seed command and a clean-clone walkthrough.
+### Clean-clone walkthrough
+
+```bash
+git clone <repo> && cd ContinuityAI
+cd backend && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+PYTHONPATH=. .venv/bin/python -m scripts.seed_demo          # 520 artifacts -> 124 evidence records
+PYTHONPATH=. .venv/bin/python -m scripts.run_evaluation     # every check should pass
+.venv/bin/python -m uvicorn app.main:app --reload
+```
+
+The seeded organisation, the hidden ground truth, and the generated artifact corpus are all
+committed, so the demo reproduces byte for byte from a fresh clone.
 
 ## Demo
 
@@ -116,8 +144,12 @@ never as inability. Staffing decisions remain human decisions.
 | Path | Contents |
 |---|---|
 | [`docs/`](docs/) | Specifications. Start at [`docs/README.md`](docs/README.md); load [`docs/ENGINEERING_RULES.md`](docs/ENGINEERING_RULES.md) before any task. |
-| [`fixtures/`](fixtures/) | Shared mock payloads — the contract fixtures both sides validate against. |
+| [`fixtures/`](fixtures/) | Shared contract payloads both sides validate against. Regenerated from live output by `scripts/refresh_fixtures.py`. |
+| `data/org/` | The NovaPay organisation structure: platforms, systems, components, capabilities, engineers. |
+| `data/synthetic/` | Generated artifact corpus — 520 incidents, pull requests, reviews, issues, tickets, documents. Committed for reproducibility. |
+| [`data/ground_truth/`](data/ground_truth/) | Hidden readiness labels. Readable by the generator and the evaluator only, never by application runtime. |
 | `frontend/` | Next.js / React / TypeScript application. |
-| `backend/` | FastAPI / Python application. |
+| `backend/` | FastAPI / Python application. Engines under `app/{evidence,continuity,simulation,recommendation,mitigation}/`. |
+| [`RECOMMENDATIONS.md`](RECOMMENDATIONS.md) | Open concerns and improvements, ranked by risk. |
 | [`BUILD_WITH_BOB.md`](BUILD_WITH_BOB.md) | Development log. |
 | [`HANDOFF.md`](HANDOFF.md) | Session handoff notes. |

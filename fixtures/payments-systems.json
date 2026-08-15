@@ -19,6 +19,38 @@
       "covered_capability_count": 3,
       "insufficient_evidence_count": 0,
       "drift_status": "NEW_RISK"
+    },
+    {
+      "system_id": "system_refund_engine",
+      "platform_id": "platform_payments",
+      "name": "Refund Engine",
+      "description": "Processes customer refunds and reversals",
+      "business_criticality": "HIGH",
+      "continuity_risk_index": 71,
+      "continuity_risk_class": "HIGH",
+      "exposure": "CRITICAL_GAP",
+      "evidence_confidence": "MEDIUM",
+      "critical_gap_count": 1,
+      "degraded_capability_count": 0,
+      "covered_capability_count": 4,
+      "insufficient_evidence_count": 0,
+      "drift_status": "STABLE"
+    },
+    {
+      "system_id": "system_billing_integration",
+      "platform_id": "platform_payments",
+      "name": "Billing Integration",
+      "description": "Synchronises invoices and billing exports with finance systems",
+      "business_criticality": "HIGH",
+      "continuity_risk_index": 52,
+      "continuity_risk_class": "MODERATE",
+      "exposure": "COVERED",
+      "evidence_confidence": "MEDIUM",
+      "critical_gap_count": 0,
+      "degraded_capability_count": 0,
+      "covered_capability_count": 5,
+      "insufficient_evidence_count": 0,
+      "drift_status": "RISK_REDUCED"
     }
   ]
 }

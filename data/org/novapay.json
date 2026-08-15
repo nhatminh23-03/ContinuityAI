@@ -1,0 +1,546 @@
+{
+  "version": "1.0",
+  "organisation": "NovaPay",
+  "note": "Organisation structure only. Contains no readiness, coverage, or evidence. Readable by application runtime; the seed loads it directly. Hidden readiness labels live in data/ground_truth/ and are NOT readable here.",
+  "engineers": [
+    {
+      "engineer_id": "eng_alex_chen",
+      "name": "Alex Chen",
+      "role": "Senior Payments Engineer",
+      "team": "Payments Engineering"
+    },
+    {
+      "engineer_id": "eng_maria_gomez",
+      "name": "Maria Gomez",
+      "role": "Platform Engineer",
+      "team": "Payments Engineering"
+    },
+    {
+      "engineer_id": "eng_jordan_lee",
+      "name": "Jordan Lee",
+      "role": "Payments Engineer",
+      "team": "Payments Engineering"
+    },
+    {
+      "engineer_id": "eng_priya_nair",
+      "name": "Priya Nair",
+      "role": "Senior Engineer",
+      "team": "Payments Engineering"
+    },
+    {
+      "engineer_id": "eng_omar_haddad",
+      "name": "Omar Haddad",
+      "role": "Engineer",
+      "team": "Payments Engineering"
+    },
+    {
+      "engineer_id": "eng_tom_becker",
+      "name": "Tom Becker",
+      "role": "Engineer",
+      "team": "Billing Engineering"
+    },
+    {
+      "engineer_id": "eng_lena_novak",
+      "name": "Lena Novak",
+      "role": "Site Reliability Engineer",
+      "team": "Platform Reliability"
+    },
+    {
+      "engineer_id": "eng_sofia_ruiz",
+      "name": "Sofia Ruiz",
+      "role": "Senior Engineer",
+      "team": "Identity Engineering"
+    },
+    {
+      "engineer_id": "eng_daniel_kim",
+      "name": "Daniel Kim",
+      "role": "Engineer",
+      "team": "Identity Engineering"
+    },
+    {
+      "engineer_id": "eng_grace_liu",
+      "name": "Grace Liu",
+      "role": "Engineer",
+      "team": "Identity Engineering"
+    },
+    {
+      "engineer_id": "eng_manager_sarah",
+      "name": "Sarah Whitfield",
+      "role": "Engineering Manager",
+      "team": "Payments Engineering"
+    }
+  ],
+  "platforms": [
+    {
+      "platform_id": "platform_payments",
+      "name": "Payments Platform",
+      "description": "Customer payment and transaction services",
+      "drift_status": "NEW_RISK",
+      "systems": [
+        {
+          "system_id": "system_payment_gateway",
+          "name": "Payment Gateway",
+          "description": "Processes customer payment transactions",
+          "business_criticality": "CRITICAL",
+          "criticality_source": "HUMAN_CONFIRMED",
+          "drift_status": "NEW_RISK",
+          "declared_owner": {
+            "engineer_id": "eng_jordan_lee",
+            "source_reference": "CODEOWNERS"
+          },
+          "components": [
+            {
+              "component_id": "component_gateway_integration",
+              "name": "Gateway Integration",
+              "description": "Handles payment-provider connectivity",
+              "capabilities": [
+                {
+                  "capability_id": "cap_incident_recovery",
+                  "name": "Incident Recovery",
+                  "description": "Ability to diagnose and restore Payment Gateway operation during production incidents",
+                  "operational_criticality": "CRITICAL",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "incident recovery",
+                    "payment recovery",
+                    "transaction routing",
+                    "service restoration",
+                    "gateway recovery"
+                  ]
+                },
+                {
+                  "capability_id": "cap_provider_failover",
+                  "name": "Provider Failover",
+                  "description": "Ability to move transaction traffic to a secondary payment provider and restore normal routing",
+                  "operational_criticality": "HIGH",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "provider failover",
+                    "failover",
+                    "secondary provider",
+                    "provider routing"
+                  ]
+                },
+                {
+                  "capability_id": "cap_certificate_management",
+                  "name": "Certificate Management",
+                  "description": "Ability to rotate and recover the mutual-TLS certificates the gateway presents to payment providers",
+                  "operational_criticality": "CRITICAL",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "certificate management",
+                    "certificate rotation",
+                    "tls certificate",
+                    "mtls"
+                  ]
+                }
+              ]
+            },
+            {
+              "component_id": "component_transaction_processor",
+              "name": "Transaction Processor",
+              "description": "Executes and settles individual payment transactions",
+              "capabilities": [
+                {
+                  "capability_id": "cap_retry_logic",
+                  "name": "Retry Logic",
+                  "description": "Ability to change and operate transaction retry and idempotency behaviour safely",
+                  "operational_criticality": "HIGH",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "retry logic",
+                    "retry policy",
+                    "idempotency",
+                    "backoff"
+                  ]
+                }
+              ]
+            },
+            {
+              "component_id": "component_gateway_operations",
+              "name": "Gateway Operations",
+              "description": "Observability and operational tooling for the gateway",
+              "capabilities": [
+                {
+                  "capability_id": "cap_monitoring",
+                  "name": "Monitoring",
+                  "description": "Ability to operate and extend gateway alerting, dashboards, and transaction observability",
+                  "operational_criticality": "MEDIUM",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "monitoring",
+                    "alerting",
+                    "dashboards",
+                    "observability"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "system_id": "system_refund_engine",
+          "name": "Refund Engine",
+          "description": "Processes customer refunds and reversals",
+          "business_criticality": "HIGH",
+          "criticality_source": "HUMAN_CONFIRMED",
+          "drift_status": "STABLE",
+          "declared_owner": {
+            "engineer_id": "eng_priya_nair",
+            "source_reference": "CODEOWNERS"
+          },
+          "components": [
+            {
+              "component_id": "component_refund_orchestration",
+              "name": "Refund Orchestration",
+              "description": "Coordinates refund workflows across providers",
+              "capabilities": [
+                {
+                  "capability_id": "cap_refund_reversal",
+                  "name": "Refund Reversal",
+                  "description": "Ability to reverse a settled refund and restore ledger consistency after a failed batch",
+                  "operational_criticality": "HIGH",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "refund reversal",
+                    "reverse refund",
+                    "refund rollback"
+                  ]
+                },
+                {
+                  "capability_id": "cap_partial_refund",
+                  "name": "Partial Refund Handling",
+                  "description": "Ability to operate partial and split refund flows",
+                  "operational_criticality": "MEDIUM",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "partial refund",
+                    "split refund"
+                  ]
+                }
+              ]
+            },
+            {
+              "component_id": "component_refund_ledger",
+              "name": "Refund Ledger",
+              "description": "Records and reconciles refund movements",
+              "capabilities": [
+                {
+                  "capability_id": "cap_ledger_reconciliation",
+                  "name": "Ledger Reconciliation",
+                  "description": "Ability to reconcile refund ledger entries against provider settlement reports",
+                  "operational_criticality": "HIGH",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "ledger reconciliation",
+                    "settlement reconciliation"
+                  ]
+                },
+                {
+                  "capability_id": "cap_refund_batch_recovery",
+                  "name": "Refund Batch Recovery",
+                  "description": "Ability to recover a stalled or partially applied refund batch",
+                  "operational_criticality": "MEDIUM",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "refund batch recovery",
+                    "batch recovery",
+                    "stalled batch"
+                  ]
+                },
+                {
+                  "capability_id": "cap_refund_monitoring",
+                  "name": "Refund Monitoring",
+                  "description": "Ability to operate refund alerting and backlog dashboards",
+                  "operational_criticality": "LOW",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "refund monitoring",
+                    "refund alerting",
+                    "refund backlog"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "system_id": "system_billing_integration",
+          "name": "Billing Integration",
+          "description": "Synchronises invoices and billing exports with finance systems",
+          "business_criticality": "HIGH",
+          "criticality_source": "HUMAN_CONFIRMED",
+          "drift_status": "RISK_REDUCED",
+          "declared_owner": {
+            "engineer_id": "eng_tom_becker",
+            "source_reference": "CODEOWNERS"
+          },
+          "components": [
+            {
+              "component_id": "component_invoice_sync",
+              "name": "Invoice Sync",
+              "description": "Generates and synchronises customer invoices",
+              "capabilities": [
+                {
+                  "capability_id": "cap_invoice_generation",
+                  "name": "Invoice Generation",
+                  "description": "Ability to operate and correct invoice generation runs",
+                  "operational_criticality": "MEDIUM",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "invoice generation",
+                    "invoice run"
+                  ]
+                },
+                {
+                  "capability_id": "cap_tax_calculation",
+                  "name": "Tax Calculation",
+                  "description": "Ability to change and validate tax calculation rules",
+                  "operational_criticality": "MEDIUM",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "tax calculation",
+                    "tax rules",
+                    "vat calculation"
+                  ]
+                },
+                {
+                  "capability_id": "cap_payment_reconciliation",
+                  "name": "Payment Reconciliation",
+                  "description": "Ability to reconcile billing records against captured payments",
+                  "operational_criticality": "MEDIUM",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "payment reconciliation",
+                    "billing reconciliation"
+                  ]
+                }
+              ]
+            },
+            {
+              "component_id": "component_billing_exports",
+              "name": "Billing Exports",
+              "description": "Scheduled exports to downstream finance systems",
+              "capabilities": [
+                {
+                  "capability_id": "cap_export_scheduling",
+                  "name": "Export Scheduling",
+                  "description": "Ability to operate and adjust billing export schedules",
+                  "operational_criticality": "LOW",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "export scheduling",
+                    "export schedule"
+                  ]
+                },
+                {
+                  "capability_id": "cap_export_recovery",
+                  "name": "Export Recovery",
+                  "description": "Ability to recover and replay a failed billing export",
+                  "operational_criticality": "MEDIUM",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "export recovery",
+                    "export replay",
+                    "failed export"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "platform_id": "platform_identity",
+      "name": "Identity Platform",
+      "description": "Authentication and authorization services",
+      "drift_status": "STABLE",
+      "systems": [
+        {
+          "system_id": "system_authentication",
+          "name": "Authentication",
+          "description": "Verifies customer and staff credentials and issues sessions",
+          "business_criticality": "CRITICAL",
+          "criticality_source": "HUMAN_CONFIRMED",
+          "drift_status": "STABLE",
+          "declared_owner": {
+            "engineer_id": "eng_sofia_ruiz",
+            "source_reference": "CODEOWNERS"
+          },
+          "components": [
+            {
+              "component_id": "component_login_flow",
+              "name": "Login Flow",
+              "description": "Credential entry, verification, and multi-factor enrolment",
+              "capabilities": [
+                {
+                  "capability_id": "cap_credential_verification",
+                  "name": "Credential Verification",
+                  "description": "Ability to operate and safely change credential verification behaviour",
+                  "operational_criticality": "CRITICAL",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "credential verification",
+                    "password verification",
+                    "login verification"
+                  ]
+                },
+                {
+                  "capability_id": "cap_mfa_enrollment",
+                  "name": "MFA Enrollment",
+                  "description": "Ability to operate multi-factor enrolment and recovery flows",
+                  "operational_criticality": "HIGH",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "mfa enrollment",
+                    "multi-factor enrolment",
+                    "second factor"
+                  ]
+                }
+              ]
+            },
+            {
+              "component_id": "component_session_management",
+              "name": "Session Management",
+              "description": "Session issuance, rotation, and recovery",
+              "capabilities": [
+                {
+                  "capability_id": "cap_session_recovery",
+                  "name": "Session Recovery",
+                  "description": "Ability to restore session issuance after a session store failure",
+                  "operational_criticality": "HIGH",
+                  "runbook_state": "CURRENT",
+                  "aliases": [
+                    "session recovery",
+                    "session store failure",
+                    "session restore"
+                  ]
+                },
+                {
+                  "capability_id": "cap_token_rotation",
+                  "name": "Token Rotation",
+                  "description": "Ability to rotate signing keys and refresh tokens without breaking active sessions",
+                  "operational_criticality": "HIGH",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "token rotation",
+                    "signing key rotation",
+                    "refresh token"
+                  ]
+                }
+              ]
+            },
+            {
+              "component_id": "component_identity_operations",
+              "name": "Identity Operations",
+              "description": "Observability and directory synchronisation",
+              "capabilities": [
+                {
+                  "capability_id": "cap_auth_monitoring",
+                  "name": "Auth Monitoring",
+                  "description": "Ability to operate authentication alerting and login-failure dashboards",
+                  "operational_criticality": "MEDIUM",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "auth monitoring",
+                    "login failure alerting",
+                    "authentication dashboards"
+                  ]
+                },
+                {
+                  "capability_id": "cap_directory_sync",
+                  "name": "Directory Sync",
+                  "description": "Ability to operate staff directory synchronisation",
+                  "operational_criticality": "MEDIUM",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "directory sync",
+                    "directory synchronisation",
+                    "staff directory"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "system_id": "system_authorization",
+          "name": "Authorization",
+          "description": "Evaluates access policy and manages roles and permissions",
+          "business_criticality": "HIGH",
+          "criticality_source": "HUMAN_CONFIRMED",
+          "drift_status": "STABLE",
+          "declared_owner": {
+            "engineer_id": "eng_daniel_kim",
+            "source_reference": "CODEOWNERS"
+          },
+          "components": [
+            {
+              "component_id": "component_policy_engine",
+              "name": "Policy Engine",
+              "description": "Evaluates and versions access policy",
+              "capabilities": [
+                {
+                  "capability_id": "cap_policy_evaluation",
+                  "name": "Policy Evaluation",
+                  "description": "Ability to operate and safely change access policy evaluation",
+                  "operational_criticality": "HIGH",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "policy evaluation",
+                    "access policy",
+                    "policy decision"
+                  ]
+                },
+                {
+                  "capability_id": "cap_policy_rollback",
+                  "name": "Policy Rollback",
+                  "description": "Ability to roll back a bad policy release without locking users out",
+                  "operational_criticality": "HIGH",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "policy rollback",
+                    "roll back policy",
+                    "policy release rollback"
+                  ]
+                }
+              ]
+            },
+            {
+              "component_id": "component_role_management",
+              "name": "Role Management",
+              "description": "Role assignment and permission auditing",
+              "capabilities": [
+                {
+                  "capability_id": "cap_role_assignment",
+                  "name": "Role Assignment",
+                  "description": "Ability to operate role assignment and entitlement changes",
+                  "operational_criticality": "MEDIUM",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "role assignment",
+                    "entitlement change",
+                    "role grant"
+                  ]
+                },
+                {
+                  "capability_id": "cap_permission_audit",
+                  "name": "Permission Audit",
+                  "description": "Ability to run and interpret the periodic permission audit",
+                  "operational_criticality": "MEDIUM",
+                  "runbook_state": "NOT_ASSESSED",
+                  "aliases": [
+                    "permission audit",
+                    "entitlement audit",
+                    "access review"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

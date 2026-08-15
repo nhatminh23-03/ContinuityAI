@@ -163,3 +163,117 @@ exclude unset fields, which brought all 10 into agreement.
 **Open questions.** `API_CONTRACT.md` §6.4 declares `last_demonstrated_at` on `EngineerCoverage`
 while the §6.5 example omits it from nested coverage entries; both sides model it as optional so
 they interoperate, but the document should be made self-consistent.
+
+---
+
+## 2026-08-15 — Backend implementation: evidence pipeline through to mitigation
+
+**What was built.** The whole backend, replacing the fixture-returning stubs with a working pipeline.
+Fourteen packages under `backend/app/`, three data directories, five scripts, and 101 tests.
+
+```
+data/org/            structure                      data/ground_truth/   hidden labels
+      │                                                   │
+      │                                    generate_synthetic_data.py (reads labels)
+      │                                                   ▼
+      │                                            data/synthetic/  520 artifacts
+      ▼                                                   ▼
+   ingestion ──> AI extraction ──> validation ──> Evidence ──> aggregation ──> Coverage
+                                                                                   │
+                        readiness rules ──> exposure rules ──> risk index ──> assessments
+                                                                                   │
+                    graph · simulation · candidates · mitigation ──> the 10 frozen endpoints
+```
+
+**Implements.** Workflow tasks A4 onward and phases 2 through 8 of
+`TEAM_WORKFLOW_PERSON_A_B.md`; milestones M2 through M13 of `PRD.md` section 29; the module layout in
+`ARCHITECTURE.md` sections 6 and 14; `FR-001` through `FR-019` and `FR-021` through `FR-025`.
+
+### The decision that shaped the build
+
+The frozen fixtures already contained specific numbers — Incident Recovery 72, Payment Gateway 74,
+93 after the simulation, Identity 68 — chosen during the Phase 0 audit before any rule engine
+existed. Two ways to proceed: write rules and let the numbers land wherever they land, or reverse
+out a rule set that reproduces them.
+
+The second is what `TEAM_WORKFLOW_PERSON_A_B.md` section 25 warns against ("do not manipulate rules
+just to make the demo answer look correct"). But the first would have broken every fixture the
+frontend was built against, on a day when the frontend had not started.
+
+The route taken was neither: derive the rule set from the PRD's own definitions — bands and anchors
+from section 17.2, coverage conditions from 17.1, readiness heuristics from 16.2 — then check what
+those rules produce, and treat any disagreement as a finding rather than a number to be forced.
+
+Three findings came out of it, and all three were specification defects rather than arithmetic:
+
+1. **The index arithmetic did not close.** Reaching 72 from the HIGH anchor of 70 needs exactly +2,
+   and no combination of the PRD's modifier table sums to +2. Adding `SOLE_ADEQUATE_ENGINEER` at +1 —
+   the sole-expert condition being the central signal of the whole product, and conspicuously absent
+   from a table that penalises weak backups — makes 72, 74, 91 and 93 all fall out of coverage
+   evidence alone.
+2. **Rule R1 flattens criticality.** As written, any CRITICAL-or-HIGH capability with no adequate
+   coverage is CRITICAL risk. That makes Refund Engine's single gap read 80+, which puts it above
+   Payment Gateway and breaks the seeded dashboard ordering the demo depends on. Scaling the class
+   with operational criticality fixes it and leaves every exposure value untouched (DEC-07).
+3. **Retry Logic could not stay covered.** Under a literal reading of R1b, removing Alex leaves
+   Jordan as the sole adequate engineer and Retry Logic degrades — losing the contrast beat that
+   makes the simulation specific rather than vague. Resolved as a *data* decision rather than a rule
+   change: the seed gives Retry Logic three adequate holders, which is also more realistic. Retry
+   logic is ordinary application code many people touch; incident recovery is the scarce skill. That
+   asymmetry is the product's whole point.
+
+Every frozen number is now reproduced by the rules from evidence, and none of them is asserted
+anywhere.
+
+### Notable implementation choices
+
+**The counterfactual is not a second engine.** `CapabilityFacts` is a frozen dataclass with a
+`.without(engineer_id)` method returning a new instance. The simulation calls the same `assess()` and
+`aggregate_system()` the baseline does. Baseline state cannot be corrupted because nothing is
+written, and before and after cannot disagree because there is only one implementation.
+
+**Extraction is closed-world.** A provider receives the capability taxonomy it may attribute to and
+is validated against it. Four rejection classes: unknown capability, cross-system attribution,
+unknown engineer, and — the one that matters most — a claim against someone who is not a recorded
+participant of the artifact. That last would put an unsupported claim against a named person, which
+is the single output this product cannot afford.
+
+**Ground-truth isolation is enforced, not asserted.** `ARCHITECTURE.md` section 40 states that
+application runtime cannot read the hidden labels. Three mechanisms now make it true: application
+configuration exposes no path to them, only `app/evaluation/` resolves one, and
+`tests/test_ground_truth_isolation.py` parses every module under `app/` and fails if any of them
+names the directory, imports the evaluation package, or reaches it through settings. Without that
+test the product's central claim would be unfalsifiable.
+
+**The AI provider is a real implementation of the interface, and it is rule-based.** It performs the
+same closed-world capability resolution and role interpretation a model would be prompted for, using
+explicit rules, so the demo cannot fail on provider latency and the evaluation is repeatable. Being
+precise about this in the README is the top item in `RECOMMENDATIONS.md` (R-01) — the seam is
+genuine, but the claim must match what ships.
+
+### Validation
+
+- **101 tests pass in under two seconds**, against a database seeded by the same script a developer
+  runs. Unit tests pin every readiness boundary and every exposure rule; behaviour tests walk the
+  golden path; `test_responsible_ai.py` asserts the `engineers` table columns against an allowlist
+  and greps generated text for prohibited phrasing; `test_ground_truth_isolation.py` enforces the
+  evaluation boundary.
+- **Hidden-ground-truth evaluation passes every check**: readiness reconstruction 56/56, exposure
+  25/25, critical gap detection 2/2 with no false positives, declared-ownership mismatch 1/1,
+  counterfactual simulation 25/25, backup candidates 2/2, evidence grounding 55/55. Report at
+  `data/generated/evaluation_report.md`, with the caveat printed inside it — the generator emits
+  classifiable patterns, so this measures pipeline self-consistency and not real-world accuracy
+  (R-02).
+- **All ten endpoints verified against the shared fixtures** by `scripts/verify_golden_path.py`.
+  Nine fixtures were regenerated from live output; every frozen number survived.
+
+Two bugs were found by tests rather than by inspection: mitigation task ids collided across plans
+because the primary key was global rather than scoped to the plan (DEC-09), and the candidate scoring
+was split across two methods such that the ordering and the displayed band could be computed from
+different numbers.
+
+### Open questions
+
+`RECOMMENDATIONS.md` carries twenty items. The four worth deciding before the README is written:
+R-01 (the AI claim), R-02 (how the 100% figures are quoted), R-03 (no authentication), and R-09 (the
+challenge workflow, now costed at 2-3 hours and the main outstanding scope call).
