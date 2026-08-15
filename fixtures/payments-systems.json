@@ -1,0 +1,24 @@
+{
+  "platform": {
+    "platform_id": "platform_payments",
+    "name": "Payments Platform"
+  },
+  "systems": [
+    {
+      "system_id": "system_payment_gateway",
+      "platform_id": "platform_payments",
+      "name": "Payment Gateway",
+      "description": "Processes customer payment transactions",
+      "business_criticality": "CRITICAL",
+      "continuity_risk_index": 74,
+      "continuity_risk_class": "HIGH",
+      "exposure": "DEGRADED",
+      "evidence_confidence": "HIGH",
+      "critical_gap_count": 0,
+      "degraded_capability_count": 2,
+      "covered_capability_count": 3,
+      "insufficient_evidence_count": 0,
+      "drift_status": "NEW_RISK"
+    }
+  ]
+}

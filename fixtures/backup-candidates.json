@@ -1,0 +1,45 @@
+{
+  "capability": {
+    "capability_id": "cap_incident_recovery",
+    "name": "Incident Recovery"
+  },
+  "candidates": [
+    {
+      "engineer_id": "eng_maria_gomez",
+      "name": "Maria Gomez",
+      "technical_overlap": "HIGH",
+      "strengths": [
+        "Production deployment",
+        "Infrastructure recovery",
+        "Assisted Payment Gateway recovery"
+      ],
+      "gaps": [
+        "Independent Payment Gateway recovery",
+        "Provider failover execution"
+      ],
+      "evidence_confidence": "HIGH",
+      "supporting_evidence_ids": [
+        "evidence_inc_230",
+        "evidence_pr_402"
+      ]
+    },
+    {
+      "engineer_id": "eng_jordan_lee",
+      "name": "Jordan Lee",
+      "technical_overlap": "MEDIUM",
+      "strengths": [
+        "Payment Gateway development",
+        "Retry architecture"
+      ],
+      "gaps": [
+        "Independent production recovery",
+        "Provider failover execution"
+      ],
+      "evidence_confidence": "MEDIUM",
+      "supporting_evidence_ids": [
+        "evidence_pr_391"
+      ]
+    }
+  ],
+  "disclaimer": "Technical overlap only. Workload, availability, staffing priorities, and career goals are not evaluated."
+}

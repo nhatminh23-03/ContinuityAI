@@ -1,0 +1,66 @@
+{
+  "plan_id": "plan_001",
+  "status": "DRAFT",
+  "capability": {
+    "capability_id": "cap_incident_recovery",
+    "name": "Incident Recovery"
+  },
+  "source_engineer": {
+    "engineer_id": "eng_alex_chen",
+    "name": "Alex Chen"
+  },
+  "backup_candidate": {
+    "engineer_id": "eng_maria_gomez",
+    "name": "Maria Gomez"
+  },
+  "target_readiness": "PRACTICED",
+  "tasks": [
+    {
+      "task_id": "task_001",
+      "title": "Review Payment Gateway recovery architecture",
+      "description": "Review the recovery architecture, current runbook, and historical incidents INC-184 and INC-221.",
+      "type": "KNOWLEDGE_REVIEW",
+      "acceptance_criteria": [
+        "Review current recovery architecture",
+        "Review two historical P1 recovery incidents",
+        "Document unresolved questions"
+      ],
+      "linked_evidence_ids": [
+        "evidence_inc_184",
+        "evidence_inc_221"
+      ]
+    },
+    {
+      "task_id": "task_002",
+      "title": "Shadow a Payment Gateway recovery exercise",
+      "description": "Observe the recovery workflow and identify decision points used during restoration.",
+      "type": "SHADOWING",
+      "acceptance_criteria": [
+        "Attend guided recovery exercise",
+        "Identify major recovery decision points"
+      ]
+    },
+    {
+      "task_id": "task_003",
+      "title": "Run provider failover in staging",
+      "description": "Perform a controlled provider failover and restore normal routing.",
+      "type": "PRACTICE",
+      "acceptance_criteria": [
+        "Execute failover in staging",
+        "Verify restored transaction flow",
+        "Document any undocumented steps"
+      ]
+    },
+    {
+      "task_id": "task_004",
+      "title": "Update the recovery runbook",
+      "description": "Capture missing recovery knowledge discovered during the exercise.",
+      "type": "DOCUMENTATION",
+      "acceptance_criteria": [
+        "Add missing recovery steps",
+        "Add rollback guidance",
+        "Submit runbook for review"
+      ]
+    }
+  ]
+}

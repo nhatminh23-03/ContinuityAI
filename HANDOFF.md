@@ -90,3 +90,71 @@ be missed.
 Person A: **A1 — bootstrap FastAPI**, stop when the health endpoint and its test pass.
 
 Before either: read `docs/ENGINEERING_RULES.md`. It replaces re-reading the five specifications.
+
+---
+
+## 2026-08-14 — Application skeletons and contract layer
+
+### Completed
+
+Workflow tasks **A1–A3** and **B1–B3**. Both applications run; everything the frozen contract
+fully determines is generated from it.
+
+- **`fixtures/`** — 10 payloads extracted programmatically from the `API_CONTRACT.md` JSON
+  examples, so they cannot have drifted from the document.
+- **Backend** — FastAPI on Python 3.11, health endpoint, all 10 frozen routes under `/api/v1`
+  returning the shared fixtures, all 19 enums and every DTO group in Pydantic, the §9 error
+  envelope as domain exceptions translated at the API boundary. 13 tests pass.
+- **Frontend** — Next.js 16, TypeScript, Tailwind, React Flow, TanStack Query, Zod.
+  `types/api.ts` mirrors the contract. One API adapter in `lib/api/`; `NEXT_PUBLIC_USE_MOCKS`
+  flips the whole app between fixtures and the live backend with no component change.
+
+### Validation
+
+**The Phase 1 integration gate is already green.** The full golden path was run against the live
+server and all 10 responses are byte-identical to the fixtures the frontend renders — reached
+before either side has written a feature. Both sides check the same fixtures from opposite
+directions: pytest on the backend, `npm run typecheck` compiling fixtures against the TypeScript
+types on the frontend. `npm run build` is clean.
+
+### Decisions made
+
+- **`backend/` was scaffolded without Person A present.** Logged as DEC-04 in `docs/DECISIONS.md`
+  with every library, version, and layout choice listed. It is a starting point, not a claim on
+  Person A's design — replace freely.
+- **All 10 routes set `response_model_exclude_unset=True`.** Without it, 4 of 10 live responses
+  stopped matching their fixtures because unset optional fields serialise as `null` or `[]` where
+  the contract omits them. **Person A: when real engines replace the stubs, an optional field you
+  intend to send must be explicitly set, not left to a default.**
+- **Fixtures are synced into `frontend/public/fixtures/`** by `scripts/sync-fixtures.mjs`, wired
+  to `predev`, `prebuild`, and `pretypecheck`. That copy is generated and gitignored — edit
+  `fixtures/` at the root, never the copy.
+- **Alembic was not added.** `ARCHITECTURE.md` §5.2 marks it optional until the schema stabilises.
+
+### In progress
+
+Nothing.
+
+### Blocked
+
+Nothing. Open items are OPEN-01 (challenge endpoint, Person A, Phase 7) and OPEN-06
+(`last_demonstrated_at` inconsistent between contract §6.4 and the §6.5 example).
+
+### Recommended next task
+
+**Person B — B4: the dashboard shell.** Render Payments Platform and Payment Gateway from
+`api.listPlatforms()` and `api.listPlatformSystems()`. Everything needed exists: types, adapter,
+fixtures, query provider. Stop when both render with loading and error states. Remember the
+frontend renders `continuity_risk_class` — it never derives it from the index.
+
+**Person A — A4: SQLite and the repository layer.** `app/core/config.py` already carries
+`database_url`. Stop when a platform/system seed can be read through a repository.
+
+Before either: read `docs/ENGINEERING_RULES.md`.
+
+### Running it
+
+```bash
+cd backend && .venv/bin/python -m uvicorn app.main:app --reload   # :8000, docs at /docs
+cd frontend && npm run dev                                         # :3000
+```

@@ -66,18 +66,30 @@ development log covering planning, implementation, testing, debugging, and docum
 
 ## Setup
 
-*TODO.*
+Prerequisites: Node 20+ and Python 3.11+ (3.9 will not work — the DTOs use `int | None` syntax).
+
+**Backend** — http://localhost:8000, interactive docs at `/docs`:
 
 ```bash
-# backend
-cd backend && uvicorn app.main:app --reload
-
-# frontend
-cd frontend && npm run dev
+cd backend && python3.11 -m venv .venv && .venv/bin/pip install -r requirements.txt && .venv/bin/python -m uvicorn app.main:app --reload
 ```
 
-Expand with: prerequisites, environment variables, the deterministic seed command, and a
-clean-clone verification walkthrough.
+**Frontend** — http://localhost:3000:
+
+```bash
+cd frontend && npm install && npm run dev
+```
+
+The frontend starts in fixture mode. To point it at the live backend, copy
+`frontend/.env.local.example` to `.env.local` and set `NEXT_PUBLIC_USE_MOCKS=false`.
+
+**Checks:**
+
+```bash
+cd backend && .venv/bin/python -m pytest -q && cd ../frontend && npm run typecheck && npm run build
+```
+
+*TODO before submission:* the deterministic seed command and a clean-clone walkthrough.
 
 ## Demo
 

@@ -106,3 +106,60 @@ intended to stay local.
 `git remote -v` and `git log` verified before and after the initial commit.
 
 **Open questions.** None for this unit.
+
+---
+
+## 2026-08-14 — Frontend and backend skeletons with the contract layer
+
+**What was built.** Both applications now run, and every artefact that the frozen contract fully
+determines has been generated from it rather than written by hand.
+
+*Shared.* The 10 fixture payloads in `fixtures/` were extracted programmatically from the JSON
+examples in `API_CONTRACT.md`, so they cannot drift from the document they came from.
+
+*Backend.* FastAPI application on Python 3.11 with a health endpoint and all 10 frozen routes
+mounted under `/api/v1`, each returning its shared fixture. Pydantic schemas cover all 19 enums
+and every DTO group. The error envelope from contract §9 is implemented as domain exceptions
+translated at the API boundary, so handlers raise `NotFoundError` rather than assembling response
+bodies.
+
+*Frontend.* Next.js 16 with TypeScript, Tailwind, React Flow, TanStack Query, and Zod — the stack
+frozen in `ARCHITECTURE.md` §5.1. `types/api.ts` mirrors the contract. A single API adapter in
+`lib/api/` is the only place the UI touches data; `NEXT_PUBLIC_USE_MOCKS` switches the whole
+application between fixtures and a live backend without a component change. Feature folders were
+created per `ARCHITECTURE.md` §8.
+
+Because the fixtures are shared and live at the repository root, the frontend copies them into
+`public/` through a sync script wired to `predev`, `prebuild`, and `pretypecheck`. The copy is
+generated and ignored; the root directory stays the single source.
+
+**Files created.** `backend/` — `requirements.txt`, `pytest.ini`, `.env.example`, `app/main.py`,
+`app/core/{config,errors,fixtures}.py`, `app/schemas/` (10 modules), `app/api/v1/` (7 modules),
+`tests/` (2 modules). `frontend/` — `types/api.ts`, `lib/api/{client,endpoints,fixtures.contract}.ts`,
+`app/providers.tsx`, `scripts/sync-fixtures.mjs`, `.env.local.example`, feature folders.
+`fixtures/` — 10 JSON payloads.
+
+**Implements.** Workflow tasks A1–A3 and B1–B3 (`TEAM_WORKFLOW_PERSON_A_B.md` §53); the 10 frozen
+endpoints (`API_CONTRACT.md` §7); the error envelope (§9); the shared enums (§5); the mock-first
+frontend strategy (§14); the module layout in `ARCHITECTURE.md` §6, §8 and §14.
+
+**Validation.** Both sides now check the same fixtures independently, from opposite directions.
+
+- 13 backend tests pass. Beyond shape checks, one asserts that the simulation payload's before and
+  after states reconcile against its own capability impact list — 0 critical / 2 degraded /
+  3 covered before, 2 / 1 / 2 after — and another asserts the error envelope returns
+  `NOT_FOUND` for an unknown identifier.
+- `npm run typecheck` compiles the fixtures against the TypeScript contract types, so a fixture
+  that drifts from a type fails the build.
+- The full golden path was run against the live server: all 10 responses are byte-identical to
+  the fixtures the frontend renders. This is the Phase 1 integration gate in `ARCHITECTURE.md`
+  §100, reached before either side has written a feature.
+- `npm run build` compiles clean.
+
+The integration check initially failed on 4 of 10 endpoints. The cause was uniform: unset optional
+fields were being serialised as `null` or empty arrays where the contract omits them. Responses now
+exclude unset fields, which brought all 10 into agreement.
+
+**Open questions.** `API_CONTRACT.md` §6.4 declares `last_demonstrated_at` on `EngineerCoverage`
+while the §6.5 example omits it from nested coverage entries; both sides model it as optional so
+they interoperate, but the document should be made self-consistent.

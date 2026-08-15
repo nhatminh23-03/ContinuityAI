@@ -1,0 +1,38 @@
+{
+  "system_id": "system_payment_gateway",
+  "platform_id": "platform_payments",
+  "name": "Payment Gateway",
+  "description": "Processes customer payment transactions",
+  "business_criticality": "CRITICAL",
+  "continuity_risk_index": 74,
+  "continuity_risk_class": "HIGH",
+  "exposure": "DEGRADED",
+  "evidence_confidence": "HIGH",
+  "critical_gap_count": 0,
+  "degraded_capability_count": 2,
+  "covered_capability_count": 3,
+  "insufficient_evidence_count": 0,
+  "drift_status": "NEW_RISK",
+  "criticality_source": "HUMAN_CONFIRMED",
+  "rules_triggered": [
+    "CRITICAL_CAPABILITY_DEGRADED",
+    "MULTIPLE_SOLE_EXPERT_CAPABILITIES"
+  ],
+  "declared_ownership": {
+    "engineer_id": "eng_jordan_lee",
+    "name": "Jordan Lee",
+    "source": "CODEOWNERS",
+    "mismatch_detected": true
+  },
+  "components": [
+    {
+      "component_id": "component_gateway_integration",
+      "name": "Gateway Integration",
+      "description": "Handles payment-provider connectivity",
+      "capability_ids": [
+        "cap_incident_recovery",
+        "cap_provider_failover"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "capability": {
+    "capability_id": "cap_incident_recovery",
+    "name": "Incident Recovery"
+  },
+  "assessment": {
+    "exposure": "DEGRADED",
+    "evidence_confidence": "HIGH",
+    "rules_triggered": [
+      "CRITICAL_CAPABILITY",
+      "SINGLE_VALIDATED_ENGINEER",
+      "NO_PRACTICED_OR_VALIDATED_BACKUP"
+    ]
+  },
+  "evidence": [
+    {
+      "evidence_id": "evidence_inc_184",
+      "source_type": "INCIDENT",
+      "source_reference": "INC-184",
+      "source_title": "P1 Payment Gateway Provider Failure",
+      "artifact_date": "2026-05-14",
+      "engineer_id": "eng_alex_chen",
+      "system_id": "system_payment_gateway",
+      "component_id": "component_gateway_integration",
+      "capability_id": "cap_incident_recovery",
+      "evidence_role": "INDEPENDENT_EXECUTION",
+      "evidence_strength": "STRONG",
+      "summary": "Alex diagnosed failed provider routing and restored payment processing.",
+      "freshness": "FRESH",
+      "provenance": {
+        "source": "synthetic_incident_dataset",
+        "record_id": "INC-184",
+        "source_url": null
+      }
+    }
+  ],
+  "missing_evidence": [
+    {
+      "engineer_id": "eng_jordan_lee",
+      "engineer_name": "Jordan Lee",
+      "description": "No qualifying independent production recovery evidence found."
+    }
+  ],
+  "conflicting_evidence": [],
+  "declared_vs_demonstrated": {
+    "declared_owner": {
+      "engineer_id": "eng_jordan_lee",
+      "name": "Jordan Lee",
+      "source": "CODEOWNERS"
+    },
+    "strongest_demonstrated_coverage": {
+      "engineer_id": "eng_alex_chen",
+      "name": "Alex Chen"
+    },
+    "mismatch_detected": true
+  }
+}

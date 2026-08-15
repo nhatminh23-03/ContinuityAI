@@ -1,0 +1,59 @@
+{
+  "scope": {
+    "type": "SYSTEM",
+    "id": "system_payment_gateway",
+    "name": "Payment Gateway"
+  },
+  "nodes": [
+    {
+      "id": "system_payment_gateway",
+      "type": "SYSTEM",
+      "label": "Payment Gateway",
+      "status": "DEGRADED",
+      "metadata": {}
+    },
+    {
+      "id": "component_gateway_integration",
+      "type": "COMPONENT",
+      "label": "Gateway Integration",
+      "metadata": {}
+    },
+    {
+      "id": "cap_incident_recovery",
+      "type": "CAPABILITY",
+      "label": "Incident Recovery",
+      "status": "DEGRADED",
+      "metadata": {
+        "operational_criticality": "CRITICAL"
+      }
+    },
+    {
+      "id": "eng_alex_chen",
+      "type": "ENGINEER",
+      "label": "Alex Chen",
+      "metadata": {}
+    }
+  ],
+  "edges": [
+    {
+      "source": "system_payment_gateway",
+      "target": "component_gateway_integration",
+      "type": "HAS_COMPONENT",
+      "metadata": {}
+    },
+    {
+      "source": "component_gateway_integration",
+      "target": "cap_incident_recovery",
+      "type": "REQUIRES_CAPABILITY",
+      "metadata": {}
+    },
+    {
+      "source": "eng_alex_chen",
+      "target": "cap_incident_recovery",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "VALIDATED"
+      }
+    }
+  ]
+}

@@ -253,6 +253,7 @@ An example payload that does not reconcile becomes a fixture that does not recon
 | ID | Item | Owner | Resolve by |
 |---|---|---|---|
 | OPEN-01 | CI-13 challenge workflow — cost the minimal `MANAGER_ATTESTATION` endpoint | Person A | Phase 7 checkpoint |
+| OPEN-06 | `last_demonstrated_at` is on `EngineerCoverage` in §6.4 but absent from the nested coverage entries in the §6.5 example | Both | Next contract touch |
 
 OPEN-02, OPEN-03, OPEN-04, and OPEN-05 were resolved on 2026-08-14 — see DEC-01, DEC-02, the
 CI-06 detailed entry, and DEC-03 respectively.
@@ -261,3 +262,49 @@ OPEN-01 stays open by design: it turns on Person A's implementation cost, which 
 estimated from the specifications alone. The frontend commitment is already firm — no "Challenge
 Assessment" action is built, and the provenance drawer is laid out so the action can be added
 later without rework.
+
+---
+
+### DEC-04 — Backend scaffolded without Person A present
+
+**Date:** 2026-08-14 · **Category:** B (tell your teammate before merging) · **Decided by:** Person B
+
+`backend/` is Person A's ownership and the Phase 1 plan left it empty. Person B chose to scaffold
+it so the API could be run locally and the Phase 1 integration gate proved before Person A starts.
+Everything below is replaceable — this is a starting point, not a claim on Person A's design.
+
+**Libraries added** (`backend/requirements.txt`), all named in `ARCHITECTURE.md` §5.2:
+
+| Package | Version | Why |
+|---|---|---|
+| fastapi | 0.115.6 | HTTP/API layer |
+| uvicorn[standard] | 0.34.0 | ASGI server |
+| pydantic | 2.10.4 | DTO validation |
+| pydantic-settings | 2.7.1 | Env configuration (`ARCHITECTURE.md` §49) |
+| SQLAlchemy | 2.0.36 | Persistence, not yet wired |
+| pytest | 8.3.4 | Tests |
+| httpx | 0.28.1 | Required by fastapi's TestClient |
+
+Alembic is listed in `ARCHITECTURE.md` §5.2 as optional and was **not** added — §5.2 says
+migration tooling can wait until the schema stabilises.
+
+**Module layout** follows `ARCHITECTURE.md` §6 and §14: `app/api/v1/` one module per resource,
+`app/schemas/` one module per DTO group, `app/core/` for config and the error envelope,
+`tests/`. No repository or service layer yet — those arrive with real persistence.
+
+**Python version.** The venv is built on Python 3.11. The machine default `python3` is 3.9.6
+(Xcode's), which is end-of-life and cannot parse the `int | None` syntax the contract's Pydantic
+sketch uses.
+
+**One behavioural choice worth reviewing.** All 10 routes set
+`response_model_exclude_unset=True`. Without it FastAPI serialises unset optional fields as
+`null` or `[]`, and four live responses stopped matching their fixtures — `status` on component
+and engineer graph nodes, `message` on the candidate response, `linked_evidence_ids` on tasks
+that have none, and `last_demonstrated_at` on coverage entries. The contract examples omit those
+fields, so the responses should too. **Person A should note this when real engines replace the
+stubs:** an optional field that is meant to be sent must be explicitly set, not left to a default.
+
+**Contract note.** `API_CONTRACT.md` §6.4 defines `last_demonstrated_at` on `EngineerCoverage`,
+but the §6.5 `CapabilityDetail` example omits it from its nested coverage entries. The field is
+modelled as optional on both sides so the two are compatible, but the contract should be made
+self-consistent. Tracked as OPEN-06.
