@@ -11,12 +11,14 @@ export default async function SystemDetailPage({
   const query = await searchParams;
   const capability = typeof query.capability === 'string' ? query.capability : undefined;
   const engineer = typeof query.engineer === 'string' ? query.engineer : undefined;
+  const focus = typeof query.focus === 'string' ? query.focus : undefined;
   return (
     <SystemDetailView
       systemId={systemId}
       capabilityParam={capability}
       evidenceOpen={query.evidence === '1'}
       engineerParam={engineer}
+      focusParam={focus}
     />
   );
 }

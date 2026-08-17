@@ -11,17 +11,20 @@ import { CapabilityPanel } from './CapabilityPanel';
 import { CoverageCard } from './CoverageCard';
 import { capabilitiesFromGraph, defaultCapabilityId } from './capabilities';
 import { EvidenceDrawer } from '@/features/evidence/EvidenceDrawer';
+import { SystemGraph } from '@/features/graph/SystemGraph';
 
 export function SystemDetailView({
   systemId,
   capabilityParam,
   evidenceOpen = false,
   engineerParam,
+  focusParam,
 }: {
   systemId: string;
   capabilityParam?: string;
   evidenceOpen?: boolean;
   engineerParam?: string;
+  focusParam?: string;
 }) {
   const router = useRouter();
 
@@ -32,6 +35,11 @@ export function SystemDetailView({
   const graphQuery = useQuery({
     queryKey: queryKeys.systemGraph(systemId),
     queryFn: () => api.getSystemGraph(systemId),
+  });
+  const focusedGraphQuery = useQuery({
+    queryKey: queryKeys.systemGraph(systemId, focusParam),
+    queryFn: () => api.getSystemGraph(systemId, focusParam),
+    enabled: Boolean(focusParam),
   });
   const platformsQuery = useQuery({
     queryKey: queryKeys.platforms,
@@ -110,9 +118,27 @@ export function SystemDetailView({
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
-          <div className="frosted-card flex h-80 items-center justify-center p-6">
-            <span className="text-sm text-slate-500">Contextual graph (next unit)</span>
-          </div>
+          <SystemGraph
+            graph={(focusParam && focusedGraphQuery.data) || graph}
+            focusId={focusParam}
+            onCapabilityClick={(id) =>
+              router.replace(
+                focusParam === id
+                  ? `/systems/${systemId}?capability=${id}`
+                  : `/systems/${systemId}?capability=${id}&focus=${id}`,
+                { scroll: false },
+              )
+            }
+            onEvidenceClick={() =>
+              selectedCapabilityId &&
+              router.replace(
+                `/systems/${systemId}?capability=${selectedCapabilityId}${
+                  focusParam ? `&focus=${focusParam}` : ''
+                }&evidence=1`,
+                { scroll: false },
+              )
+            }
+          />
           {selectedCapabilityId ? (
             <CoverageCard
               capabilityId={selectedCapabilityId}
