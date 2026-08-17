@@ -1,0 +1,214 @@
+[
+  {
+    "reference": "DOC-17",
+    "title": "Payment Gateway incident recovery runbook",
+    "body": "Runbook authored by Alex Chen covering gateway recovery: how to confirm the blast radius, how to drain and restart the integration workers, and how to verify that transaction routing has been restored. Rollback guidance is still outstanding.",
+    "date": "2026-06-01",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [
+      "docs/runbooks/gateway-recovery.md"
+    ]
+  },
+  {
+    "reference": "DOC-200",
+    "title": "Authentication Auth Monitoring runbook",
+    "body": "Lena Novak authored this runbook describing Auth Monitoring for Identity Operations, including the verification steps used after a change.",
+    "date": "2025-11-17",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "DOC-201",
+    "title": "Payment Gateway Certificate Management runbook",
+    "body": "Alex Chen authored this runbook describing Certificate Management for Gateway Integration, including the verification steps used after a change.",
+    "date": "2025-11-11",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "DOC-202",
+    "title": "Authentication Credential Verification runbook",
+    "body": "Grace Liu authored this runbook describing Credential Verification for Login Flow, including the verification steps used after a change.",
+    "date": "2026-01-02",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "DOC-203",
+    "title": "Authentication Credential Verification runbook",
+    "body": "Sofia Ruiz authored this runbook describing Credential Verification for Login Flow, including the verification steps used after a change.",
+    "date": "2025-12-24",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "DOC-204",
+    "title": "Billing Integration Export Recovery runbook",
+    "body": "Tom Becker authored this runbook describing Export Recovery for Billing Exports, including the verification steps used after a change.",
+    "date": "2025-11-30",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "DOC-205",
+    "title": "Refund Engine Ledger Reconciliation runbook",
+    "body": "Priya Nair authored this runbook describing Ledger Reconciliation for Refund Ledger, including the verification steps used after a change.",
+    "date": "2025-12-04",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "DOC-206",
+    "title": "Payment Gateway Monitoring runbook",
+    "body": "Lena Novak authored this runbook describing Monitoring for Gateway Operations, including the verification steps used after a change.",
+    "date": "2025-12-31",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "DOC-207",
+    "title": "Payment Gateway Monitoring runbook",
+    "body": "Maria Gomez authored this runbook describing Monitoring for Gateway Operations, including the verification steps used after a change.",
+    "date": "2026-01-10",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "DOC-208",
+    "title": "Billing Integration Payment Reconciliation runbook",
+    "body": "Priya Nair authored this runbook describing Payment Reconciliation for Invoice Sync, including the verification steps used after a change.",
+    "date": "2025-11-23",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "DOC-209",
+    "title": "Authorization Policy Evaluation runbook",
+    "body": "Daniel Kim authored this runbook describing Policy Evaluation for Policy Engine, including the verification steps used after a change.",
+    "date": "2026-01-07",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "DOC-210",
+    "title": "Refund Engine Refund Monitoring runbook",
+    "body": "Lena Novak authored this runbook describing Refund Monitoring for Refund Ledger, including the verification steps used after a change.",
+    "date": "2025-11-05",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "DOC-211",
+    "title": "Payment Gateway Retry Logic runbook",
+    "body": "Alex Chen authored this runbook describing Retry Logic for Transaction Processor, including the verification steps used after a change.",
+    "date": "2025-12-31",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "DOC-212",
+    "title": "Payment Gateway Retry Logic runbook",
+    "body": "Jordan Lee authored this runbook describing Retry Logic for Transaction Processor, including the verification steps used after a change.",
+    "date": "2025-12-08",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "DOC-213",
+    "title": "Billing Integration Tax Calculation runbook",
+    "body": "Tom Becker authored this runbook describing Tax Calculation for Invoice Sync, including the verification steps used after a change.",
+    "date": "2025-11-28",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  }
+]

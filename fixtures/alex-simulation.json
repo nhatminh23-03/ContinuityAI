@@ -66,5 +66,5 @@
       "remaining_best_readiness": "VALIDATED"
     }
   ],
-  "summary": "Alex's unavailability creates two critical capability gaps in Payment Gateway while Retry Logic remains covered."
+  "summary": "Without Alex Chen, Payment Gateway moves from HIGH to CRITICAL: 2 capability gaps (Incident Recovery and Certificate Management) would have no adequate demonstrated coverage; Provider Failover would lose redundancy. Retry Logic and Monitoring remain covered."
 }

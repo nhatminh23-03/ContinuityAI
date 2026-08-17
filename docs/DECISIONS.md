@@ -308,3 +308,326 @@ stubs:** an optional field that is meant to be sent must be explicitly set, not 
 but the §6.5 `CapabilityDetail` example omits it from its nested coverage entries. The field is
 modelled as optional on both sides so the two are compatible, but the contract should be made
 self-consistent. Tracked as OPEN-06.
+
+---
+
+## Implementation decisions — backend build
+
+Made while implementing the backend on **2026-08-15**. Person A decided each one under time
+pressure with the reasoning recorded here rather than deferring; the four marked **needs
+acknowledgement** are contract-visible and should be walked through at the next sync
+(RECOMMENDATIONS.md R-20).
+
+### DEC-05 — `API_CONTRACT.md` reason-code spelling is authoritative
+
+**Date:** 2026-08-15 · **Category:** C · **Needs acknowledgement**
+
+Two spellings existed for the same three concepts:
+
+| `API_CONTRACT.md` section 12.1 | `ARCHITECTURE.md` section 29 |
+|---|---|
+| `SINGLE_VALIDATED_ENGINEER` | `SINGLE_VALIDATED_EXPERT` |
+| `NO_PRACTICED_OR_VALIDATED_BACKUP` | `NO_READY_BACKUP` |
+| `INCOMPLETE_DOCUMENTATION` | `AGING_DOCUMENTATION` |
+
+**Decision.** The contract spelling wins, and the closed list now lives in
+`app/continuity/reason_codes.py` — which is what `API_CONTRACT.md` section 12.1 assigned to Person A
+("Person A owns the closed list of codes").
+
+**Rationale.** The frozen fixtures already used the contract spelling, so the frontend will have
+written display copy against it. Per SR-01 the contract owns the wire format, and these values cross
+the wire.
+
+**Also decided:** index modifiers are **not** reason codes. `rules_triggered` answers "which rules
+decided the classification"; a modifier only nudges the comparison number inside a band it cannot
+leave. Modifiers are persisted separately on the assessment row. Without this split, Incident
+Recovery would return five codes instead of the three in the fixture.
+
+**Documents affected:** `ARCHITECTURE.md` section 29 should be amended to match.
+
+---
+
+### DEC-06 — AI extraction returns per-claim records, not a flat capability array
+
+**Date:** 2026-08-15 · **Category:** C · **Needs acknowledgement**
+
+`ARCHITECTURE.md` section 21 shows extraction returning a list of records, each with its own
+engineer and evidence role. `API_CONTRACT.md` section 10.2 shows a flat array of capability strings
+with a single `engineer_id` and a single `evidence_role` for the whole artifact. They are not
+compatible.
+
+**Decision.** The section 21 shape is implemented (`ArtifactExtraction` in `app/ai/schemas.py`).
+
+**Rationale.** The section 10.2 shape cannot express the hero artifact. INC-230 shows Maria
+assisting while INC-184 shows Alex resolving independently; an artifact with both participants —
+which is the realistic case and the one the demo depends on — would have to discard one role. A
+shape that cannot represent the hero scenario is not a candidate.
+
+**Blast radius: none on the wire.** Extraction output is internal and never crosses the API
+boundary. `API_CONTRACT.md` section 10.2 should be amended to match so the two documents agree.
+
+---
+
+### DEC-07 — Continuity risk class scales with operational criticality
+
+**Date:** 2026-08-15 · **Category:** C · **Needs acknowledgement**
+
+`PRD.md` rule R1 assigns `CRITICAL` class to any CRITICAL-**or-HIGH** capability with no adequate
+coverage. R1b assigns `HIGH` to either with exactly one.
+
+**Decision.** Exposure is unchanged, but the class scales:
+
+| Coverage | CRITICAL capability | HIGH capability |
+|---|---|---|
+| no adequate engineer | `CRITICAL_GAP` / class CRITICAL | `CRITICAL_GAP` / class HIGH |
+| exactly one adequate | `DEGRADED` / class HIGH | `DEGRADED` / class MODERATE |
+
+**Rationale.** Implemented literally, every uncovered capability in the portfolio reads CRITICAL, the
+criticality dimension collapses, and a HIGH capability with a gap becomes indistinguishable from a
+CRITICAL one. It also makes the seeded dashboard unreachable: Refund Engine has one gap on a HIGH
+capability and must read 71 / HIGH for Payment Gateway to remain the top row at 74, which a CRITICAL
+class (band 80-100) forbids.
+
+**Verified unaffected:** exposure values, all gap and degraded counts, and the entire hero scenario —
+both Payment Gateway gaps are on CRITICAL capabilities and still read CRITICAL.
+
+---
+
+### DEC-08 — `SUPPORTED_BY` edges originate at the engineer
+
+**Date:** 2026-08-15 · **Category:** C
+
+The contract's canonical direction is `Coverage --SUPPORTED_BY--> Evidence`, but `GraphNodeType` has
+no `COVERAGE` value, so a coverage relationship has no id to serve as an edge endpoint.
+
+**Decision.** Emit `Engineer --SUPPORTED_BY--> Evidence` with `capability_id` in the edge metadata,
+preserving the full `(engineer, capability, evidence)` triple without adding a node type.
+
+**Rationale.** The alternative is a seventh node type, which is a larger contract change for the same
+information. Evidence nodes are included only when `?focus_capability_id=` is supplied — a whole
+system's evidence would put hundreds of leaves on the canvas.
+
+---
+
+### DEC-09 — Mitigation task ids are scoped to their plan
+
+**Date:** 2026-08-15 · **Category:** A
+
+`mitigation_tasks` now has a composite primary key `(plan_id, task_id)`.
+
+**Rationale.** The contract's task ids are `task_001`, `task_002`, ... within a plan (section 8.9). A
+globally unique key would either force `plan_001_task_001` onto the wire or make the second plan
+collide with the first — which it did, until a test caught it.
+
+---
+
+### Fixture amendments — nine payloads regenerated from live engine output
+
+**Date:** 2026-08-15 · **Category:** C · **Needs acknowledgement**
+
+`scripts/refresh_fixtures.py` now regenerates `fixtures/` from a freshly seeded database, and
+`--check` fails if any fixture is stale. Nine of the ten changed. `platforms.json` was already
+correct.
+
+| Fixture | Change | Why |
+|---|---|---|
+| `payments-systems.json` | 1 → 3 systems | Payments Platform has three systems; the fixture listed one, so `system_count: 3` did not reconcile |
+| `payment-gateway.json` | 1 → 3 components | The single component carried 2 capability ids while the counts summed to 5. All five now belong to a component |
+| `payment-gateway-graph.json` | 4 → 14 nodes, 3 → 25 edges | Was illustrative. Now the real contextual graph, including the `DECLARED_OWNER` edge |
+| `incident-recovery.json` | `last_demonstrated_at` added | **Closes OPEN-06** — the field was declared in section 6.4 but omitted from the section 6.5 example |
+| `incident-recovery-evidence.json` | 1 → 7 evidence records | Was a single illustrative card. Ordered strongest-role first, so `evidence_inc_184` still leads |
+| `alex-simulation.json` | `summary` rewritten | Generated from the deterministic result; names both gaps and both preserved capabilities |
+| `backup-candidates.json` | strengths, gaps, confidence, evidence ids | Now derived from evidence rather than hand-written. Maria's confidence is MEDIUM, not HIGH — see R-14 |
+| `mitigation-plan.json` | task titles, descriptions, criteria | Generated from the capability gap |
+| `mitigation-plan-approved.json` | `approved_at` pinned | A real timestamp would churn the fixture every run |
+
+**Every frozen number survived unchanged:** Incident Recovery 72 / HIGH, Payment Gateway 74 / HIGH
+with 0 critical gaps / 2 degraded / 3 covered, after simulating Alex 93 / CRITICAL with 2 / 1 / 2,
+Payments highest 74, Identity highest 68, Maria HIGH overlap, Jordan MEDIUM. The rule engine
+reproduces all of them from evidence rather than having them asserted — see DEC-01, which required
+exactly that.
+
+---
+
+### OPEN-06 — closed
+
+`last_demonstrated_at` is now always populated on `EngineerCoverage` and present in the fixture. The
+field is optional in both the Pydantic and the TypeScript types, so nothing breaks either way.
+
+### Open items after this build
+
+| ID | Item | Owner | Resolve by |
+|---|---|---|---|
+| OPEN-01 | Challenge / attestation workflow (CI-13, FR-020, AC-11). **Now costed at 2-3 hours** — the recompute path exists and is already used by the seed. See RECOMMENDATIONS.md R-09 | Person A | Decide at the next sync, not at "Phase 7" |
+| OPEN-07 | Runtime AI provider is rule-based. Interface, validation, and prompt specification are model-ready. See R-01 | Person A | Before the README is written |
+| OPEN-08 | No real public GitHub data ingested, against the section 14.1 commitment. Adapter exists. See R-07 | Person A | Before submission, or amend the PRD |
+
+---
+
+## Implementation decisions — closing the remaining backend scope
+
+Made on **2026-08-17**. Four are contract-visible and need Person B's acknowledgement; the fifth is
+a data-strategy decision with a privacy dimension worth reading.
+
+### DEC-10 — An eleventh endpoint, for the challenge workflow
+
+**Date:** 2026-08-17 · **Category:** C · **Needs acknowledgement** · **Closes OPEN-01 / CI-13**
+
+`POST /api/v1/capabilities/{capability_id}/challenge` is added. The contract froze ten endpoints and
+`API_CONTRACT.md` section 7 says an eleventh requires both developers, so this is logged rather than
+assumed.
+
+**Why build it now.** `FR-020`, `AC-11`, user scenario S5, the `AssessmentChallenge` domain entity,
+and `PRD.md` section 21 all depend on it, and there is no way to satisfy them without a write path.
+CI-13 deferred the costing to "the Phase 7 checkpoint" — which, at the current pace, arrives after
+the deadline, so the deferral was quietly turning into an omission rather than a decision.
+
+**Why it is now cheap.** When it was deferred, the objection was that the full workflow "re-runs
+extraction, aggregation, readiness, and risk on demand — the most expensive unbuilt feature in the
+register". That is no longer true: `app/services/recompute.py` already does exactly that, and the
+seed already exercises it on every run. The endpoint is a thin layer over tested machinery.
+
+**Three actions**, matching PRD section 21:
+
+| Action | Behaviour |
+|---|---|
+| `LINK_EVIDENCE` | Attach an artifact extraction missed. The manager references an existing artifact; they cannot invent one, and the engineer must be a recorded participant of it |
+| `MANAGER_ATTESTATION` | Record something no artifact captured, as evidence with `source_type=MANAGER_ATTESTATION`, capped at MODERATE strength |
+| `CORRECT_CAPABILITY_MAPPING` | Move an evidence record to the capability it belongs to. Both capabilities are recomputed |
+
+**The rule the design enforces.** A manager changes *evidence*, never a score. `ChallengeRequest`
+has no field for readiness, exposure, confidence, or a risk index, and a test asserts their absence.
+Previous and new assessments are both persisted: a correctable assessment that cannot be audited is
+worse than one that cannot be corrected, because nobody can later ask why it moved.
+
+**Attestation is capped at MODERATE** whatever role is claimed. A MODERATE record never contributes
+to the strong-source diversity `VALIDATED` requires, so no quantity of assertions can manufacture a
+validated expert — the abuse case that would make the whole evidence model decorative. It can
+establish `ASSISTED` or contribute to `PRACTICED`, which is the point: a manager who watched someone
+do the work can say so. Implements DOMAIN_MODEL.md section 34's "lower evidentiary weight" as a
+mechanism rather than a sentence.
+
+**Additive.** Nothing that previously worked changes. The frontend can adopt it whenever the
+provenance drawer is ready for a "Challenge Assessment" action; until then the endpoint is simply
+unused.
+
+---
+
+### DEC-11 — `index_modifiers` on `CapabilityDetail`
+
+**Date:** 2026-08-17 · **Category:** C · **Needs acknowledgement**
+
+An optional array of `{code, delta}` is added, exposing the arithmetic behind the Continuity Risk
+Index. Incident Recovery returns:
+
+```json
+"index_modifiers": [
+  { "code": "SOLE_ADEQUATE_ENGINEER", "delta": 1 },
+  { "code": "BEST_ALTERNATIVE_ASSISTED", "delta": 1 }
+]
+```
+
+Read with the class anchor of 70, that is the whole derivation of 72.
+
+**Rationale.** `rules_triggered` already answers "which rules fired", but the number itself was
+reproducible without being inspectable. PRD section 30 lists "risk score appears arbitrary" as a high
+severity risk, and showing the arithmetic is the strongest available answer to it. The data was
+already computed and persisted; only the transport was missing.
+
+Optional and additive, so it costs the frontend nothing until it is rendered.
+
+---
+
+### DEC-12 — `missing_evidence` widened to everyone below PRACTICED
+
+**Date:** 2026-08-17 · **Category:** C · **Needs acknowledgement**
+
+Previously a "no qualifying evidence found" note was emitted only for engineers below `ASSISTED`,
+which in the hero scenario meant Jordan alone.
+
+**Decision.** Emit for anyone below `PRACTICED`.
+
+**Rationale.** Maria is `ASSISTED` and is the leading backup candidate, and "has assisted but has no
+independent recovery evidence" is precisely what a manager choosing a backup needs to read. Omitting
+it made the Why drawer least informative about the person the decision is actually about.
+
+`fixtures/incident-recovery-evidence.json` gains one entry. The wording remains descriptive —
+"No qualifying independent incident recovery evidence found" — never evaluative.
+
+---
+
+### DEC-13 — Optional bearer authentication, off by default
+
+**Date:** 2026-08-17 · **Category:** C · **Closes part of R-03**
+
+`API_TOKEN` is unset by default, and with it unset every endpoint is open exactly as before. When
+set, `/api/v1` requires `Authorization: Bearer <token>`; `/health` is never gated so a container can
+report ready.
+
+**Rationale.** `ARCHITECTURE.md` section 50 descopes enterprise IAM, correctly. But the product
+serves per-person capability assessments and "the manager approves the plan" rested on a
+caller-supplied `approved_by` string, so shipping with no option at all left a responsible-AI claim
+resting on nothing. A single shared token is honest about being a demo control rather than
+pretending to be authorisation, and defaulting it off means the frontend developer never has to
+coordinate a secret to run the demo.
+
+Deliberately not attempted: per-user identity, roles, sessions, token rotation.
+
+---
+
+### DEC-14 — Real public GitHub evidence is ingested with pseudonymised identities
+
+**Date:** 2026-08-17 · **Category:** C · **Closes R-07**
+
+120 merged pull requests and reviews from a public repository are fetched, normalised, committed
+under `data/public/`, and ingested through the same pipeline as the synthetic corpus. This satisfies
+the second half of the PRD section 14.1 hybrid data strategy.
+
+**Contributor identities are pseudonymised** onto the synthetic organisation, and the real logins are
+never written to disk — including `@mentions` scrubbed out of pull request bodies, because bodies
+routinely name other contributors.
+
+**Rationale, and it is substantive rather than procedural.** This product infers capability readiness
+about named people. Doing that to real engineers who never consented, from a repository they do not
+work on, mapped onto an invented company, is precisely the behaviour the responsible-AI boundary in
+PRD section 22 exists to prevent. PRD section 14.1 anticipated this and asked for public evidence to
+be "normalized/anonymized".
+
+Artifacts stay fully traceable — `source_url` points at the real pull request, so any conclusion can
+be checked against its source. What is synthetic is the attribution, and the manifest states so
+rather than leaving it to be discovered. Bots are excluded: automated codegen authors a large share
+of real pull requests, and counting it as demonstrated human capability would be a measurement error.
+
+**Pseudonyms deliberately exclude Alex, Maria, Jordan and Omar.** Those four carry the seeded hero
+coverage that the frozen fixtures and the hidden ground truth both depend on, and mixing unlabelled
+real activity into a labelled pair would corrupt the evaluation rather than add to it.
+
+**The finding worth carrying into the README.** Exactly one of the 120 real artifacts produced
+capability evidence. A public SDK repository's vocabulary is library maintenance — support, error
+handling, tests, packaging — while the capabilities this product assesses are demonstrated in private
+operational records: incidents, runbooks, on-call history. That is evidence *for* the hybrid data
+strategy, and a concrete measurement of the rule-based extractor's ceiling (R-01).
+
+---
+
+### Fixture amendments — three payloads
+
+`incident-recovery.json` gains `index_modifiers` (DEC-11). `incident-recovery-evidence.json` gains a
+`missing_evidence` entry for Maria (DEC-12). `payment-gateway-graph.json` gains one `DEMONSTRATES`
+edge — Lena Novak on Retry Logic at `EXPOSED / STALE / LOW`, derived from the real public pull
+request, which is a nice illustration that old third-party activity reads as stale low-confidence
+exposure rather than as capability.
+
+All three changes are additive. **Every frozen number is unchanged**: Incident Recovery 72 / HIGH,
+Payment Gateway 74 / HIGH with 0 critical gaps / 2 degraded / 3 covered, the simulation 74 → 93 and
+HIGH → CRITICAL with 2 / 1 / 2, Payments highest 74, Identity highest 68, Maria HIGH overlap, Jordan
+MEDIUM.
+
+### Open items after this build
+
+| ID | Item | Owner | Resolve by |
+|---|---|---|---|
+| OPEN-07 | Runtime AI provider is rule-based. Interface, validation, and prompt specification are model-ready; a provider and credential are needed. See R-01 | Both | Before the demo is recorded |
+| OPEN-09 | `ARCHITECTURE.md` section 29 and `API_CONTRACT.md` section 10.2 still carry the superseded reason-code spelling and extraction shape (DEC-05, DEC-06). Amend for self-consistency | Both | Next contract touch |
+
+OPEN-01 is closed by DEC-10. OPEN-08 is closed by DEC-14. OPEN-06 was closed by the previous build.

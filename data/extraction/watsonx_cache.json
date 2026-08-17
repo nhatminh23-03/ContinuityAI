@@ -1,0 +1,4394 @@
+{
+  "entries": {
+    "artifact_doc_200": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_doc_200",
+        "claims": [
+          {
+            "capability_id": "cap_auth_monitoring",
+            "engineer_id": "eng_lena_novak",
+            "evidence_role": "KNOWLEDGE_CAPTURE",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The document title and body explicitly state that Lena Novak authored the runbook describing Auth Monitoring, indicating she captured the knowledge.",
+            "summary": "Lena Novak authored the Auth Monitoring runbook, capturing knowledge of verification steps for Identity Operations."
+          }
+        ],
+        "component_id": "component_identity_operations",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "8aabb2326c0a47ea"
+    },
+    "artifact_doc_201": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_doc_201",
+        "claims": [
+          {
+            "capability_id": "cap_certificate_management",
+            "engineer_id": "eng_alex_chen",
+            "evidence_role": "KNOWLEDGE_CAPTURE",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The artifact explicitly states that Alex Chen authored the runbook describing Certificate Management, which directly matches the capability and shows knowledge capture.",
+            "summary": "Alex Chen authored a runbook on Certificate Management for Gateway Integration, demonstrating knowledge capture of the process."
+          }
+        ],
+        "component_id": "component_gateway_integration",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "71cdd3d6ad0268f1"
+    },
+    "artifact_doc_202": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_doc_202",
+        "claims": [
+          {
+            "capability_id": "cap_credential_verification",
+            "engineer_id": "eng_grace_liu",
+            "evidence_role": "KNOWLEDGE_CAPTURE",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The document title and body explicitly state that Grace Liu authored the runbook describing Credential Verification for Login Flow, including the verification steps used after a change.",
+            "summary": "Grace Liu authored the Authentication Credential Verification runbook, capturing knowledge of the verification steps used after a change."
+          }
+        ],
+        "component_id": "component_login_flow",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "f821bf8394657f96"
+    },
+    "artifact_doc_203": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_doc_203",
+        "claims": [
+          {
+            "capability_id": "cap_credential_verification",
+            "engineer_id": "eng_sofia_ruiz",
+            "evidence_role": "KNOWLEDGE_CAPTURE",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The document title and body explicitly state that Sofia Ruiz authored the runbook describing Credential Verification for Login Flow.",
+            "summary": "Sofia Ruiz authored the Authentication Credential Verification runbook, demonstrating knowledge capture of credential verification processes."
+          }
+        ],
+        "component_id": "component_login_flow",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "4b073e49b7321f1e"
+    },
+    "artifact_doc_207": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_doc_207",
+        "claims": [
+          {
+            "capability_id": "cap_monitoring",
+            "engineer_id": "eng_maria_gomez",
+            "evidence_role": "KNOWLEDGE_CAPTURE",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The artifact is a runbook authored by Maria Gomez that describes Monitoring for Gateway Operations, indicating she captured knowledge about monitoring procedures.",
+            "summary": "Maria Gomez authored the Payment Gateway Monitoring runbook, demonstrating knowledge capture of monitoring procedures for gateway operations."
+          }
+        ],
+        "component_id": "component_gateway_operations",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "08703c66f790de73"
+    },
+    "artifact_doc_209": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_doc_209",
+        "claims": [
+          {
+            "capability_id": "cap_policy_evaluation",
+            "engineer_id": "eng_daniel_kim",
+            "evidence_role": "KNOWLEDGE_CAPTURE",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The document title and body explicitly state that Daniel Kim authored the runbook describing Policy Evaluation.",
+            "summary": "Daniel Kim authored the Authorization Policy Evaluation runbook, capturing knowledge of policy evaluation procedures."
+          }
+        ],
+        "component_id": "component_policy_engine",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "7df8f5cb0f7f946e"
+    },
+    "artifact_doc_210": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_doc_210",
+        "claims": [
+          {
+            "capability_id": "cap_refund_monitoring",
+            "engineer_id": "eng_lena_novak",
+            "evidence_role": "KNOWLEDGE_CAPTURE",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The document is titled 'Refund Engine Refund Monitoring runbook' and states that Lena Novak authored it, describing verification steps for Refund Ledger changes.",
+            "summary": "Lena Novak authored the Refund Monitoring runbook, capturing knowledge of the verification steps for Refund Ledger changes."
+          }
+        ],
+        "component_id": "component_refund_ledger",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "d1bb8e2d80c2712c"
+    },
+    "artifact_doc_211": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_doc_211",
+        "claims": [
+          {
+            "capability_id": "cap_retry_logic",
+            "engineer_id": "eng_alex_chen",
+            "evidence_role": "KNOWLEDGE_CAPTURE",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The artifact is a runbook authored by Alex Chen that describes Retry Logic for Transaction Processor, including verification steps after a change.",
+            "summary": "Alex Chen authored the Payment Gateway Retry Logic runbook, demonstrating knowledge capture of retry logic for the Transaction Processor."
+          }
+        ],
+        "component_id": "component_transaction_processor",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "a6e2edf8a224f98f"
+    },
+    "artifact_doc_212": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_doc_212",
+        "claims": [
+          {
+            "capability_id": "cap_retry_logic",
+            "engineer_id": "eng_jordan_lee",
+            "evidence_role": "KNOWLEDGE_CAPTURE",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The artifact is a runbook authored by Jordan Lee that describes Retry Logic for Transaction Processor, including verification steps after a change.",
+            "summary": "Jordan Lee authored the Payment Gateway Retry Logic runbook, capturing the retry logic and verification steps for Transaction Processor."
+          }
+        ],
+        "component_id": "component_transaction_processor",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "beedbe5440681549"
+    },
+    "artifact_doc_213": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_doc_213",
+        "claims": [
+          {
+            "capability_id": "cap_tax_calculation",
+            "engineer_id": "eng_tom_becker",
+            "evidence_role": "KNOWLEDGE_CAPTURE",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The document is titled 'Billing Integration Tax Calculation runbook' and explicitly states that Tom Becker authored it, describing the Tax Calculation process and verification steps.",
+            "summary": "Tom Becker authored a runbook that captures the Tax Calculation process for Invoice Sync and the verification steps used after changes."
+          }
+        ],
+        "component_id": "component_invoice_sync",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "f4d46ce45e9d35f5"
+    },
+    "artifact_inc_184": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_184",
+        "claims": [
+          {
+            "capability_id": "cap_incident_recovery",
+            "engineer_id": "eng_alex_chen",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident description states Alex was paged, traced the fault, restarted workers, and restored routing without escalation.",
+            "summary": "Alex Chen independently recovered the payment gateway after a provider failure by diagnosing a connection pool stall and restarting workers."
+          }
+        ],
+        "component_id": "component_gateway_integration",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "178e49cfad60ded2"
+    },
+    "artifact_inc_221": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_221",
+        "claims": [
+          {
+            "capability_id": "cap_incident_recovery",
+            "engineer_id": "eng_alex_chen",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident description states Alex Chen 'diagnosed a misapplied routing weight, corrected it, and confirmed transaction routing had recovered' and 'Handled single-handedly during the out-of-hours window.'",
+            "summary": "Alex Chen independently diagnosed and corrected a misapplied routing weight, restoring transaction routing during a P1 payment gateway outage."
+          }
+        ],
+        "component_id": "component_gateway_integration",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "b0c25da4666f16fb"
+    },
+    "artifact_inc_230": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_230",
+        "claims": [
+          {
+            "capability_id": "cap_incident_recovery",
+            "engineer_id": "eng_maria_gomez",
+            "evidence_role": "ASSISTED_EXECUTION",
+            "evidence_strength": "MODERATE",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident body states 'Maria Gomez joined the response and assisted with gateway recovery, working through the checks with the lead responder rather than driving the restoration.'",
+            "summary": "Maria Gomez assisted with payment gateway recovery during the incident, working through checks with the lead responder rather than driving the restoration."
+          }
+        ],
+        "component_id": "component_gateway_integration",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "f539e6f8f6311b31"
+    },
+    "artifact_inc_259": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_259",
+        "claims": [
+          {
+            "capability_id": "cap_policy_rollback",
+            "engineer_id": "eng_daniel_kim",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": true,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident title and body explicitly state that Daniel Kim attempted Policy Rollback, and the incident was handed off unresolved, indicating independent execution of the rollback attempt.",
+            "summary": "Daniel Kim attempted a Policy Rollback after a bad policy release, but the incident remained unresolved due to decision cache issues."
+          }
+        ],
+        "component_id": "component_policy_engine",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "366ac6e87adcb50c"
+    },
+    "artifact_inc_302": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_302",
+        "claims": [
+          {
+            "capability_id": "cap_auth_monitoring",
+            "engineer_id": "eng_lena_novak",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident title and body state that Lena Novak was paged, diagnosed the fault, and carried out Auth Monitoring to restore service without escalation or a second responder.",
+            "summary": "Lena Novak independently diagnosed the Auth Monitoring failure and restored service without escalation."
+          }
+        ],
+        "component_id": "component_identity_operations",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "a892c97fdad790c2"
+    },
+    "artifact_inc_304": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_304",
+        "claims": [
+          {
+            "capability_id": "cap_certificate_management",
+            "engineer_id": "eng_alex_chen",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident title and body state that Alex Chen diagnosed the fault and carried out Certificate Management to restore service without escalation or a second responder.",
+            "summary": "Alex Chen performed Certificate Management to restore the payment gateway service."
+          }
+        ],
+        "component_id": "component_gateway_integration",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "45923ffce61e9a0b"
+    },
+    "artifact_inc_306": {
+      "extraction": {
+        "ambiguity": [
+          "discarded uncited claim for cap_credential_verification/eng_grace_liu"
+        ],
+        "artifact_id": "artifact_inc_306",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "a9d998eac0b35bce"
+    },
+    "artifact_inc_307": {
+      "extraction": {
+        "ambiguity": [
+          "discarded uncited claim for cap_credential_verification/eng_sofia_ruiz"
+        ],
+        "artifact_id": "artifact_inc_307",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "5c05a3f2907b8cf4"
+    },
+    "artifact_inc_308": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_308",
+        "claims": [
+          {
+            "capability_id": "cap_credential_verification",
+            "engineer_id": "eng_sofia_ruiz",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident title and body state that Sofia was paged, diagnosed the fault, and carried out credential verification to restore service without escalation or a second responder.",
+            "summary": "Sofia Ruiz independently diagnosed the credential verification failure in the login flow and restored service without escalation."
+          }
+        ],
+        "component_id": "component_login_flow",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "232a5c7dd75a1dbf"
+    },
+    "artifact_inc_317": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_317",
+        "claims": [
+          {
+            "capability_id": "cap_invoice_generation",
+            "engineer_id": "eng_tom_becker",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident body states that Tom Becker 'carried out Invoice Generation' and that the work was 'Completed without escalation or a second responder.'",
+            "summary": "Tom Becker independently executed Invoice Generation to restore service after diagnosing the fault in Invoice Sync."
+          }
+        ],
+        "component_id": "component_invoice_sync",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "62e5c303d1105206"
+    },
+    "artifact_inc_318": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_318",
+        "claims": [
+          {
+            "capability_id": "cap_ledger_reconciliation",
+            "engineer_id": "eng_priya_nair",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident title and body state that Priya Nair diagnosed the fault in Refund Ledger and carried out Ledger Reconciliation to restore service without escalation or a second responder.",
+            "summary": "Priya Nair independently performed Ledger Reconciliation to resolve a P1 refund engine failure."
+          }
+        ],
+        "component_id": "component_refund_ledger",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "efb8e385e7edbd96"
+    },
+    "artifact_inc_320": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_320",
+        "claims": [
+          {
+            "capability_id": "cap_ledger_reconciliation",
+            "engineer_id": "eng_tom_becker",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident title and body state that Tom Becker diagnosed the fault in Refund Ledger and carried out Ledger Reconciliation without escalation or a second responder.",
+            "summary": "Tom Becker independently performed Ledger Reconciliation to resolve a P1 refund engine failure."
+          }
+        ],
+        "component_id": "component_refund_ledger",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "f5594f4c14ca5336"
+    },
+    "artifact_inc_321": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_321",
+        "claims": [
+          {
+            "capability_id": "cap_mfa_enrollment",
+            "engineer_id": "eng_daniel_kim",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident body states that Daniel Kim 'diagnosed the fault in Login Flow, and carried out MFA Enrollment to restore service' without mentioning any other person's involvement.",
+            "summary": "Daniel Kim independently diagnosed the MFA Enrollment failure and restored service by performing the enrollment."
+          }
+        ],
+        "component_id": "component_login_flow",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "2627ee32bf93ad6f"
+    },
+    "artifact_inc_322": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_322",
+        "claims": [
+          {
+            "capability_id": "cap_mfa_enrollment",
+            "engineer_id": "eng_grace_liu",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident title and body state that Grace Liu diagnosed the fault, carried out MFA Enrollment, and completed the work without escalation or a second responder.",
+            "summary": "Grace Liu independently executed MFA Enrollment to restore service after diagnosing the fault in the Login Flow."
+          }
+        ],
+        "component_id": "component_login_flow",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "9c7d9a5d699cdca0"
+    },
+    "artifact_inc_326": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_326",
+        "claims": [
+          {
+            "capability_id": "cap_monitoring",
+            "engineer_id": "eng_lena_novak",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident description states that Lena Novak was paged, diagnosed the fault in Gateway Operations, and carried out Monitoring to restore service without escalation or a second responder.",
+            "summary": "Lena Novak independently restored service by diagnosing and fixing the monitoring failure for the payment gateway."
+          }
+        ],
+        "component_id": "component_gateway_operations",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "ca435776429b21fd"
+    },
+    "artifact_inc_328": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_328",
+        "claims": [
+          {
+            "capability_id": "cap_monitoring",
+            "engineer_id": "eng_maria_gomez",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident description states that Maria Gomez 'diagnosed the fault in Gateway Operations, and carried out Monitoring to restore service' and that the work was 'Completed without escalation or a second responder.'",
+            "summary": "Maria Gomez independently restored service by diagnosing and fixing the monitoring failure in the payment gateway."
+          }
+        ],
+        "component_id": "component_gateway_operations",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "6563721249dfc550"
+    },
+    "artifact_inc_329": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_329",
+        "claims": [
+          {
+            "capability_id": "cap_partial_refund",
+            "engineer_id": "eng_omar_haddad",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident title and body explicitly state that Omar Haddad diagnosed the fault and carried out Partial Refund Handling to restore service without escalation or a second responder.",
+            "summary": "Omar Haddad independently diagnosed and resolved a Partial Refund Handling failure in the Refund Engine."
+          }
+        ],
+        "component_id": "component_refund_orchestration",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "87ea47b1b8c7ddeb"
+    },
+    "artifact_inc_330": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_330",
+        "claims": [
+          {
+            "capability_id": "cap_partial_refund",
+            "engineer_id": "eng_priya_nair",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident title and body explicitly state that Priya Nair diagnosed the fault and carried out Partial Refund Handling without escalation or a second responder.",
+            "summary": "Priya Nair independently executed Partial Refund Handling to restore service after diagnosing a fault in Refund Orchestration."
+          }
+        ],
+        "component_id": "component_refund_orchestration",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "f1374db5f2ed062b"
+    },
+    "artifact_inc_332": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_332",
+        "claims": [
+          {
+            "capability_id": "cap_payment_reconciliation",
+            "engineer_id": "eng_priya_nair",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: Priya Nair was paged, diagnosed the fault in Invoice Sync, and carried out Payment Reconciliation to restore service. Completed without escalation or a second responder.",
+            "summary": "Priya Nair independently executed Payment Reconciliation to restore service after diagnosing a fault in Invoice Sync."
+          }
+        ],
+        "component_id": "component_invoice_sync",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "537c263a1065d19e"
+    },
+    "artifact_inc_335": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_335",
+        "claims": [
+          {
+            "capability_id": "cap_policy_evaluation",
+            "engineer_id": "eng_daniel_kim",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident title and body state that Daniel Kim was paged, diagnosed the fault in Policy Engine, and carried out Policy Evaluation to restore service without escalation or a second responder.",
+            "summary": "Daniel Kim independently diagnosed the Policy Engine fault and executed Policy Evaluation to restore service."
+          }
+        ],
+        "component_id": "component_policy_engine",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "3a82b6541e02e39a"
+    },
+    "artifact_inc_336": {
+      "extraction": {
+        "ambiguity": [
+          "discarded uncited claim for cap_policy_evaluation/eng_sofia_ruiz"
+        ],
+        "artifact_id": "artifact_inc_336",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "cda56174c42e3245"
+    },
+    "artifact_inc_339": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_339",
+        "claims": [
+          {
+            "capability_id": "cap_provider_failover",
+            "engineer_id": "eng_maria_gomez",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident record states that Maria Gomez diagnosed the fault, carried out Provider Failover, and completed the recovery without escalation or a second responder.",
+            "summary": "Maria Gomez independently executed Provider Failover to restore the payment gateway service."
+          }
+        ],
+        "component_id": "component_gateway_integration",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "e219b1306e18a575"
+    },
+    "artifact_inc_342": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_342",
+        "claims": [
+          {
+            "capability_id": "cap_refund_monitoring",
+            "engineer_id": "eng_lena_novak",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident title and body state that Lena was paged, diagnosed the fault in Refund Ledger, and carried out Refund Monitoring to restore service without escalation or a second responder.",
+            "summary": "Lena Novak independently restored Refund Monitoring after diagnosing a Refund Ledger fault."
+          }
+        ],
+        "component_id": "component_refund_ledger",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "87ff7b5f4e75e24a"
+    },
+    "artifact_inc_343": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_343",
+        "claims": [
+          {
+            "capability_id": "cap_refund_monitoring",
+            "engineer_id": "eng_lena_novak",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident title and body state that Lena Novak was paged, diagnosed the fault, and carried out Refund Monitoring without escalation or a second responder.",
+            "summary": "Lena Novak independently executed Refund Monitoring to restore service after diagnosing the fault in Refund Ledger."
+          }
+        ],
+        "component_id": "component_refund_ledger",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "14b3595266b4b044"
+    },
+    "artifact_inc_345": {
+      "extraction": {
+        "ambiguity": [
+          "discarded uncited claim for cap_refund_reversal/eng_priya_nair"
+        ],
+        "artifact_id": "artifact_inc_345",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "5f3ea7a55e1948f4"
+    },
+    "artifact_inc_346": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_346",
+        "claims": [
+          {
+            "capability_id": "cap_retry_logic",
+            "engineer_id": "eng_alex_chen",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident description states that Alex Chen diagnosed the fault and carried out Retry Logic without escalation or a second responder.",
+            "summary": "Alex Chen independently executed Retry Logic to restore the payment gateway after diagnosing the Transaction Processor fault."
+          }
+        ],
+        "component_id": "component_transaction_processor",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "aa8d11a5f6b9660d"
+    },
+    "artifact_inc_349": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_349",
+        "claims": [
+          {
+            "capability_id": "cap_retry_logic",
+            "engineer_id": "eng_jordan_lee",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: Jordan Lee was paged, diagnosed the fault in Transaction Processor, and carried out Retry Logic to restore service. Completed without escalation or a second responder.",
+            "summary": "Jordan Lee independently executed Retry Logic to restore the payment gateway after diagnosing the fault in Transaction Processor."
+          }
+        ],
+        "component_id": "component_transaction_processor",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "4084ef3bb15363c9"
+    },
+    "artifact_inc_350": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_350",
+        "claims": [
+          {
+            "capability_id": "cap_retry_logic",
+            "engineer_id": "eng_omar_haddad",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident description states that Omar Haddad 'diagnosed the fault in Transaction Processor, and carried out Retry Logic to restore service' without mentioning any other person's involvement.",
+            "summary": "Omar Haddad independently executed Retry Logic to restore the payment gateway service after diagnosing the fault in Transaction Processor."
+          }
+        ],
+        "component_id": "component_transaction_processor",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "2818eefcbb70d138"
+    },
+    "artifact_inc_351": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_351",
+        "claims": [
+          {
+            "capability_id": "cap_role_assignment",
+            "engineer_id": "eng_daniel_kim",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident title and body state that Daniel Kim diagnosed the fault in Role Management and carried out Role Assignment without escalation or a second responder.",
+            "summary": "Daniel Kim independently performed a Role Assignment to restore service after diagnosing a Role Management fault."
+          }
+        ],
+        "component_id": "component_role_management",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "6dab15501fb0651b"
+    },
+    "artifact_inc_353": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_inc_353",
+        "claims": [
+          {
+            "capability_id": "cap_session_recovery",
+            "engineer_id": "eng_sofia_ruiz",
+            "evidence_role": "ASSISTED_EXECUTION",
+            "evidence_strength": "MODERATE",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The incident body states 'Sofia Ruiz joined the response and assisted with Session Recovery ... following the lead responder's direction rather than driving the restoration.'",
+            "summary": "Sofia Ruiz assisted with Session Recovery during the P2 authentication incident, following the lead responder's direction."
+          }
+        ],
+        "component_id": "component_session_management",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "79a0d7c3fc70cde8"
+    },
+    "artifact_iss_803": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_803",
+        "claims": [
+          {
+            "capability_id": "cap_refund_reversal",
+            "engineer_id": "eng_omar_haddad",
+            "evidence_role": "EXPOSURE",
+            "evidence_strength": "WEAK",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The artifact records Omar Haddad as a COMMENTER on a discussion about Refund Reversal behavior.",
+            "summary": "Omar Haddad reviewed a discussion about Refund Reversal behavior in Refund Orchestration."
+          }
+        ],
+        "component_id": "component_refund_orchestration",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "25e949198593fadc"
+    },
+    "artifact_iss_804": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_804",
+        "claims": [
+          {
+            "capability_id": "cap_retry_logic",
+            "engineer_id": "eng_maria_gomez",
+            "evidence_role": "EXPOSURE",
+            "evidence_strength": "WEAK",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The comment indicates Maria Gomez reviewed and discussed Retry Logic behaviour, but there is no evidence of implementation, execution, or operational work.",
+            "summary": "Maria Gomez commented on a discussion about Retry Logic behaviour in Transaction Processor."
+          }
+        ],
+        "component_id": "component_transaction_processor",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "6c7490349aa2c958"
+    },
+    "artifact_iss_805": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_805",
+        "claims": [
+          {
+            "capability_id": "cap_session_recovery",
+            "engineer_id": "eng_daniel_kim",
+            "evidence_role": "EXPOSURE",
+            "evidence_strength": "WEAK",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The comment records Daniel Kim commenting on a discussion about Session Recovery behaviour.",
+            "summary": "Daniel Kim exposed knowledge of Session Recovery behavior during a discussion."
+          }
+        ],
+        "component_id": "component_session_management",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "51a688a5ac289fba"
+    },
+    "artifact_iss_806": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_806",
+        "claims": [
+          {
+            "capability_id": "cap_token_rotation",
+            "engineer_id": "eng_grace_liu",
+            "evidence_role": "EXPOSURE",
+            "evidence_strength": "WEAK",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: Grace Liu commented on a discussion about Token Rotation behaviour in Session Management.",
+            "summary": "Grace Liu exposed knowledge of Token Rotation behavior by commenting on the discussion."
+          }
+        ],
+        "component_id": "component_session_management",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "3bbdf3b919087859"
+    },
+    "artifact_iss_807": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not specify which capability (policy evaluation, policy rollback, role assignment, or permission audit) the flaky test relates to, so no capability can be confidently assigned."
+        ],
+        "artifact_id": "artifact_iss_807",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "68bbab2919802484"
+    },
+    "artifact_iss_808": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_808",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "27ee5f247cd15f73"
+    },
+    "artifact_iss_809": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_809",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "bf131442e1be6ca4"
+    },
+    "artifact_iss_810": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide evidence of any capability listed in the CAPABILITIES list. It describes a routine maintenance change with no operational significance, which does not demonstrate incident recovery, provider failover, certificate management, retry logic, or monitoring."
+        ],
+        "artifact_id": "artifact_iss_810",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "97cd2f78c36b4c92"
+    },
+    "artifact_iss_812": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_812",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "688b9efed75f9f2c"
+    },
+    "artifact_iss_813": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_813",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "134ecbdcc556a237"
+    },
+    "artifact_iss_814": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_814",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "3330fd333c15f2da"
+    },
+    "artifact_iss_816": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_816",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "d8686515925bb828"
+    },
+    "artifact_iss_817": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_817",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "f4a1906dd5d22f66"
+    },
+    "artifact_iss_818": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_818",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "44f8b6cf3024f3af"
+    },
+    "artifact_iss_819": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states a routine maintenance change with no operational significance, so no capability from the list is demonstrated."
+        ],
+        "artifact_id": "artifact_iss_819",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "1ebe40895a8dc885"
+    },
+    "artifact_iss_822": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide enough detail to determine whether the change targeted any of the listed capabilities (policy evaluation, policy rollback, role assignment, permission audit)."
+        ],
+        "artifact_id": "artifact_iss_822",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "3a16d8c600cd490f"
+    },
+    "artifact_iss_823": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_823",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "82bfad9242085486"
+    },
+    "artifact_iss_824": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_824",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "b947bdd514a30199"
+    },
+    "artifact_iss_826": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability beyond routine maintenance. No operational capability (invoice generation, tax calculation, payment reconciliation, export scheduling, or export recovery) is demonstrated."
+        ],
+        "artifact_id": "artifact_iss_826",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "3ee8ef66e69a1c49"
+    },
+    "artifact_iss_827": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability being exercised or demonstrated."
+        ],
+        "artifact_id": "artifact_iss_827",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "c43f7ef98f9816e2"
+    },
+    "artifact_iss_828": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_828",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "86bcdb73cdda83a2"
+    },
+    "artifact_iss_829": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only describes a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_iss_829",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "d5a2b90dfc0819d6"
+    },
+    "artifact_iss_833": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_833",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "250c0878fd297e3e"
+    },
+    "artifact_iss_834": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide evidence of any capability listed in CAPABILITIES. It only describes a routine maintenance change (deleting a deprecated feature flag) with no operational significance."
+        ],
+        "artifact_id": "artifact_iss_834",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "f0562f64f4a3dce2"
+    },
+    "artifact_iss_836": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_836",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "e644364d3b853fb4"
+    },
+    "artifact_iss_837": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability being exercised by Alex Chen. The description indicates a routine maintenance change with no operational significance, which does not map to any of the defined capabilities."
+        ],
+        "artifact_id": "artifact_iss_837",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "c7025d9b6fe3143d"
+    },
+    "artifact_iss_838": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_838",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "e0a84dae0d228ed6"
+    },
+    "artifact_iss_839": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_839",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "e03ff721a5eaeb19"
+    },
+    "artifact_iss_841": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not demonstrate any of the listed capabilities. It is a routine maintenance change (adding a type annotation) with no operational significance."
+        ],
+        "artifact_id": "artifact_iss_841",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "9a2d3f2c092c5d08"
+    },
+    "artifact_iss_842": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_842",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "c26cf1362f39d078"
+    },
+    "artifact_iss_843": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_843",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "f3753bfaed6de989"
+    },
+    "artifact_iss_845": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_845",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "0f0f590da9e82a0e"
+    },
+    "artifact_iss_846": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_846",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "12c89fb58d5080cd"
+    },
+    "artifact_iss_847": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_847",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "7ce113351dba08a8"
+    },
+    "artifact_iss_848": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_848",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "d9ccf044dfdf6ceb"
+    },
+    "artifact_iss_849": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states that Lena Novak performed routine maintenance with no operational significance. It does not provide evidence of any specific capability being exercised."
+        ],
+        "artifact_id": "artifact_iss_849",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "d8262fbe25de946d"
+    },
+    "artifact_iss_851": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not demonstrate any of the listed capabilities (invoice generation, tax calculation, payment reconciliation, export scheduling, export recovery). It is a routine maintenance change with no operational significance."
+        ],
+        "artifact_id": "artifact_iss_851",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "ba97a443c8e5cddf"
+    },
+    "artifact_iss_852": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not specify which capability was addressed, only that it was a routine maintenance change related to a flaky test in CI for Authorization. No capability_id from the list can be confidently matched."
+        ],
+        "artifact_id": "artifact_iss_852",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "0112fef31880832e"
+    },
+    "artifact_iss_854": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact describes a routine maintenance change (deleting a deprecated feature flag) with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_iss_854",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "2175bab36246b65e"
+    },
+    "artifact_iss_856": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_856",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "dff3d57a7875041c"
+    },
+    "artifact_iss_857": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide enough detail to determine whether the change targeted any of the listed capabilities (policy evaluation, policy rollback, role assignment, permission audit)."
+        ],
+        "artifact_id": "artifact_iss_857",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "d46c7ee11f1a1acd"
+    },
+    "artifact_iss_858": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_858",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "e100f13dbc957180"
+    },
+    "artifact_iss_859": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_iss_859",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "e32f1f556297de74"
+    },
+    "artifact_iss_862": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_862",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "e8f08f4d4fd98da6"
+    },
+    "artifact_iss_863": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_863",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "4b07c5ea23bd82bf"
+    },
+    "artifact_iss_865": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_865",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "0277b638c185ca69"
+    },
+    "artifact_iss_866": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_866",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "e86e92e6f3c18083"
+    },
+    "artifact_iss_869": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states that Omar Haddad made a routine maintenance change with no operational significance. It does not provide evidence of any specific capability being demonstrated."
+        ],
+        "artifact_id": "artifact_iss_869",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "0fe2f8bef4a8b15e"
+    },
+    "artifact_iss_870": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_870",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "d9ef5fe7c153db9a"
+    },
+    "artifact_iss_871": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_871",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "177fc5e8cc9b25e7"
+    },
+    "artifact_iss_872": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability being exercised or demonstrated."
+        ],
+        "artifact_id": "artifact_iss_872",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "695b95ca95af6ebb"
+    },
+    "artifact_iss_874": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_874",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "e012daf6663ed83f"
+    },
+    "artifact_iss_876": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_876",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "64c3afbd2d29607e"
+    },
+    "artifact_iss_877": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_877",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "05fc14f007fb730a"
+    },
+    "artifact_iss_878": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_878",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "594b898514e674b7"
+    },
+    "artifact_iss_879": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_879",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "a0c9f37d5c49a7df"
+    },
+    "artifact_iss_880": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_880",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "b51e77d64b4f79c8"
+    },
+    "artifact_iss_881": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability from the CAPABILITIES list. It only states that Alex Chen made a routine maintenance change with no operational significance."
+        ],
+        "artifact_id": "artifact_iss_881",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "bfe1b5c20a14ec4b"
+    },
+    "artifact_iss_882": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability being exercised or demonstrated."
+        ],
+        "artifact_id": "artifact_iss_882",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "74f209247b25f4d2"
+    },
+    "artifact_iss_883": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_883",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "4c702a948edd2026"
+    },
+    "artifact_iss_884": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_884",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "17381eb499565551"
+    },
+    "artifact_iss_885": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_885",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "685c74d70e56d71d"
+    },
+    "artifact_iss_886": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_886",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "c676c2c47d03004c"
+    },
+    "artifact_iss_887": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact indicates a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_iss_887",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "70eb67f8a085eee9"
+    },
+    "artifact_iss_888": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_888",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "3942cd0049e539a9"
+    },
+    "artifact_iss_889": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_iss_889",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "2972cef29a167e08"
+    },
+    "artifact_iss_893": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_893",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "cdd569cf86c0b31c"
+    },
+    "artifact_iss_895": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_895",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "cbdbe03581fc2dad"
+    },
+    "artifact_iss_896": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not demonstrate any of the listed capabilities. It is a routine maintenance change (adding a type annotation) with no operational significance."
+        ],
+        "artifact_id": "artifact_iss_896",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "218adca77946db30"
+    },
+    "artifact_iss_899": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_iss_899",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "61e1b0f0e4602afb"
+    },
+    "artifact_iss_900": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_900",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "bd54547243a3aea8"
+    },
+    "artifact_iss_901": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_901",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "b1068b91aa27c735"
+    },
+    "artifact_iss_902": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide enough detail to determine whether the change affected any of the listed capabilities (policy evaluation, policy rollback, role assignment, permission audit)."
+        ],
+        "artifact_id": "artifact_iss_902",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "c69c476171cc4049"
+    },
+    "artifact_iss_903": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_903",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "bb70e56561b8ad0c"
+    },
+    "artifact_iss_904": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states that Lena Novak performed routine maintenance with no operational significance. It does not provide evidence of any capability from the CAPABILITIES list."
+        ],
+        "artifact_id": "artifact_iss_904",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "c0cdcd936389dda5"
+    },
+    "artifact_iss_905": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_iss_905",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "0984ab8d388efd85"
+    },
+    "artifact_issue_77": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_issue_77",
+        "claims": [
+          {
+            "capability_id": "cap_incident_recovery",
+            "engineer_id": "eng_jordan_lee",
+            "evidence_role": "EXPOSURE",
+            "evidence_strength": "WEAK",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: Jordan Lee commented on the ordering of steps during gateway recovery and asked whether the drain step could be automated.",
+            "summary": "Jordan Lee exposed knowledge of incident recovery ordering by commenting on the sequence of steps during gateway recovery and questioning the automation of the drain step."
+          }
+        ],
+        "component_id": "component_gateway_integration",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "9e3d5b2c8bf653df"
+    },
+    "artifact_pr_402": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_402",
+        "claims": [
+          {
+            "capability_id": "cap_incident_recovery",
+            "engineer_id": "eng_maria_gomez",
+            "evidence_role": "CONTRIBUTION",
+            "evidence_strength": "MODERATE",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The PR title and description explicitly state that Maria Gomez authored a change to the gateway integration health probes to detect a half\u2011open connection pool before it affects incident recovery.",
+            "summary": "Maria Gomez implemented health\u2011probe logic that detects a half\u2011open connection pool before it can interfere with incident recovery."
+          }
+        ],
+        "component_id": "component_gateway_integration",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "2102280cf6885348"
+    },
+    "artifact_pr_500": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_500",
+        "claims": [
+          {
+            "capability_id": "cap_auth_monitoring",
+            "engineer_id": "eng_daniel_kim",
+            "evidence_role": "CONTRIBUTION",
+            "evidence_strength": "MODERATE",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title explicitly states 'Auth Monitoring: correctness fix' and the body attributes the change to Daniel Kim.",
+            "summary": "Daniel Kim contributed a correctness fix to the Auth Monitoring component in Identity Operations."
+          }
+        ],
+        "component_id": "component_identity_operations",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "d6ee166e478a1e6d"
+    },
+    "artifact_pr_501": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_501",
+        "claims": [
+          {
+            "capability_id": "cap_directory_sync",
+            "engineer_id": "eng_daniel_kim",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title states 'Directory Sync: correctness fix' and the body attributes the change to Daniel Kim, indicating he performed the work independently.",
+            "summary": "Daniel Kim implemented a correctness fix for Directory Sync in Identity Operations."
+          }
+        ],
+        "component_id": "component_identity_operations",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "e9550e742c54ccf4"
+    },
+    "artifact_pr_502": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_502",
+        "claims": [
+          {
+            "capability_id": "cap_directory_sync",
+            "engineer_id": "eng_grace_liu",
+            "evidence_role": "KNOWLEDGE_CAPTURE",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title and body explicitly state that Grace Liu authored the change affecting Directory Sync.",
+            "summary": "Grace Liu authored a correctness fix for Directory Sync in Identity Operations."
+          }
+        ],
+        "component_id": "component_identity_operations",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "966fa389e0388ccd"
+    },
+    "artifact_pr_503": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_503",
+        "claims": [
+          {
+            "capability_id": "cap_export_recovery",
+            "engineer_id": "eng_lena_novak",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title explicitly states 'Export Recovery: correctness fix' and the body attributes the change to Lena Novak.",
+            "summary": "Lena Novak implemented a correctness fix for Export Recovery in Billing Exports."
+          }
+        ],
+        "component_id": "component_billing_exports",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "6ddac4d206dba353"
+    },
+    "artifact_pr_504": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_504",
+        "claims": [
+          {
+            "capability_id": "cap_export_scheduling",
+            "engineer_id": "eng_omar_haddad",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title states 'Export Scheduling: correctness fix in Billing Exports' and the body attributes the change to Omar Haddad.",
+            "summary": "Omar Haddad implemented a correctness fix for Export Scheduling in Billing Exports."
+          }
+        ],
+        "component_id": "component_billing_exports",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "de025eb99d9b8dd4"
+    },
+    "artifact_pr_505": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_505",
+        "claims": [
+          {
+            "capability_id": "cap_export_scheduling",
+            "engineer_id": "eng_tom_becker",
+            "evidence_role": "CONTRIBUTION",
+            "evidence_strength": "MODERATE",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title explicitly states 'Export Scheduling: correctness fix in Billing Exports' and the body confirms Tom Becker authored the change.",
+            "summary": "Tom Becker contributed a correctness fix to the Export Scheduling component in Billing Exports."
+          }
+        ],
+        "component_id": "component_billing_exports",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "dddf0036ed57a44b"
+    },
+    "artifact_pr_507": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_507",
+        "claims": [
+          {
+            "capability_id": "cap_ledger_reconciliation",
+            "engineer_id": "eng_tom_becker",
+            "evidence_role": "KNOWLEDGE_CAPTURE",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title explicitly states 'Ledger Reconciliation: correctness fix in Refund Ledger' and the body attributes the change to Tom Becker.",
+            "summary": "Tom Becker authored a correctness fix for Ledger Reconciliation in the Refund Ledger service."
+          }
+        ],
+        "component_id": "component_refund_ledger",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "06d0f5341d1aef31"
+    },
+    "artifact_pr_508": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_508",
+        "claims": [
+          {
+            "capability_id": "cap_mfa_enrollment",
+            "engineer_id": "eng_daniel_kim",
+            "evidence_role": "CONTRIBUTION",
+            "evidence_strength": "MODERATE",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title explicitly states 'MFA Enrollment: correctness fix in Login Flow' and the body attributes the change to Daniel Kim.",
+            "summary": "Daniel Kim contributed a correctness fix to the MFA Enrollment component of the Login Flow."
+          }
+        ],
+        "component_id": "component_login_flow",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "cd71fde690815700"
+    },
+    "artifact_pr_509": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_509",
+        "claims": [
+          {
+            "capability_id": "cap_mfa_enrollment",
+            "engineer_id": "eng_grace_liu",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title explicitly states 'MFA Enrollment: correctness fix in Login Flow' and the body confirms Grace Liu authored the change.",
+            "summary": "Grace Liu implemented a correctness fix in the MFA Enrollment component of the Login Flow."
+          }
+        ],
+        "component_id": "component_login_flow",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "6404cce32fa49230"
+    },
+    "artifact_pr_511": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_511",
+        "claims": [
+          {
+            "capability_id": "cap_partial_refund",
+            "engineer_id": "eng_omar_haddad",
+            "evidence_role": "CONTRIBUTION",
+            "evidence_strength": "MODERATE",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title explicitly states 'Partial Refund Handling: correctness fix in Refund Orchestration' and the body attributes the change to Omar Haddad.",
+            "summary": "Omar Haddad implemented a correctness fix for Partial Refund Handling in Refund Orchestration."
+          }
+        ],
+        "component_id": "component_refund_orchestration",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "fbe2881de83a9a45"
+    },
+    "artifact_pr_512": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_512",
+        "claims": [
+          {
+            "capability_id": "cap_partial_refund",
+            "engineer_id": "eng_priya_nair",
+            "evidence_role": "CONTRIBUTION",
+            "evidence_strength": "MODERATE",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: Priya Nair authored this change affecting Partial Refund Handling in Refund Orchestration.",
+            "summary": "Priya Nair implemented a correctness fix for Partial Refund Handling in Refund Orchestration."
+          }
+        ],
+        "component_id": "component_refund_orchestration",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "8691036f3d7a4391"
+    },
+    "artifact_pr_513": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_513",
+        "claims": [
+          {
+            "capability_id": "cap_payment_reconciliation",
+            "engineer_id": "eng_tom_becker",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title explicitly states 'Payment Reconciliation: correctness fix in Invoice Sync' and the body attributes the change to Tom Becker.",
+            "summary": "Tom Becker implemented a correctness fix in the Payment Reconciliation component of Invoice Sync."
+          }
+        ],
+        "component_id": "component_invoice_sync",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "b3685c9f70da2f67"
+    },
+    "artifact_pr_514": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_514",
+        "claims": [
+          {
+            "capability_id": "cap_policy_evaluation",
+            "engineer_id": "eng_sofia_ruiz",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title explicitly states 'Policy Evaluation: correctness fix in Policy Engine' and the body confirms Sofia Ruiz authored the change.",
+            "summary": "Sofia Ruiz independently fixed a correctness issue in the Policy Evaluation component of the Policy Engine."
+          }
+        ],
+        "component_id": "component_policy_engine",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "c8b5614d6ad14cbb"
+    },
+    "artifact_pr_516": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_516",
+        "claims": [
+          {
+            "capability_id": "cap_provider_failover",
+            "engineer_id": "eng_alex_chen",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title and body explicitly state that Alex Chen authored a change affecting Provider Failover, indicating independent execution of the work.",
+            "summary": "Alex Chen implemented a correctness fix for Provider Failover in Gateway Integration."
+          }
+        ],
+        "component_id": "component_gateway_integration",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "f7947a2eb858cbea"
+    },
+    "artifact_pr_517": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_517",
+        "claims": [
+          {
+            "capability_id": "cap_provider_failover",
+            "engineer_id": "eng_maria_gomez",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title and body explicitly state that Maria Gomez authored a change affecting Provider Failover, indicating she implemented the fix.",
+            "summary": "Maria Gomez implemented a correctness fix for Provider Failover in Gateway Integration."
+          }
+        ],
+        "component_id": "component_gateway_integration",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "3a78de82de2a717a"
+    },
+    "artifact_pr_518": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_518",
+        "claims": [
+          {
+            "capability_id": "cap_refund_batch_recovery",
+            "engineer_id": "eng_omar_haddad",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title explicitly states 'Refund Batch Recovery: correctness fix in Refund Ledger' and the body attributes the change to Omar Haddad.",
+            "summary": "Omar Haddad implemented a correctness fix for Refund Batch Recovery in the Refund Ledger service."
+          }
+        ],
+        "component_id": "component_refund_ledger",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "69c9924d4faf924f"
+    },
+    "artifact_pr_519": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_519",
+        "claims": [
+          {
+            "capability_id": "cap_refund_monitoring",
+            "engineer_id": "eng_omar_haddad",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title explicitly states 'Refund Monitoring: correctness fix in Refund Ledger' and the body attributes the change to Omar Haddad.",
+            "summary": "Omar Haddad implemented a correctness fix in the Refund Monitoring component of the Refund Ledger service."
+          }
+        ],
+        "component_id": "component_refund_ledger",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "86a7a5ad2d74c227"
+    },
+    "artifact_pr_520": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_520",
+        "claims": [
+          {
+            "capability_id": "cap_retry_logic",
+            "engineer_id": "eng_omar_haddad",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title and body explicitly state that Omar Haddad authored a change affecting Retry Logic in the Transaction Processor.",
+            "summary": "Omar Haddad implemented a correctness fix for Retry Logic in the Transaction Processor."
+          }
+        ],
+        "component_id": "component_transaction_processor",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "eeeba18f923ba3bf"
+    },
+    "artifact_pr_521": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_521",
+        "claims": [
+          {
+            "capability_id": "cap_role_assignment",
+            "engineer_id": "eng_daniel_kim",
+            "evidence_role": "CONTRIBUTION",
+            "evidence_strength": "MODERATE",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title explicitly states 'Role Assignment: correctness fix in Role Management' and the body mentions Daniel Kim authored the change.",
+            "summary": "Daniel Kim contributed a correctness fix to the Role Assignment component in Role Management."
+          }
+        ],
+        "component_id": "component_role_management",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "d79026e67c5fdaaa"
+    },
+    "artifact_pr_522": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_522",
+        "claims": [
+          {
+            "capability_id": "cap_role_assignment",
+            "engineer_id": "eng_grace_liu",
+            "evidence_role": "KNOWLEDGE_CAPTURE",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The pull request title explicitly states the change is a 'Role Assignment: correctness fix' and the body attributes the work to Grace Liu, indicating she captured the knowledge of the role assignment capability.",
+            "summary": "Grace Liu authored a correctness fix for Role Assignment in Role Management, demonstrating knowledge capture of the role assignment capability."
+          }
+        ],
+        "component_id": "component_role_management",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "cbe19aed846884a1"
+    },
+    "artifact_pr_526": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact describes a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_pr_526",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "24b7d56baba9ab06"
+    },
+    "artifact_pr_528": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact is a routine maintenance change (README update) that does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_pr_528",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "b3370daa87e2db7c"
+    },
+    "artifact_pr_530": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_530",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "52dfe9ea5b1fe43a"
+    },
+    "artifact_pr_535": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_535",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "f36209e159d8b8d4"
+    },
+    "artifact_pr_545": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_545",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "98679355bb4e2db6"
+    },
+    "artifact_pr_550": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_550",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "beefb266e43a4b6c"
+    },
+    "artifact_pr_555": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_555",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "53ff0a5aedddc612"
+    },
+    "artifact_pr_559": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states that Lena Novak made a routine maintenance change with no operational significance. It does not specify which capability, if any, the change relates to, and the lack of operational impact means it does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_pr_559",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "9222b792ce656392"
+    },
+    "artifact_pr_560": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_560",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "8a539d23a63aa827"
+    },
+    "artifact_pr_564": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability being exercised."
+        ],
+        "artifact_id": "artifact_pr_564",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "1ba30ac91eec4b4c"
+    },
+    "artifact_pr_565": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_565",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "e9ecb8bddbe17a5c"
+    },
+    "artifact_pr_566": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact is a routine maintenance change with no operational significance, so it does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_pr_566",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "f041fb758b646d5f"
+    },
+    "artifact_pr_567": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not contain any evidence of a capability from the provided list. It only states that Jordan Lee made a routine maintenance change with no operational significance."
+        ],
+        "artifact_id": "artifact_pr_567",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "14f20322f8e3f721"
+    },
+    "artifact_pr_568": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_568",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "436f8e2dd561d419"
+    },
+    "artifact_pr_570": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_570",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "d299be01009af8f9"
+    },
+    "artifact_pr_578": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_578",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "f1cbaddddc877876"
+    },
+    "artifact_pr_591": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_591",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "d9d310cba97d095a"
+    },
+    "artifact_pr_595": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_595",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "0d609e92f1bfbf73"
+    },
+    "artifact_pr_597": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact explicitly states the change was routine maintenance with no operational significance, so it demonstrates no capability from the list."
+        ],
+        "artifact_id": "artifact_pr_597",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "40f7aa5ce7d86d7a"
+    },
+    "artifact_pr_600": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_600",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "2db9f2fcc7b04c58"
+    },
+    "artifact_pr_601": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact is a routine maintenance change with no operational significance, so it demonstrates no capability from the provided list."
+        ],
+        "artifact_id": "artifact_pr_601",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "4aea45a0bcb0f005"
+    },
+    "artifact_pr_602": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not describe any change to a capability listed in the CAPABILITIES list. It only states that Alex Chen made a routine maintenance change with no operational significance. Therefore, there is no evidence of any capability being demonstrated."
+        ],
+        "artifact_id": "artifact_pr_602",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "4c3591ad89673838"
+    },
+    "artifact_pr_606": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact describes a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_pr_606",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "9e5d04dec9d32977"
+    },
+    "artifact_pr_611": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_611",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "fab3e1f157e96fda"
+    },
+    "artifact_pr_612": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_612",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "632b478c94e0bfca"
+    },
+    "artifact_pr_613": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact is a routine maintenance change with no operational significance, so it does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_pr_613",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "0e5c0729963a347c"
+    },
+    "artifact_pr_614": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide evidence of any capability from the CAPABILITIES list. It is a routine maintenance change (typo correction) with no operational significance, so no capability can be demonstrated."
+        ],
+        "artifact_id": "artifact_pr_614",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "5af00f526b731f78"
+    },
+    "artifact_pr_618": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states that Sofia Ruiz performed a routine maintenance change with no operational significance. It does not provide evidence of any specific capability being exercised or demonstrated."
+        ],
+        "artifact_id": "artifact_pr_618",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "51c063796e4d76d9"
+    },
+    "artifact_pr_619": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact is a routine maintenance change (typo fix) that demonstrates no operational capability. No capability from the list matches this type of work."
+        ],
+        "artifact_id": "artifact_pr_619",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "c5816f595ebbe035"
+    },
+    "artifact_pr_620": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_pr_620",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "0c283fd5434f8571"
+    },
+    "artifact_rev_702": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_702",
+        "claims": [
+          {
+            "capability_id": "cap_policy_rollback",
+            "engineer_id": "eng_grace_liu",
+            "evidence_role": "EXPOSURE",
+            "evidence_strength": "WEAK",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The artifact is a code review of a change to Policy Rollback, and the participant's role is REVIEWER.",
+            "summary": "Grace Liu reviewed a change to Policy Rollback in Policy Engine and left comments."
+          }
+        ],
+        "component_id": "component_policy_engine",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "cbfc5c358e6fc638"
+    },
+    "artifact_rev_705": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_705",
+        "claims": [
+          {
+            "capability_id": "cap_retry_logic",
+            "engineer_id": "eng_maria_gomez",
+            "evidence_role": "EXPOSURE",
+            "evidence_strength": "WEAK",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The artifact states that Maria Gomez reviewed the change and left comments, with no execution involved.",
+            "summary": "Maria Gomez reviewed a change to Retry Logic in Transaction Processor and left comments."
+          }
+        ],
+        "component_id": "component_transaction_processor",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "b60d605fa8801ecb"
+    },
+    "artifact_rev_711": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_711",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "f278f6f30de91e2a"
+    },
+    "artifact_rev_712": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_712",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "c44371984c3434e1"
+    },
+    "artifact_rev_713": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_713",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "3e43338f376a091c"
+    },
+    "artifact_rev_714": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability beyond routine maintenance."
+        ],
+        "artifact_id": "artifact_rev_714",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "fbe7610c8867dbc4"
+    },
+    "artifact_rev_715": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact is a routine maintenance change with no operational significance, so it does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_rev_715",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "9916075a19914ee6"
+    },
+    "artifact_rev_718": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_718",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "eadb3b7e935857f3"
+    },
+    "artifact_rev_719": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_719",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "20db2c49ff46048c"
+    },
+    "artifact_rev_724": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide enough detail to determine whether the change targeted any of the listed capabilities. The title mentions a Billing Integration, but no specific capability (e.g., invoice generation, tax calculation, etc.) is identified."
+        ],
+        "artifact_id": "artifact_rev_724",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "6bdb3c5e8054e8c9"
+    },
+    "artifact_rev_726": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_726",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "23f70a106a46af1e"
+    },
+    "artifact_rev_727": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact is a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_rev_727",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "b78fbd7fe3c9a16c"
+    },
+    "artifact_rev_728": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_728",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "2c2822c679e1ff2e"
+    },
+    "artifact_rev_729": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_729",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "721eb850b08f13b7"
+    },
+    "artifact_rev_731": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_731",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "dcda25ae07e3a2bb"
+    },
+    "artifact_rev_733": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide evidence of any capability listed in the CAPABILITIES list. It describes a routine maintenance change (removal of an unused configuration flag) that has no operational significance, so no capability can be demonstrated."
+        ],
+        "artifact_id": "artifact_rev_733",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "a80882b86e58715d"
+    },
+    "artifact_rev_735": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact indicates a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_rev_735",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "84b237e50f933843"
+    },
+    "artifact_rev_737": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_737",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "faeda4b468d85e25"
+    },
+    "artifact_rev_738": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact indicates a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_rev_738",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "18f457d7edc9b387"
+    },
+    "artifact_rev_739": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability from the CAPABILITIES list. It only states that Maria Gomez made a routine maintenance change with no operational significance."
+        ],
+        "artifact_id": "artifact_rev_739",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "545060a96809e920"
+    },
+    "artifact_rev_741": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_741",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "68a0357035261e63"
+    },
+    "artifact_rev_743": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_743",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "e3c50c975afc1af2"
+    },
+    "artifact_rev_744": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact is a routine maintenance change with no operational significance, so it does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_rev_744",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "09426044bd9a2881"
+    },
+    "artifact_rev_745": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact indicates a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_rev_745",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "427bc1c4bdccbf2d"
+    },
+    "artifact_rev_746": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_746",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "2999bc68f8e1e118"
+    },
+    "artifact_rev_747": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states that Sarah Whitfield made a routine maintenance change with no operational significance. It does not provide any evidence of Sarah performing any of the listed capabilities (refund reversal, partial refund handling, ledger reconciliation, refund batch recovery, or refund monitoring). Therefore, no claims can be made about Sarah's capabilities based on this artifact."
+        ],
+        "artifact_id": "artifact_rev_747",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "ae2d3c17aba23eee"
+    },
+    "artifact_rev_749": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact is a routine maintenance change (type annotation) with no operational significance, so it demonstrates no capability from the provided list."
+        ],
+        "artifact_id": "artifact_rev_749",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "1f03b3baf70d2573"
+    },
+    "artifact_rev_750": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact describes a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_rev_750",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "5d32fadfda84cea4"
+    },
+    "artifact_rev_752": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_752",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "e78bea3ce629558f"
+    },
+    "artifact_rev_753": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_753",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "6ce0590ecb5a21ce"
+    },
+    "artifact_rev_754": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of operational capability; it is a routine maintenance change with no operational significance."
+        ],
+        "artifact_id": "artifact_rev_754",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "f364dcd5a7aa0ce5"
+    },
+    "artifact_rev_755": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states that Lena Novak made a routine maintenance change with no operational significance. It does not provide evidence of any specific capability being demonstrated."
+        ],
+        "artifact_id": "artifact_rev_755",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "625e7276e23ece11"
+    },
+    "artifact_rev_757": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_757",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "ddae90a8d3e20bac"
+    },
+    "artifact_rev_759": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states that Sofia Ruiz made a routine maintenance change with no operational significance. It does not provide enough detail to determine whether the change relates to any of the listed capabilities or to assess Sofia's role beyond the recorded PARTICIPANT_ROLE of AUTHOR."
+        ],
+        "artifact_id": "artifact_rev_759",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "c29786de01718baf"
+    },
+    "artifact_rev_760": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact describes a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_rev_760",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "c85cbd4a80a29db7"
+    },
+    "artifact_rev_763": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_763",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "f26786b0e594eee9"
+    },
+    "artifact_rev_764": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_764",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "8562bfc4cace91c9"
+    },
+    "artifact_rev_766": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_766",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "4c82930a06f59968"
+    },
+    "artifact_rev_768": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_768",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "420d7c91df7b08e9"
+    },
+    "artifact_rev_769": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide enough detail to determine whether the change targeted any of the listed capabilities. The title mentions a Billing Integration, but no specific capability (e.g., invoice generation, tax calculation, payment reconciliation, export scheduling, or export recovery) is described."
+        ],
+        "artifact_id": "artifact_rev_769",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "8c08aee692835654"
+    },
+    "artifact_rev_770": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide evidence of any capability from the CAPABILITIES list. It only states that Sofia Ruiz made a routine maintenance change with no operational significance."
+        ],
+        "artifact_id": "artifact_rev_770",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "8c0facdf896e072c"
+    },
+    "artifact_rev_771": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_771",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "5c70ebdb6f887a2a"
+    },
+    "artifact_rev_772": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_772",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "573c4328eeab827c"
+    },
+    "artifact_rev_773": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_773",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "e7e9826fe4c0001a"
+    },
+    "artifact_rev_774": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_774",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "836e872a740fdef1"
+    },
+    "artifact_rev_775": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact indicates a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_rev_775",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "f8573c3186938ee6"
+    },
+    "artifact_rev_776": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_776",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "7611fc1dfb88a11e"
+    },
+    "artifact_rev_780": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact indicates a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_rev_780",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "89b21f7c1d67e30b"
+    },
+    "artifact_rev_781": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_781",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "7df57960c614d867"
+    },
+    "artifact_rev_782": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact is a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_rev_782",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "04feeb9e354072db"
+    },
+    "artifact_rev_783": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_783",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "fd044cdf741575e6"
+    },
+    "artifact_rev_784": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_784",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "e914c0c018e75857"
+    },
+    "artifact_rev_786": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_786",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "b5f1ca9021ef605d"
+    },
+    "artifact_rev_787": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_787",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "907b36817615b241"
+    },
+    "artifact_rev_788": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide evidence of any capability from the CAPABILITIES list. It describes a routine maintenance change with no operational significance, which does not demonstrate incident recovery, provider failover, certificate management, retry logic, or monitoring."
+        ],
+        "artifact_id": "artifact_rev_788",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "557ea873111b7797"
+    },
+    "artifact_rev_789": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability beyond routine maintenance. No operational capability (invoice generation, tax calculation, payment reconciliation, export scheduling, or export recovery) is demonstrated."
+        ],
+        "artifact_id": "artifact_rev_789",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "da4ab1d38af1f4a1"
+    },
+    "artifact_rev_790": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_790",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "832092c9fc8b2ac4"
+    },
+    "artifact_rev_791": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_791",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "c9501d4f83799d7a"
+    },
+    "artifact_rev_792": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_792",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "5f76fc452aa757de"
+    },
+    "artifact_rev_793": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_793",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "17760a99ad718d51"
+    },
+    "artifact_rev_794": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states that Maria Gomez made a routine maintenance change with no operational significance. It does not provide any evidence of Maria Gomez demonstrating any of the listed capabilities (cap_invoice_generation, cap_tax_calculation, cap_payment_reconciliation, cap_export_scheduling, cap_export_recovery). Therefore, no claims can be made."
+        ],
+        "artifact_id": "artifact_rev_794",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "28e2d00fc4b134ec"
+    },
+    "artifact_rev_795": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_795",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "f71045d0a84242ee"
+    },
+    "artifact_rev_796": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_796",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "bc9515ac51dd747f"
+    },
+    "artifact_rev_797": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states that Omar Haddad made a routine maintenance change with no operational significance. It does not provide enough information to determine if the change relates to any of the listed capabilities or if Omar's role was AUTHOR, ASSISTING_RESPONDER, or REVIEWER."
+        ],
+        "artifact_id": "artifact_rev_797",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "4ee4e8e5d52d1eab"
+    },
+    "artifact_rev_798": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_798",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "e3428b2e7679f08f"
+    },
+    "artifact_rev_799": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_799",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "81fe51dbb0e5fe25"
+    },
+    "artifact_rev_800": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_800",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "57a6f94f0602bf71"
+    },
+    "artifact_rev_801": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_801",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "e655ce5b6384e223"
+    },
+    "artifact_rev_803": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_rev_803",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "da2fba2c82b1ab5f"
+    },
+    "artifact_rev_805": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide enough detail to determine whether the change had any operational significance beyond routine maintenance. The title mentions a flaky test, which could imply a functional issue, but the body states it was routine maintenance with no operational significance."
+        ],
+        "artifact_id": "artifact_rev_805",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "015636bccdb0e166"
+    },
+    "artifact_tck_1003": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_tck_1003",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "3149246c2cbbeaf4"
+    },
+    "artifact_tck_900": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_900",
+        "claims": [
+          {
+            "capability_id": "cap_invoice_generation",
+            "engineer_id": "eng_priya_nair",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The ticket states that Priya Nair was assigned and completed the work on Invoice Generation.",
+            "summary": "Priya Nair completed the assigned work on Invoice Generation in Invoice Sync."
+          }
+        ],
+        "component_id": "component_invoice_sync",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "d5264d25eebd93de"
+    },
+    "artifact_tck_901": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states that Jordan Lee was assigned and completed work on Monitoring in Gateway Operations. It does not provide any evidence of Jordan Lee's actual execution, contribution, or knowledge capture related to monitoring capabilities. The PARTICIPANT_ROLE of ASSIGNEE is noted, but the artifact lacks sufficient detail to determine the nature or extent of Jordan Lee's involvement."
+        ],
+        "artifact_id": "artifact_tck_901",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "c4ebca4833726949"
+    },
+    "artifact_tck_903": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_903",
+        "claims": [
+          {
+            "capability_id": "cap_refund_reversal",
+            "engineer_id": "eng_priya_nair",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The ticket states that Priya Nair was assigned and completed the work on Refund Reversal.",
+            "summary": "Priya Nair completed the scheduled work on Refund Reversal in Refund Orchestration."
+          }
+        ],
+        "component_id": "component_refund_orchestration",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "b948c9e318befa39"
+    },
+    "artifact_tck_904": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_904",
+        "claims": [
+          {
+            "capability_id": "cap_session_recovery",
+            "engineer_id": "eng_sofia_ruiz",
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "evidence_strength": "STRONG",
+            "extraction_confidence": "MEDIUM",
+            "is_conflicting": false,
+            "rationale": "watsonx/ibm/granite-4-h-small: The ticket states that Sofia Ruiz was assigned and completed the Session Recovery work.",
+            "summary": "Sofia Ruiz independently completed the scheduled Session Recovery work in Session Management."
+          }
+        ],
+        "component_id": "component_session_management",
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "58afae3f1df9d584"
+    },
+    "artifact_tck_905": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only describes a routine maintenance change to a README with no operational impact. No capability from the list is demonstrated, and the participant's role as AUTHOR does not provide evidence of any capability execution."
+        ],
+        "artifact_id": "artifact_tck_905",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "1ab989d351ae530d"
+    },
+    "artifact_tck_906": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_906",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "3d49ca16b0f025ac"
+    },
+    "artifact_tck_907": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_907",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "24f01961b2cc00c9"
+    },
+    "artifact_tck_909": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not describe any capability from the CAPABILITIES list; it only mentions a routine maintenance change with no operational significance."
+        ],
+        "artifact_id": "artifact_tck_909",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "e7f712fd40364de4"
+    },
+    "artifact_tck_912": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_912",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "c104de7285b0c7f3"
+    },
+    "artifact_tck_914": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not describe any change to incident recovery, provider failover, certificate management, retry logic, or monitoring capabilities."
+        ],
+        "artifact_id": "artifact_tck_914",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "1682f9c9615e41b2"
+    },
+    "artifact_tck_915": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states that Sofia Ruiz made a routine maintenance change with no operational significance. It does not provide any evidence of her performing any of the listed capabilities (invoice generation, tax calculation, payment reconciliation, export scheduling, or export recovery). Therefore, no claims can be made about her demonstrating any of those capabilities."
+        ],
+        "artifact_id": "artifact_tck_915",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "af3ff0260e367263"
+    },
+    "artifact_tck_916": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability being exercised. The change is described as routine maintenance with no operational significance, which does not match any of the defined capability categories."
+        ],
+        "artifact_id": "artifact_tck_916",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "24897aaee334fd85"
+    },
+    "artifact_tck_917": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_917",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "49038717c6b809fd"
+    },
+    "artifact_tck_918": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not demonstrate any of the listed capabilities; it is a routine maintenance change with no operational significance."
+        ],
+        "artifact_id": "artifact_tck_918",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "c30e088790612664"
+    },
+    "artifact_tck_919": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not describe any capability from the CAPABILITIES list; it only mentions a routine maintenance change with no operational significance."
+        ],
+        "artifact_id": "artifact_tck_919",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "c736ef86c7edae21"
+    },
+    "artifact_tck_921": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability being exercised. The change described is routine maintenance (a typo correction) and does not demonstrate any of the listed capabilities (policy evaluation, policy rollback, role assignment, permission audit)."
+        ],
+        "artifact_id": "artifact_tck_921",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "04b86541826ff430"
+    },
+    "artifact_tck_922": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_922",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "0fd55f5fcd00221b"
+    },
+    "artifact_tck_923": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only describes a routine maintenance change with no operational significance, so no capability from the list is demonstrated."
+        ],
+        "artifact_id": "artifact_tck_923",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "d0903d980ba05706"
+    },
+    "artifact_tck_924": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_924",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "d222fbf0e394a62e"
+    },
+    "artifact_tck_925": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_925",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "b1599d7f51a98f05"
+    },
+    "artifact_tck_926": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability being exercised. The change is described as routine maintenance with no operational significance, which does not map to any of the defined capabilities."
+        ],
+        "artifact_id": "artifact_tck_926",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "d17e2821677e2c44"
+    },
+    "artifact_tck_927": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_927",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "7531f13afe59128a"
+    },
+    "artifact_tck_929": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_929",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "d044ef14923f69ef"
+    },
+    "artifact_tck_930": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_930",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "fc8afa950e111eb8"
+    },
+    "artifact_tck_934": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_934",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "1798e8e546896c4d"
+    },
+    "artifact_tck_936": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states that Sarah Whitfield made a routine maintenance change with no operational significance. It does not specify which capability, if any, the change relates to, so no valid claim can be made."
+        ],
+        "artifact_id": "artifact_tck_936",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "d9187de07ea1cbec"
+    },
+    "artifact_tck_937": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_937",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "f7c92468973f9a15"
+    },
+    "artifact_tck_938": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact describes a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_tck_938",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "e241efdb81cf3915"
+    },
+    "artifact_tck_940": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_940",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "bb977f1cd34a2fef"
+    },
+    "artifact_tck_941": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_941",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "c8f9018f96e1390b"
+    },
+    "artifact_tck_944": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_944",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "1784adb10afd4fac"
+    },
+    "artifact_tck_945": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only describes a routine maintenance change to a README with no operational significance, so it demonstrates no capability from the provided list."
+        ],
+        "artifact_id": "artifact_tck_945",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "4cde1dab5d02a807"
+    },
+    "artifact_tck_946": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability being exercised. The title and body indicate a routine maintenance change (typo correction) with no operational impact, which does not map to any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_tck_946",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "86f9c07107c6ac7f"
+    },
+    "artifact_tck_947": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_947",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "554c44a66e71f78d"
+    },
+    "artifact_tck_949": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_949",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "da3e450c68e50cd0"
+    },
+    "artifact_tck_950": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only describes a routine maintenance change to a README with no operational significance, so no capability is demonstrated."
+        ],
+        "artifact_id": "artifact_tck_950",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "221c5e37f5b58594"
+    },
+    "artifact_tck_951": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_951",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "590c086dca1a16a0"
+    },
+    "artifact_tck_952": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_952",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "4fdd29a72d12e49c"
+    },
+    "artifact_tck_953": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_953",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "87398e2446b0d438"
+    },
+    "artifact_tck_954": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_954",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "004a1fa2b3d39baf"
+    },
+    "artifact_tck_955": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states that Lena Novak performed a routine maintenance change with no operational significance. It does not provide any evidence of a specific capability being demonstrated, so no claims can be made."
+        ],
+        "artifact_id": "artifact_tck_955",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "549dc6d1f8d67106"
+    },
+    "artifact_tck_956": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability being exercised. The change described is routine maintenance (a typo correction) and does not demonstrate any of the listed capabilities (policy evaluation, policy rollback, role assignment, permission audit)."
+        ],
+        "artifact_id": "artifact_tck_956",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "8fcccd2d403cecb8"
+    },
+    "artifact_tck_957": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_957",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "d4586fdf750354b6"
+    },
+    "artifact_tck_958": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not contain any evidence of a capability being exercised or contributed."
+        ],
+        "artifact_id": "artifact_tck_958",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "788b5784d0e6b3a3"
+    },
+    "artifact_tck_959": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not describe any capability from the CAPABILITIES list; it only mentions a routine maintenance change with no operational significance."
+        ],
+        "artifact_id": "artifact_tck_959",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "c23752995a4a5dc0"
+    },
+    "artifact_tck_960": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only indicates a routine maintenance change to a README with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_tck_960",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "e18e0cfa514682c2"
+    },
+    "artifact_tck_962": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_962",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "7ccad9375b12ee76"
+    },
+    "artifact_tck_963": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_963",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "64c9479bf4d0ad30"
+    },
+    "artifact_tck_964": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_964",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "e534b649ef928cdd"
+    },
+    "artifact_tck_966": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide evidence of any capability from the CAPABILITIES list. It only states that Lena Novak made a routine maintenance change with no operational significance."
+        ],
+        "artifact_id": "artifact_tck_966",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "21b88a0db879202f"
+    },
+    "artifact_tck_967": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_967",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "f118ec80420bb294"
+    },
+    "artifact_tck_968": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_968",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "b73bbdc55f1561f7"
+    },
+    "artifact_tck_971": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_971",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "accf1a326d3f6717"
+    },
+    "artifact_tck_974": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_974",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "990bebe134c4f96e"
+    },
+    "artifact_tck_976": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability being exercised. The change described is routine maintenance (a typo correction) and does not demonstrate any of the listed capabilities (policy evaluation, policy rollback, role assignment, or permission audit)."
+        ],
+        "artifact_id": "artifact_tck_976",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "50cad59343949568"
+    },
+    "artifact_tck_978": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability beyond routine maintenance. No capability_id from the list matches the described work."
+        ],
+        "artifact_id": "artifact_tck_978",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "720f2c3d69f18704"
+    },
+    "artifact_tck_979": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not describe any change to incident recovery, provider failover, certificate management, retry logic, or monitoring capabilities. It only states that Daniel Kim made a routine maintenance change with no operational significance."
+        ],
+        "artifact_id": "artifact_tck_979",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "a83ceb444d39a475"
+    },
+    "artifact_tck_980": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only indicates a routine maintenance change to a README with no operational significance. No capability from the list is demonstrated."
+        ],
+        "artifact_id": "artifact_tck_980",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "8dc2f360ac0eff24"
+    },
+    "artifact_tck_981": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_981",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "9dc93804959b74db"
+    },
+    "artifact_tck_982": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_982",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "0fef61fc1dbc7c7c"
+    },
+    "artifact_tck_983": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only describes a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_tck_983",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "1ad1f0ca3b6ca55a"
+    },
+    "artifact_tck_984": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_984",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "e84dca099d91d9d7"
+    },
+    "artifact_tck_985": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_985",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "2762774f8966c97f"
+    },
+    "artifact_tck_987": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_987",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "e71dbf28d07729d3"
+    },
+    "artifact_tck_988": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact only states that Lena Novak performed a routine maintenance change with no operational significance. It does not provide evidence of any specific capability being exercised or demonstrated."
+        ],
+        "artifact_id": "artifact_tck_988",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "d822951df5da5d85"
+    },
+    "artifact_tck_989": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_989",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "b4481a1675c68ecf"
+    },
+    "artifact_tck_992": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_992",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "d5e894d9110c53d8"
+    },
+    "artifact_tck_993": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact describes a routine maintenance change with no operational significance, which does not demonstrate any of the listed capabilities."
+        ],
+        "artifact_id": "artifact_tck_993",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "1085b19fe55dfe2d"
+    },
+    "artifact_tck_994": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not describe any change to incident recovery, provider failover, certificate management, retry logic, or monitoring capabilities."
+        ],
+        "artifact_id": "artifact_tck_994",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "5dde934fcda9e621"
+    },
+    "artifact_tck_995": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_995",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_billing_integration"
+      },
+      "fingerprint": "76904591837fe8f0"
+    },
+    "artifact_tck_996": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_996",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authorization"
+      },
+      "fingerprint": "d4c75f76699ed3b5"
+    },
+    "artifact_tck_997": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_997",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_authentication"
+      },
+      "fingerprint": "74086709e0fc193d"
+    },
+    "artifact_tck_998": {
+      "extraction": {
+        "ambiguity": [
+          "The artifact does not provide any evidence of a capability from the CAPABILITIES list. The change described is routine maintenance with no operational significance, and no specific capability is mentioned."
+        ],
+        "artifact_id": "artifact_tck_998",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_refund_engine"
+      },
+      "fingerprint": "ab6df0cb4c81f2fe"
+    },
+    "artifact_tck_999": {
+      "extraction": {
+        "ambiguity": [],
+        "artifact_id": "artifact_tck_999",
+        "claims": [],
+        "component_id": null,
+        "possible_taxonomy_duplicates": [],
+        "system_id": "system_payment_gateway"
+      },
+      "fingerprint": "e3068f6410c40a5e"
+    }
+  },
+  "entry_count": 313,
+  "model_id": "ibm/granite-4-h-small",
+  "note": "Structured extraction output, committed so seeding is offline and reproducible without a credential. Regenerate with python -m scripts.extract_with_provider. Keyed by artifact fingerprint, so a changed artifact invalidates its entry rather than replaying stale extraction.",
+  "provider": "watsonx"
+}

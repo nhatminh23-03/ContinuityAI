@@ -1,0 +1,19 @@
+{
+  "source_repository": "stripe/stripe-python",
+  "source_url": "https://github.com/stripe/stripe-python",
+  "fetched_artifacts": 120,
+  "pull_requests": 120,
+  "code_reviews": 0,
+  "attributed_to_system": "system_payment_gateway",
+  "distinct_public_contributors": 49,
+  "pseudonym_pool": [
+    "eng_priya_nair",
+    "eng_tom_becker",
+    "eng_lena_novak"
+  ],
+  "anonymisation": "Pull request titles, bodies, dates and URLs are real and unmodified. Contributor identities are NOT: each real login is deterministically mapped onto a synthetic NovaPay engineer and the real login is never written to disk. ContinuityAI infers capability readiness about named people, and doing that to real engineers who never consented would breach the responsible-AI boundary in PRD section 22. Artifacts stay traceable through source_url; the attribution is what is synthetic.",
+  "bots_excluded": true,
+  "text_scrubbing": "@mentions are replaced with @contributor and GitHub profile links are stripped, because pull request bodies routinely name other contributors. Bare logins written as ordinary prose cannot be caught by pattern and may remain in body text.",
+  "finding": "Most artifacts in a public SDK repository evidence no operational capability. The vocabulary is library maintenance \u2014 support, error handling, tests, packaging \u2014 while the capabilities this product assesses (service recovery, provider failover, certificate rotation) are demonstrated in private operational records: incidents, runbooks, on-call history. That is a finding about where capability evidence lives, not a defect in extraction, and it is what the hybrid data strategy in PRD section 14.1 already assumes.",
+  "note": "Committed so seeding is offline and reproducible. Refresh with python -m scripts.fetch_public_github"
+}

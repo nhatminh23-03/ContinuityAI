@@ -1,0 +1,375 @@
+"""IBM watsonx.ai provider. The model-backed half of the AI layer.
+
+Implements the same `AIProvider` interface as the deterministic provider, so swapping between them
+changes extraction quality and changes no conclusion path: readiness, exposure, continuity risk,
+simulation, and candidate selection are all downstream and deterministic either way. That property is
+the whole reason the interface exists.
+
+Endpoint: `POST {url}/ml/v1/text/chat`. The older `text/generation` endpoint is deprecated and
+returns a deprecation warning, so chat is used. IAM tokens are exchanged from the API key and cached
+until shortly before expiry.
+
+Failure policy differs by method, deliberately:
+
+* **Extraction raises.** A silent fallback would mean a model outage quietly produced a different
+  knowledge graph while every number still looked plausible. `AIExtractionError` is loud, and the
+  pipeline already handles it.
+* **Narrative methods fall back** to the deterministic templates. The simulation summary, candidate
+  strengths, and plan text are prose over facts the rules already decided, so a timeout should
+  degrade the wording rather than break the demo (ARCHITECTURE.md section 85).
+
+Every response is validated by `app/ai/validation.py` before anything reaches the database — the same
+gate the deterministic provider passes through. An invented capability, a claim against someone who
+is not a recorded participant, or a cross-system attribution is rejected regardless of which provider
+produced it.
+"""
+
+from __future__ import annotations
+
+import json
+import logging
+import re
+import threading
+import time
+from pathlib import Path
+
+import httpx
+
+from app.ai.deterministic import DeterministicProvider
+from app.ai.provider import ExtractionContext
+from app.ai.schemas import (
+    ArtifactExtraction,
+    ArtifactInput,
+    CandidateNarrative,
+    CandidateNarrativeContext,
+    CapabilityClaim,
+    PlanContext,
+    PlanDraft,
+    SimulationSummaryContext,
+)
+from app.core.config import settings
+from app.core.errors import AIExtractionError
+from app.evidence.strength import strength_for_role
+from app.schemas.enums import EvidenceConfidence, EvidenceRole
+
+logger = logging.getLogger(__name__)
+
+IAM_TOKEN_URL = "https://iam.cloud.ibm.com/identity/token"
+CHAT_PATH = "/ml/v1/text/chat"
+API_VERSION = "2024-05-31"
+TOKEN_SAFETY_MARGIN_SECONDS = 120
+
+PROMPT_DIR = Path(__file__).parent / "prompts"
+SYSTEM_PROMPT_FILE = PROMPT_DIR / "extraction_system.txt"
+
+# Extraction is a classification task, so sampling buys nothing and costs reproducibility.
+EXTRACTION_TEMPERATURE = 0.0
+EXTRACTION_MAX_TOKENS = 900
+NARRATIVE_MAX_TOKENS = 500
+
+_JSON_BLOCK = re.compile(r"\{.*\}", re.DOTALL)
+
+
+class QuotaExhaustedError(AIExtractionError):
+    """The account's token allowance is spent.
+
+    Distinguished from a transient failure because the response is completely different: a rate limit
+    clears in a second, a spent quota needs a plan change or a new window. Retrying the second one
+    just turns a clear problem into a slow, confusing one.
+    """
+
+
+class WatsonxProvider:
+    name = "watsonx"
+
+    def __init__(self) -> None:
+        missing = [
+            field
+            for field in ("watsonx_api_key", "watsonx_project_id", "watsonx_api_url")
+            if not getattr(settings, field)
+        ]
+        if missing:
+            raise ValueError(
+                f"AI_PROVIDER=watsonx requires {', '.join(m.upper() for m in missing)} in "
+                f"backend/.env. Never commit real credentials."
+            )
+        self.model_id = settings.watsonx_model_id
+        self._fallback = DeterministicProvider()
+        self._token: str | None = None
+        self._token_expires_at: float = 0.0
+        self._system_prompt = SYSTEM_PROMPT_FILE.read_text()
+        self._client = httpx.Client(timeout=settings.watsonx_timeout_seconds)
+        self._pace_lock = threading.Lock()
+        self._next_slot = 0.0
+
+    # -- transport ----------------------------------------------------------------------
+
+    def _access_token(self) -> str:
+        if self._token and time.time() < self._token_expires_at:
+            return self._token
+
+        response = self._client.post(
+            IAM_TOKEN_URL,
+            data={
+                "grant_type": "urn:ibm:params:oauth:grant-type:apikey",
+                "apikey": settings.watsonx_api_key,
+            },
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+        if response.status_code != 200:
+            raise AIExtractionError(
+                "Could not exchange the watsonx API key for an IAM token.",
+                {"status": response.status_code},
+            )
+        payload = response.json()
+        self._token = payload["access_token"]
+        self._token_expires_at = time.time() + payload.get("expires_in", 3600) - TOKEN_SAFETY_MARGIN_SECONDS
+        return self._token
+
+    def _throttle(self) -> None:
+        """Client-side pacing.
+
+        The service enforces a hard requests-per-second ceiling per instance — 2/s on the plan this
+        was developed against — and exceeding it returns 429 for the *whole* burst, so eight parallel
+        workers made things slower rather than faster. Pacing in the client is the difference between
+        a run that completes and a run that mostly fails.
+        """
+        minimum_gap = 1.0 / max(settings.watsonx_requests_per_second, 0.1)
+        with self._pace_lock:
+            wait = self._next_slot - time.monotonic()
+            if wait > 0:
+                time.sleep(wait)
+            self._next_slot = max(time.monotonic(), self._next_slot) + minimum_gap
+
+    def _chat(self, system: str, user: str, max_tokens: int) -> str:
+        url = f"{settings.watsonx_api_url.rstrip('/')}{CHAT_PATH}?version={API_VERSION}"
+        body = {
+            "model_id": self.model_id,
+            "project_id": settings.watsonx_project_id,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+            "max_tokens": max_tokens,
+            "temperature": EXTRACTION_TEMPERATURE,
+        }
+
+        last_error: str | None = None
+        for attempt in range(settings.watsonx_max_retries + 1):
+            self._throttle()
+            try:
+                response = self._client.post(
+                    url,
+                    json=body,
+                    headers={
+                        "Authorization": f"Bearer {self._access_token()}",
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                    },
+                )
+            except httpx.HTTPError as exc:
+                last_error = f"transport error: {exc}"
+            else:
+                if response.status_code == 200:
+                    return response.json()["choices"][0]["message"]["content"]
+
+                last_error = f"HTTP {response.status_code}: {response.text[:200]}"
+
+                if response.status_code == 403 and "token_quota_reached" in response.text:
+                    # The account's token allowance is spent. Retrying cannot help and would only
+                    # obscure the cause, so fail immediately with a message that names the fix.
+                    raise QuotaExhaustedError(
+                        "The watsonx token quota for this account is exhausted, so extraction "
+                        "cannot continue. Wait for the quota window to reset or raise the plan "
+                        "limit, then re-run scripts.extract_with_provider — cached artifacts are "
+                        "skipped, so the run resumes where it stopped.",
+                        {"model_id": self.model_id},
+                    )
+                if response.status_code == 401:
+                    self._token = None  # force a fresh IAM token, then retry
+                if response.status_code == 429:
+                    # Honour Retry-After when offered; otherwise back off enough to clear the window.
+                    retry_after = response.headers.get("retry-after")
+                    delay = float(retry_after) if retry_after and retry_after.isdigit() else 2.0
+                    time.sleep(delay)
+                    continue
+
+            if attempt < settings.watsonx_max_retries:
+                time.sleep(1.5 * (attempt + 1))
+
+        raise AIExtractionError(
+            f"watsonx chat call failed after {settings.watsonx_max_retries + 1} attempts: "
+            f"{last_error}",
+            {"model_id": self.model_id, "last_error": last_error},
+        )
+
+    @staticmethod
+    def _parse_json(raw: str) -> dict:
+        """Models wrap JSON in prose or fences often enough that this must be tolerant."""
+        text = raw.strip()
+        if text.startswith("```"):
+            text = text.strip("`")
+            text = text[text.find("\n") + 1 :] if "\n" in text else text
+            text = text.replace("json\n", "", 1)
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            match = _JSON_BLOCK.search(text)
+            if not match:
+                raise
+            return json.loads(match.group(0))
+
+    # -- extraction ---------------------------------------------------------------------
+
+    def extract_artifact_semantics(
+        self, artifact: ArtifactInput, context: ExtractionContext
+    ) -> ArtifactExtraction:
+        candidates = context.by_system(artifact.system_hint)
+        if not candidates or not artifact.participants:
+            # Nothing to attribute to, or nobody to attribute it to. Spending a model call to
+            # confirm that would be wasteful.
+            return ArtifactExtraction(
+                artifact_id=artifact.artifact_id,
+                system_id=artifact.system_hint,
+                ambiguity=["no capabilities in scope" if not candidates else "no participants"],
+            )
+
+        raw = self._chat(self._system_prompt, self._user_prompt(artifact, context), EXTRACTION_MAX_TOKENS)
+
+        try:
+            payload = self._parse_json(raw)
+        except json.JSONDecodeError as exc:
+            raise AIExtractionError(
+                f"watsonx returned output that is not JSON for {artifact.source_reference}.",
+                {"artifact_id": artifact.artifact_id, "snippet": raw[:200]},
+            ) from exc
+
+        taxonomy = {c.capability_id for c in candidates}
+        participants = {p.engineer_id for p in artifact.participants}
+        claims: list[CapabilityClaim] = []
+        ambiguity = [str(a) for a in payload.get("ambiguity", []) if a]
+
+        for entry in payload.get("claims", []) or []:
+            if not isinstance(entry, dict):
+                continue
+            try:
+                role = EvidenceRole(str(entry.get("evidence_role", "")).strip().upper())
+            except ValueError:
+                ambiguity.append(f"unrecognised evidence_role {entry.get('evidence_role')!r}")
+                continue
+
+            capability_id = str(entry.get("capability_id", "")).strip()
+            engineer_id = str(entry.get("engineer_id", "")).strip()
+            summary = str(entry.get("summary") or "").strip()
+            rationale = str(entry.get("rationale") or "").strip()
+
+            # Cheap local checks first so obvious rubbish never reaches validation. The real gate is
+            # still app/ai/validation.py, which both providers pass through.
+            if capability_id not in taxonomy or engineer_id not in participants:
+                ambiguity.append(
+                    f"discarded claim outside the supplied lists: {capability_id!r}/{engineer_id!r}"
+                )
+                continue
+            if not summary or not rationale:
+                ambiguity.append(f"discarded uncited claim for {capability_id}/{engineer_id}")
+                continue
+
+            claims.append(
+                CapabilityClaim(
+                    capability_id=capability_id,
+                    engineer_id=engineer_id,
+                    evidence_role=role,
+                    # Derived, never taken from the model. PRD section 16.1.
+                    evidence_strength=strength_for_role(role),
+                    summary=summary,
+                    rationale=f"watsonx/{self.model_id}: {rationale}",
+                    extraction_confidence=EvidenceConfidence.MEDIUM,
+                    is_conflicting=self._fallback._looks_conflicting(artifact),
+                )
+            )
+
+        component_id = None
+        if len({c.capability_id for c in claims}) == 1:
+            claimed = next(iter({c.capability_id for c in claims}))
+            component_id = next((c.component_id for c in candidates if c.capability_id == claimed), None)
+
+        return ArtifactExtraction(
+            artifact_id=artifact.artifact_id,
+            system_id=artifact.system_hint,
+            component_id=component_id,
+            claims=claims,
+            ambiguity=ambiguity,
+        )
+
+    @staticmethod
+    def _user_prompt(artifact: ArtifactInput, context: ExtractionContext) -> str:
+        capabilities = context.by_system(artifact.system_hint)
+        capability_lines = "\n".join(
+            f"- {c.capability_id} — {c.name}" + (f" (also called: {', '.join(c.aliases)})" if c.aliases else "")
+            for c in capabilities
+        )
+        participant_lines = "\n".join(
+            f"- {p.engineer_id} — {context.engineer_names.get(p.engineer_id, p.engineer_id)} "
+            f"— PARTICIPANT_ROLE: {p.participant_role}"
+            for p in artifact.participants
+        )
+        paths = ", ".join(artifact.file_paths) if artifact.file_paths else "none recorded"
+
+        return (
+            f"CAPABILITIES (the only permitted capability_id values)\n{capability_lines}\n\n"
+            f"PARTICIPANTS (the only permitted engineer_id values)\n{participant_lines}\n\n"
+            f"ARTIFACT\n"
+            f"type: {artifact.source_type.value}\n"
+            f"reference: {artifact.source_reference}\n"
+            f"date: {artifact.artifact_date.isoformat()}\n"
+            f"files: {paths}\n"
+            f"title: {artifact.title or '(none)'}\n"
+            f"body:\n{artifact.body or '(empty)'}\n"
+        )
+
+    # -- narrative methods, with a deterministic safety net -----------------------------
+
+    def summarize_simulation(self, context: SimulationSummaryContext) -> str | None:
+        # Phrased to avoid naming the prohibited words even in order to forbid them: the
+        # responsible-AI test scans string literals in this package, and a prohibition list is more
+        # reliable when it needs no exceptions for text that merely quotes what it bans.
+        system = (
+            "You write one plain sentence for an engineering manager, from facts already computed by "
+            "a deterministic rule engine. Constraints: describe only which capabilities would lose "
+            "adequate demonstrated coverage; never predict that anything will break; never state a "
+            "likelihood or a percentage; never characterise a person's importance or their limits. "
+            "Talk about capabilities and coverage, not about people. Reply with the sentence and "
+            "nothing else."
+        )
+        user = (
+            f"Engineer unavailable: {context.engineer_name}\n"
+            f"Scope: {context.scope_name}\n"
+            f"Would have no adequate coverage: {', '.join(context.critical_gap_capabilities) or 'none'}\n"
+            f"Would lose redundancy: {', '.join(context.degraded_capabilities) or 'none'}\n"
+            f"Remain covered: {', '.join(context.preserved_capabilities) or 'none'}\n"
+            f"Risk class moves from {context.risk_class_before} to {context.risk_class_after}."
+        )
+        try:
+            sentence = self._chat(system, user, NARRATIVE_MAX_TOKENS).strip().strip('"')
+            return sentence or self._fallback.summarize_simulation(context)
+        except AIExtractionError:
+            logger.warning("watsonx summary failed; using the deterministic template")
+            return self._fallback.summarize_simulation(context)
+
+    def explain_candidate(self, context: CandidateNarrativeContext) -> CandidateNarrative:
+        # The structured content — which capabilities are demonstrated, assisted, or missing — is
+        # decided by the rules. A model here would only rephrase it, and a rephrasing that drifts
+        # is worse than a plain one, so the deterministic phrasing stands.
+        return self._fallback.explain_candidate(context)
+
+    def generate_mitigation_plan(self, context: PlanContext) -> PlanDraft:
+        """The deterministic plan is already gap-targeted and validated for 3-5 actions.
+
+        A model could write warmer prose, but the plan is the artifact a manager approves and then
+        someone executes — invented steps or an invented tool would be a real cost, and the
+        structure is what carries the value. Left deterministic on purpose.
+        """
+        return self._fallback.generate_mitigation_plan(context)
+
+    def close(self) -> None:
+        self._client.close()

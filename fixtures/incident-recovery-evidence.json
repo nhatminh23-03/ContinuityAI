@@ -25,11 +25,131 @@
       "capability_id": "cap_incident_recovery",
       "evidence_role": "INDEPENDENT_EXECUTION",
       "evidence_strength": "STRONG",
-      "summary": "Alex diagnosed failed provider routing and restored payment processing.",
+      "summary": "Alex Chen independently carried out Incident Recovery in INC-184.",
       "freshness": "FRESH",
       "provenance": {
         "source": "synthetic_incident_dataset",
         "record_id": "INC-184",
+        "source_url": null
+      }
+    },
+    {
+      "evidence_id": "evidence_inc_221",
+      "source_type": "INCIDENT",
+      "source_reference": "INC-221",
+      "source_title": "P1 Payment Gateway transaction routing stall",
+      "artifact_date": "2026-03-02",
+      "engineer_id": "eng_alex_chen",
+      "system_id": "system_payment_gateway",
+      "component_id": "component_gateway_integration",
+      "capability_id": "cap_incident_recovery",
+      "evidence_role": "INDEPENDENT_EXECUTION",
+      "evidence_strength": "STRONG",
+      "summary": "Alex Chen independently carried out Incident Recovery in INC-221.",
+      "freshness": "FRESH",
+      "provenance": {
+        "source": "synthetic_incident_dataset",
+        "record_id": "INC-221",
+        "source_url": null
+      }
+    },
+    {
+      "evidence_id": "evidence_doc_17",
+      "source_type": "DOCUMENT",
+      "source_reference": "DOC-17",
+      "source_title": "Payment Gateway incident recovery runbook",
+      "artifact_date": "2026-06-01",
+      "engineer_id": "eng_alex_chen",
+      "system_id": "system_payment_gateway",
+      "component_id": "component_gateway_integration",
+      "capability_id": "cap_incident_recovery",
+      "evidence_role": "KNOWLEDGE_CAPTURE",
+      "evidence_strength": "STRONG",
+      "summary": "Alex Chen authored operational documentation for Incident Recovery in DOC-17.",
+      "freshness": "FRESH",
+      "provenance": {
+        "source": "synthetic_document_dataset",
+        "record_id": "DOC-17",
+        "source_url": null
+      }
+    },
+    {
+      "evidence_id": "evidence_inc_230",
+      "source_type": "INCIDENT",
+      "source_reference": "INC-230",
+      "source_title": "P2 Payment Gateway degraded authorisations",
+      "artifact_date": "2026-04-18",
+      "engineer_id": "eng_maria_gomez",
+      "system_id": "system_payment_gateway",
+      "component_id": "component_gateway_integration",
+      "capability_id": "cap_incident_recovery",
+      "evidence_role": "ASSISTED_EXECUTION",
+      "evidence_strength": "MODERATE",
+      "summary": "Maria Gomez assisted with Incident Recovery in INC-230, with another responder leading.",
+      "freshness": "FRESH",
+      "provenance": {
+        "source": "synthetic_incident_dataset",
+        "record_id": "INC-230",
+        "source_url": null
+      }
+    },
+    {
+      "evidence_id": "evidence_pr_402",
+      "source_type": "PULL_REQUEST",
+      "source_reference": "PR-402",
+      "source_title": "Harden gateway recovery health checks",
+      "artifact_date": "2026-02-10",
+      "engineer_id": "eng_maria_gomez",
+      "system_id": "system_payment_gateway",
+      "component_id": "component_gateway_integration",
+      "capability_id": "cap_incident_recovery",
+      "evidence_role": "CONTRIBUTION",
+      "evidence_strength": "MODERATE",
+      "summary": "Maria Gomez authored a change affecting Incident Recovery in PR-402.",
+      "freshness": "FRESH",
+      "provenance": {
+        "source": "synthetic_repository_export",
+        "record_id": "PR-402",
+        "source_url": null
+      }
+    },
+    {
+      "evidence_id": "evidence_issue_77",
+      "source_type": "ISSUE",
+      "source_reference": "ISSUE-77",
+      "source_title": "Discussion: incident recovery ordering",
+      "artifact_date": "2024-08-05",
+      "engineer_id": "eng_jordan_lee",
+      "system_id": "system_payment_gateway",
+      "component_id": "component_gateway_integration",
+      "capability_id": "cap_incident_recovery",
+      "evidence_role": "EXPOSURE",
+      "evidence_strength": "WEAK",
+      "summary": "Jordan Lee reviewed or discussed Incident Recovery in ISSUE-77; no execution is evidenced.",
+      "freshness": "AGING",
+      "provenance": {
+        "source": "synthetic_issue_dataset",
+        "record_id": "ISSUE-77",
+        "source_url": null
+      }
+    },
+    {
+      "evidence_id": "evidence_pr_391",
+      "source_type": "CODE_REVIEW",
+      "source_reference": "PR-391",
+      "source_title": "Review: adjust incident recovery timeouts",
+      "artifact_date": "2024-06-12",
+      "engineer_id": "eng_jordan_lee",
+      "system_id": "system_payment_gateway",
+      "component_id": "component_gateway_integration",
+      "capability_id": "cap_incident_recovery",
+      "evidence_role": "EXPOSURE",
+      "evidence_strength": "WEAK",
+      "summary": "Jordan Lee reviewed or discussed Incident Recovery in PR-391; no execution is evidenced.",
+      "freshness": "AGING",
+      "provenance": {
+        "source": "synthetic_repository_export",
+        "record_id": "PR-391",
         "source_url": null
       }
     }
@@ -38,7 +158,12 @@
     {
       "engineer_id": "eng_jordan_lee",
       "engineer_name": "Jordan Lee",
-      "description": "No qualifying independent production recovery evidence found."
+      "description": "No qualifying independent incident recovery evidence found."
+    },
+    {
+      "engineer_id": "eng_maria_gomez",
+      "engineer_name": "Maria Gomez",
+      "description": "No qualifying independent incident recovery evidence found."
     }
   ],
   "conflicting_evidence": [],

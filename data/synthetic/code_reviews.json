@@ -1,0 +1,1518 @@
+[
+  {
+    "reference": "PR-391",
+    "title": "Review: adjust incident recovery timeouts",
+    "body": "Jordan Lee reviewed a change to the incident recovery timeout constants and approved it with a comment about metric naming. No execution involved.",
+    "date": "2024-06-12",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "REVIEWER"
+      }
+    ],
+    "file_paths": [
+      "services/gateway/integration/timeouts.py"
+    ]
+  },
+  {
+    "reference": "REV-700",
+    "title": "Review: change to Certificate Management",
+    "body": "Maria Gomez reviewed a change to Certificate Management in Gateway Integration and left comments. No execution involved.",
+    "date": "2026-06-13",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "REVIEWER"
+      }
+    ],
+    "file_paths": [
+      "services/gateway-integration/certificate_management.py"
+    ]
+  },
+  {
+    "reference": "REV-701",
+    "title": "Review: change to Permission Audit",
+    "body": "Grace Liu reviewed a change to Permission Audit in Role Management and left comments. No execution involved.",
+    "date": "2026-06-04",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "REVIEWER"
+      }
+    ],
+    "file_paths": [
+      "services/role-management/permission_audit.py"
+    ]
+  },
+  {
+    "reference": "REV-702",
+    "title": "Review: change to Policy Rollback",
+    "body": "Grace Liu reviewed a change to Policy Rollback in Policy Engine and left comments. No execution involved.",
+    "date": "2026-05-03",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "REVIEWER"
+      }
+    ],
+    "file_paths": [
+      "services/policy-engine/policy_rollback.py"
+    ]
+  },
+  {
+    "reference": "REV-703",
+    "title": "Review: change to Provider Failover",
+    "body": "Jordan Lee reviewed a change to Provider Failover in Gateway Integration and left comments. No execution involved.",
+    "date": "2026-05-29",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "REVIEWER"
+      }
+    ],
+    "file_paths": [
+      "services/gateway-integration/provider_failover.py"
+    ]
+  },
+  {
+    "reference": "REV-704",
+    "title": "Review: change to Refund Reversal",
+    "body": "Omar Haddad reviewed a change to Refund Reversal in Refund Orchestration and left comments. No execution involved.",
+    "date": "2026-06-22",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "REVIEWER"
+      }
+    ],
+    "file_paths": [
+      "services/refund-orchestration/refund_reversal.py"
+    ]
+  },
+  {
+    "reference": "REV-705",
+    "title": "Review: change to Retry Logic",
+    "body": "Maria Gomez reviewed a change to Retry Logic in Transaction Processor and left comments. No execution involved.",
+    "date": "2026-05-21",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "REVIEWER"
+      }
+    ],
+    "file_paths": [
+      "services/transaction-processor/retry_logic.py"
+    ]
+  },
+  {
+    "reference": "REV-706",
+    "title": "Review: change to Session Recovery",
+    "body": "Daniel Kim reviewed a change to Session Recovery in Session Management and left comments. No execution involved.",
+    "date": "2026-06-25",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "REVIEWER"
+      }
+    ],
+    "file_paths": [
+      "services/session-management/session_recovery.py"
+    ]
+  },
+  {
+    "reference": "REV-707",
+    "title": "Review: change to Token Rotation",
+    "body": "Grace Liu reviewed a change to Token Rotation in Session Management and left comments. No execution involved.",
+    "date": "2026-07-11",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "REVIEWER"
+      }
+    ],
+    "file_paths": [
+      "services/session-management/token_rotation.py"
+    ]
+  },
+  {
+    "reference": "REV-708",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-09-10",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-709",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-09-13",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-710",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-09-06",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-711",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2025-09-05",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-712",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-08-29",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-713",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2025-08-26",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-714",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-10-09",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-715",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-09-10",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-716",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-08-11",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-717",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-09-03",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-718",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2025-09-17",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-719",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-09-07",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-720",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-10-09",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-721",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-08-20",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-722",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2025-08-11",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-723",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-08-01",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-724",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2025-07-31",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-725",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-08-28",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-726",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-08-19",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-727",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-09-19",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-728",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-09-28",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-729",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2025-09-08",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-730",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-10-12",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-731",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-08-09",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-732",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-08-23",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-733",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2025-08-10",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-734",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-09-21",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-735",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2025-08-23",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-736",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-08-04",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-737",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-08-20",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-738",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-09-30",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-739",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-08-07",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-740",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2025-09-05",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-741",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-09-18",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-742",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-08-10",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-743",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-08-04",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-744",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2025-10-11",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-745",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-10-08",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-746",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2025-09-15",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-747",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-10-04",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-748",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-09-23",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-749",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-10-10",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-750",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-09-14",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-751",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2025-09-01",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-752",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-10-10",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-753",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-09-05",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-754",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-09-11",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-755",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2025-09-12",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-756",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-09-16",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-757",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2025-09-07",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-758",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-09-22",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-759",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-09-22",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-760",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-08-31",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-761",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-08-03",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-762",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2025-09-13",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-763",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-10-08",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-764",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-09-05",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-765",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-08-30",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-766",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2025-09-25",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-767",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-08-15",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-768",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2025-09-08",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-769",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-09-18",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-770",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-10-09",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-771",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-08-08",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-772",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-08-08",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-773",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2025-08-11",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-774",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-09-24",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-775",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-09-10",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-776",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-08-17",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-777",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2025-08-23",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-778",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-08-15",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-779",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2025-08-31",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-780",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-08-25",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-781",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-09-11",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-782",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-08-28",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-783",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-09-27",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-784",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2025-08-03",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-785",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-08-02",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-786",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-08-09",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-787",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-08-06",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-788",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2025-08-05",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-789",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-09-11",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-790",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2025-08-18",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-791",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-09-25",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-792",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-08-20",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-793",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-09-15",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-794",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-10-01",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-795",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2025-08-04",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-796",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-08-16",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-797",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-08-22",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-798",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-09-30",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-799",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2025-08-27",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-800",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-08-19",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-801",
+    "title": "Upgrade base container image (Authentication)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2025-10-04",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-802",
+    "title": "Delete a deprecated feature flag (Refund Engine)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-08-22",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-803",
+    "title": "Remove unused configuration flag (Payment Gateway)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-08-18",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-804",
+    "title": "Add a missing type annotation (Billing Integration)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-09-24",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "REV-805",
+    "title": "Fix flaky test in CI (Authorization)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-09-09",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  }
+]

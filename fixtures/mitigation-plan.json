@@ -17,13 +17,13 @@
   "tasks": [
     {
       "task_id": "task_001",
-      "title": "Review Payment Gateway recovery architecture",
-      "description": "Review the recovery architecture, current runbook, and historical incidents INC-184 and INC-221.",
+      "title": "Review Payment Gateway Incident Recovery architecture",
+      "description": "Review the Incident Recovery path in Gateway Integration, the current runbook, and the historical records INC-184 and INC-221.",
       "type": "KNOWLEDGE_REVIEW",
       "acceptance_criteria": [
-        "Review current recovery architecture",
-        "Review two historical P1 recovery incidents",
-        "Document unresolved questions"
+        "Walk the current Incident Recovery path end to end",
+        "Review the recorded Payment Gateway incidents that exercised it",
+        "Record the questions the existing material does not answer"
       ],
       "linked_evidence_ids": [
         "evidence_inc_184",
@@ -32,35 +32,38 @@
     },
     {
       "task_id": "task_002",
-      "title": "Shadow a Payment Gateway recovery exercise",
-      "description": "Observe the recovery workflow and identify decision points used during restoration.",
+      "title": "Shadow Incident Recovery with Alex Chen",
+      "description": "Observe Alex Chen working through Incident Recovery and capture the decision points that are not written down.",
       "type": "SHADOWING",
       "acceptance_criteria": [
-        "Attend guided recovery exercise",
-        "Identify major recovery decision points"
-      ]
+        "Attend a guided exercise end to end",
+        "Write down each decision point and what drove it"
+      ],
+      "linked_evidence_ids": []
     },
     {
       "task_id": "task_003",
-      "title": "Run provider failover in staging",
-      "description": "Perform a controlled provider failover and restore normal routing.",
+      "title": "Execute Incident Recovery in staging",
+      "description": "Perform Incident Recovery in staging without step-by-step prompting and confirm normal operation is restored.",
       "type": "PRACTICE",
       "acceptance_criteria": [
-        "Execute failover in staging",
-        "Verify restored transaction flow",
-        "Document any undocumented steps"
-      ]
+        "Complete Incident Recovery unaided in staging",
+        "Verify the system returns to normal operation",
+        "Note any step the runbook is missing"
+      ],
+      "linked_evidence_ids": []
     },
     {
       "task_id": "task_004",
-      "title": "Update the recovery runbook",
-      "description": "Capture missing recovery knowledge discovered during the exercise.",
+      "title": "Update the Payment Gateway Incident Recovery runbook",
+      "description": "Fold the gaps found during the exercise back into the runbook so the next person does not rediscover them.",
       "type": "DOCUMENTATION",
       "acceptance_criteria": [
-        "Add missing recovery steps",
+        "Add the missing steps identified during practice",
         "Add rollback guidance",
-        "Submit runbook for review"
-      ]
+        "Submit the runbook for review"
+      ],
+      "linked_evidence_ids": []
     }
   ]
 }

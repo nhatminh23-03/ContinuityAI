@@ -1,0 +1,1458 @@
+[
+  {
+    "reference": "TCK-1000",
+    "title": "Update service README (Billing Integration)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-11-05",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-1001",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2025-11-22",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-1002",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-11-28",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-1003",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-11-08",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-900",
+    "title": "Invoice Generation: scheduled work in Invoice Sync",
+    "body": "Priya Nair was assigned work on Invoice Generation in Invoice Sync and completed it.",
+    "date": "2026-03-20",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "ASSIGNEE"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-901",
+    "title": "Monitoring: scheduled work in Gateway Operations",
+    "body": "Jordan Lee was assigned work on Monitoring in Gateway Operations and completed it.",
+    "date": "2026-02-26",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "ASSIGNEE"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-902",
+    "title": "Refund Batch Recovery: scheduled work in Refund Ledger",
+    "body": "Tom Becker was assigned work on Refund Batch Recovery in Refund Ledger and completed it.",
+    "date": "2026-03-17",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "ASSIGNEE"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-903",
+    "title": "Refund Reversal: scheduled work in Refund Orchestration",
+    "body": "Priya Nair was assigned work on Refund Reversal in Refund Orchestration and completed it.",
+    "date": "2026-04-13",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "ASSIGNEE"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-904",
+    "title": "Session Recovery: scheduled work in Session Management",
+    "body": "Sofia Ruiz was assigned work on Session Recovery in Session Management and completed it.",
+    "date": "2026-04-10",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "ASSIGNEE"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-905",
+    "title": "Update service README (Billing Integration)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-12-28",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-906",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-10-31",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-907",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2025-12-19",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-908",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-11-28",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-909",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-10-31",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-910",
+    "title": "Update service README (Billing Integration)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-11-10",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-911",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2025-12-21",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-912",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-12-29",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-913",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-01-07",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-914",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-12-26",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-915",
+    "title": "Update service README (Billing Integration)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2026-01-03",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-916",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-11-11",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-917",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-12-31",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-918",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2025-11-17",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-919",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-11-03",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-920",
+    "title": "Update service README (Billing Integration)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2026-01-09",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-921",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-12-22",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-922",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-01-04",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-923",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-11-21",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-924",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2025-11-28",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-925",
+    "title": "Update service README (Billing Integration)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-10-31",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-926",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-11-14",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-927",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-12-06",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-928",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2026-01-11",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-929",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2025-12-23",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-930",
+    "title": "Update service README (Billing Integration)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-11-09",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-931",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-12-13",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-932",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-11-09",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-933",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2025-12-30",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-934",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-12-18",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-935",
+    "title": "Update service README (Billing Integration)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2025-12-11",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-936",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-12-12",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-937",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-11-07",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-938",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2026-01-10",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-939",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-12-29",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-940",
+    "title": "Update service README (Billing Integration)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2025-11-09",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-941",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-11-22",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-942",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-11-27",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-943",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-12-29",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-944",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2026-01-02",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-945",
+    "title": "Update service README (Billing Integration)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-12-06",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-946",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2025-12-27",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-947",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-12-02",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-948",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-12-01",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-949",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-11-23",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-950",
+    "title": "Update service README (Billing Integration)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-12-14",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-951",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-01-03",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-952",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-11-26",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-953",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-12-23",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-954",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-12-17",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-955",
+    "title": "Update service README (Billing Integration)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2025-12-09",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-956",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2026-01-09",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-957",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2025-11-30",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-958",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-11-10",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-959",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-12-03",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-960",
+    "title": "Update service README (Billing Integration)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-11-30",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-961",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-12-14",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-962",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2026-01-02",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-963",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-12-25",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-964",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-10-31",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-965",
+    "title": "Update service README (Billing Integration)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-11-17",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-966",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2025-11-15",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-967",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-11-17",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-968",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2025-11-09",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-969",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-11-26",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-970",
+    "title": "Update service README (Billing Integration)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-11-08",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-971",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-12-08",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-972",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-12-20",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-973",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2025-12-01",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-974",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-11-26",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-975",
+    "title": "Update service README (Billing Integration)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-10-31",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-976",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-11-21",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-977",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2025-12-12",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-978",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-12-13",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-979",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2025-11-08",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-980",
+    "title": "Update service README (Billing Integration)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2025-11-18",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-981",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-12-01",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-982",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-11-04",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-983",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-11-29",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-984",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2025-11-20",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-985",
+    "title": "Update service README (Billing Integration)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-12-02",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-986",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-11-01",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-987",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-12-08",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-988",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2025-11-05",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-989",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Priya Nair made a routine maintenance change with no operational significance.",
+    "date": "2025-12-14",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-990",
+    "title": "Update service README (Billing Integration)",
+    "body": "Daniel Kim made a routine maintenance change with no operational significance.",
+    "date": "2026-01-07",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_daniel_kim",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-991",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
+    "date": "2026-01-08",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_manager_sarah",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-992",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
+    "date": "2025-12-18",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_sofia_ruiz",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-993",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Grace Liu made a routine maintenance change with no operational significance.",
+    "date": "2025-12-26",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-994",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
+    "date": "2025-11-26",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_maria_gomez",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-995",
+    "title": "Update service README (Billing Integration)",
+    "body": "Tom Becker made a routine maintenance change with no operational significance.",
+    "date": "2025-12-20",
+    "system_id": "system_billing_integration",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-996",
+    "title": "Correct a typo in an error message (Authorization)",
+    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
+    "date": "2025-11-08",
+    "system_id": "system_authorization",
+    "participants": [
+      {
+        "engineer_id": "eng_jordan_lee",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-997",
+    "title": "Bump dependency versions (Authentication)",
+    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
+    "date": "2025-11-02",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_omar_haddad",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-998",
+    "title": "Tidy log formatting (Refund Engine)",
+    "body": "Alex Chen made a routine maintenance change with no operational significance.",
+    "date": "2025-12-03",
+    "system_id": "system_refund_engine",
+    "participants": [
+      {
+        "engineer_id": "eng_alex_chen",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "TCK-999",
+    "title": "Reduce build time in the release pipeline (Payment Gateway)",
+    "body": "Lena Novak made a routine maintenance change with no operational significance.",
+    "date": "2025-11-29",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": []
+  }
+]

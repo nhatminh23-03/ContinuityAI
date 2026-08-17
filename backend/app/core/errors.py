@@ -12,6 +12,7 @@ from app.schemas.enums import ErrorCode
 HTTP_STATUS: dict[ErrorCode, int] = {
     ErrorCode.NOT_FOUND: 404,
     ErrorCode.VALIDATION_ERROR: 422,
+    ErrorCode.UNAUTHORIZED: 401,
     ErrorCode.INSUFFICIENT_EVIDENCE: 409,
     ErrorCode.AI_EXTRACTION_FAILED: 502,
     ErrorCode.GRAPH_INCONSISTENCY: 500,

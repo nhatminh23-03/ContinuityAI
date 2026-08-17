@@ -1,0 +1,135 @@
+{
+  "version": "1.0",
+  "organisation": "NovaPay",
+  "warning": "HIDDEN GROUND TRUTH. Readable by data generation and evaluation scripts only, never by application runtime. docs/ARCHITECTURE.md section 40. Enforced by backend/tests/test_ground_truth_isolation.py.",
+  "reference_date": "2026-08-15",
+  "coverage": [
+    { "engineer_id": "eng_alex_chen",   "capability_id": "cap_incident_recovery",       "true_readiness": "VALIDATED" },
+    { "engineer_id": "eng_maria_gomez", "capability_id": "cap_incident_recovery",       "true_readiness": "ASSISTED"  },
+    { "engineer_id": "eng_jordan_lee",  "capability_id": "cap_incident_recovery",       "true_readiness": "EXPOSED", "evidence_profile": "aging" },
+
+    { "engineer_id": "eng_alex_chen",   "capability_id": "cap_provider_failover",       "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_maria_gomez", "capability_id": "cap_provider_failover",       "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_jordan_lee",  "capability_id": "cap_provider_failover",       "true_readiness": "EXPOSED"   },
+
+    { "engineer_id": "eng_alex_chen",   "capability_id": "cap_certificate_management",  "true_readiness": "VALIDATED" },
+    { "engineer_id": "eng_maria_gomez", "capability_id": "cap_certificate_management",  "true_readiness": "EXPOSED"   },
+    { "engineer_id": "eng_jordan_lee",  "capability_id": "cap_certificate_management",  "true_readiness": "NONE"      },
+
+    { "engineer_id": "eng_alex_chen",   "capability_id": "cap_retry_logic",             "true_readiness": "VALIDATED" },
+    { "engineer_id": "eng_jordan_lee",  "capability_id": "cap_retry_logic",             "true_readiness": "VALIDATED" },
+    { "engineer_id": "eng_omar_haddad", "capability_id": "cap_retry_logic",             "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_maria_gomez", "capability_id": "cap_retry_logic",             "true_readiness": "EXPOSED"   },
+
+    { "engineer_id": "eng_maria_gomez", "capability_id": "cap_monitoring",              "true_readiness": "VALIDATED" },
+    { "engineer_id": "eng_lena_novak",  "capability_id": "cap_monitoring",              "true_readiness": "VALIDATED" },
+    { "engineer_id": "eng_alex_chen",   "capability_id": "cap_monitoring",              "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_jordan_lee",  "capability_id": "cap_monitoring",              "true_readiness": "ASSISTED"  },
+
+    { "engineer_id": "eng_priya_nair",  "capability_id": "cap_refund_reversal",         "true_readiness": "ASSISTED"  },
+    { "engineer_id": "eng_omar_haddad", "capability_id": "cap_refund_reversal",         "true_readiness": "EXPOSED"   },
+    { "engineer_id": "eng_priya_nair",  "capability_id": "cap_partial_refund",          "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_omar_haddad", "capability_id": "cap_partial_refund",          "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_priya_nair",  "capability_id": "cap_ledger_reconciliation",   "true_readiness": "VALIDATED" },
+    { "engineer_id": "eng_tom_becker",  "capability_id": "cap_ledger_reconciliation",   "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_omar_haddad", "capability_id": "cap_refund_batch_recovery",   "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_tom_becker",  "capability_id": "cap_refund_batch_recovery",   "true_readiness": "ASSISTED"  },
+    { "engineer_id": "eng_lena_novak",  "capability_id": "cap_refund_monitoring",       "true_readiness": "VALIDATED" },
+    { "engineer_id": "eng_omar_haddad", "capability_id": "cap_refund_monitoring",       "true_readiness": "PRACTICED" },
+
+    { "engineer_id": "eng_tom_becker",  "capability_id": "cap_invoice_generation",      "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_priya_nair",  "capability_id": "cap_invoice_generation",      "true_readiness": "ASSISTED"  },
+    { "engineer_id": "eng_tom_becker",  "capability_id": "cap_tax_calculation",         "true_readiness": "VALIDATED" },
+    { "engineer_id": "eng_priya_nair",  "capability_id": "cap_tax_calculation",         "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_priya_nair",  "capability_id": "cap_payment_reconciliation",  "true_readiness": "VALIDATED" },
+    { "engineer_id": "eng_tom_becker",  "capability_id": "cap_payment_reconciliation",  "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_tom_becker",  "capability_id": "cap_export_scheduling",       "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_omar_haddad", "capability_id": "cap_export_scheduling",       "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_tom_becker",  "capability_id": "cap_export_recovery",         "true_readiness": "VALIDATED" },
+    { "engineer_id": "eng_lena_novak",  "capability_id": "cap_export_recovery",         "true_readiness": "PRACTICED" },
+
+    { "engineer_id": "eng_sofia_ruiz",  "capability_id": "cap_credential_verification", "true_readiness": "VALIDATED" },
+    { "engineer_id": "eng_grace_liu",   "capability_id": "cap_credential_verification", "true_readiness": "VALIDATED" },
+    { "engineer_id": "eng_grace_liu",   "capability_id": "cap_mfa_enrollment",          "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_daniel_kim",  "capability_id": "cap_mfa_enrollment",          "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_sofia_ruiz",  "capability_id": "cap_session_recovery",        "true_readiness": "ASSISTED"  },
+    { "engineer_id": "eng_daniel_kim",  "capability_id": "cap_session_recovery",        "true_readiness": "EXPOSED"   },
+    { "engineer_id": "eng_sofia_ruiz",  "capability_id": "cap_token_rotation",          "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_grace_liu",   "capability_id": "cap_token_rotation",          "true_readiness": "EXPOSED"   },
+    { "engineer_id": "eng_lena_novak",  "capability_id": "cap_auth_monitoring",         "true_readiness": "VALIDATED" },
+    { "engineer_id": "eng_daniel_kim",  "capability_id": "cap_auth_monitoring",         "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_grace_liu",   "capability_id": "cap_directory_sync",          "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_daniel_kim",  "capability_id": "cap_directory_sync",          "true_readiness": "PRACTICED" },
+
+    { "engineer_id": "eng_daniel_kim",  "capability_id": "cap_policy_evaluation",       "true_readiness": "VALIDATED" },
+    { "engineer_id": "eng_sofia_ruiz",  "capability_id": "cap_policy_evaluation",       "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_daniel_kim",  "capability_id": "cap_policy_rollback",         "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_grace_liu",   "capability_id": "cap_policy_rollback",         "true_readiness": "EXPOSED"   },
+    { "engineer_id": "eng_grace_liu",   "capability_id": "cap_role_assignment",         "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_daniel_kim",  "capability_id": "cap_role_assignment",         "true_readiness": "PRACTICED" },
+    { "engineer_id": "eng_grace_liu",   "capability_id": "cap_permission_audit",        "true_readiness": "EXPOSED", "evidence_profile": "sparse" }
+  ],
+  "expected_capability_exposure": {
+    "cap_incident_recovery": "DEGRADED",
+    "cap_provider_failover": "COVERED",
+    "cap_certificate_management": "DEGRADED",
+    "cap_retry_logic": "COVERED",
+    "cap_monitoring": "COVERED",
+    "cap_refund_reversal": "CRITICAL_GAP",
+    "cap_partial_refund": "COVERED",
+    "cap_ledger_reconciliation": "COVERED",
+    "cap_refund_batch_recovery": "COVERED",
+    "cap_refund_monitoring": "COVERED",
+    "cap_invoice_generation": "COVERED",
+    "cap_tax_calculation": "COVERED",
+    "cap_payment_reconciliation": "COVERED",
+    "cap_export_scheduling": "COVERED",
+    "cap_export_recovery": "COVERED",
+    "cap_credential_verification": "COVERED",
+    "cap_mfa_enrollment": "COVERED",
+    "cap_session_recovery": "CRITICAL_GAP",
+    "cap_token_rotation": "DEGRADED",
+    "cap_auth_monitoring": "COVERED",
+    "cap_directory_sync": "COVERED",
+    "cap_policy_evaluation": "COVERED",
+    "cap_policy_rollback": "DEGRADED",
+    "cap_role_assignment": "COVERED",
+    "cap_permission_audit": "INSUFFICIENT_EVIDENCE"
+  },
+  "expected_declared_owner_mismatch": [
+    "system_payment_gateway"
+  ],
+  "expected_simulation": {
+    "simulation_type": "ENGINEER_UNAVAILABLE",
+    "engineer_id": "eng_alex_chen",
+    "scope_type": "SYSTEM",
+    "scope_id": "system_payment_gateway",
+    "before": {
+      "continuity_risk_index": 74,
+      "continuity_risk_class": "HIGH",
+      "critical_gap_count": 0,
+      "degraded_capability_count": 2,
+      "covered_capability_count": 3
+    },
+    "after": {
+      "continuity_risk_index": 93,
+      "continuity_risk_class": "CRITICAL",
+      "critical_gap_count": 2,
+      "degraded_capability_count": 1,
+      "covered_capability_count": 2
+    },
+    "impacts": {
+      "cap_incident_recovery": { "before": "DEGRADED", "after": "CRITICAL_GAP", "remaining_best_readiness": "ASSISTED" },
+      "cap_provider_failover": { "before": "COVERED", "after": "DEGRADED", "remaining_best_readiness": "PRACTICED" },
+      "cap_certificate_management": { "before": "DEGRADED", "after": "CRITICAL_GAP", "remaining_best_readiness": "EXPOSED" },
+      "cap_retry_logic": { "before": "COVERED", "after": "COVERED", "remaining_best_readiness": "VALIDATED" },
+      "cap_monitoring": { "before": "COVERED", "after": "COVERED", "remaining_best_readiness": "VALIDATED" }
+    }
+  },
+  "expected_backup_candidates": {
+    "cap_incident_recovery": [
+      { "engineer_id": "eng_maria_gomez", "technical_overlap": "HIGH" },
+      { "engineer_id": "eng_jordan_lee", "technical_overlap": "MEDIUM" }
+    ]
+  }
+}

@@ -7,24 +7,32 @@
 > disappears — and prepare targeted knowledge-transfer work before the gap becomes an operational
 > problem.
 
-*Submission README — sections below are stubs to be completed before submission.*
+*Submission README. The technical sections are drafted; the product narrative, screenshots, and
+demo walkthrough are still to come (`TEAM_WORKFLOW_PERSON_A_B.md` section 27 splits the first
+drafts, then both developers cross-review).*
 
 ---
 
 ## Problem
 
-*TODO.* Engineering organisations eliminate infrastructure single points of failure while leaving
-a less visible failure mode untreated: critical technical knowledge concentrated in one person. A
-service may be redundant across regions, but the ability to recover it, deploy it, rotate its
-credentials, or diagnose its failures may still depend on one engineer.
+*Draft — product narrative to be expanded.* Engineering organisations eliminate infrastructure
+single points of failure while leaving a less visible failure mode untreated: critical technical
+knowledge concentrated in one person. A service may be redundant across regions, but the ability to
+recover it, deploy it, rotate its credentials, or diagnose its failures may still depend on one
+engineer.
 
-Expand with: why declared ownership is not demonstrated capability, why activity volume is not
-expertise, and the trigger scenarios (resignation, leave during an incident, reorganisation,
-architecture change).
+Existing tools cannot answer this. `CODEOWNERS` records who *declared* ownership, not who has
+demonstrably operated the service. Contribution graphs record activity volume, and two hundred
+trivial commits say less than two independent production recoveries. The evidence that would answer
+the question is real but scattered across repositories, incident platforms, ticket systems, and
+runbooks, and it goes stale as architecture changes.
+
+*To expand: the trigger scenarios — resignation, leave during an incident, reorganisation,
+architecture migration.*
 
 ## Solution
 
-*TODO.* One decision loop for an engineering manager:
+*Draft — screenshots and user journey to come.* One decision loop for an engineering manager:
 
 ```
 Dashboard → System Detail → Graph + Evidence ("Why?") → Simulate engineer unavailable
@@ -32,64 +40,368 @@ Dashboard → System Detail → Graph + Evidence ("Why?") → Simulate engineer 
   → Generate knowledge-transfer plan → Manager approves
 ```
 
-Expand with: screenshots, the four scored concepts (readiness, exposure, continuity risk,
-evidence confidence), and what the product deliberately does not do.
+Four concepts are measured, and keeping them separate is what makes the output legible:
+
+| Concept | Attaches to | Answers |
+|---|---|---|
+| **Readiness** | one `(engineer, capability)` pair | What has this person demonstrably done? |
+| **Exposure** | a capability, rolled up to a system | Does redundant coverage exist across everyone? |
+| **Continuity Risk Index / Class** | a capability, a system | How severe, for comparison and sorting? |
+| **Evidence Confidence** | coverage, capability, system | How much do we trust the underlying data? |
+
+`Risk: HIGH` with `Confidence: LOW` is a legitimate and meaningful state — the evidence points at
+exposure, and the evidence is thin. Collapsing the two would let a data-quality problem read as
+safety.
 
 ## AI approach and architecture
 
-*TODO.* The governing rule is **AI understands, rules decide**:
+The governing rule is **AI understands, rules decide**:
 
 ```
-Engineering artifacts → AI semantic extraction → structured evidence
-  → deterministic aggregation → readiness / exposure / continuity risk
-  → counterfactual simulation → grounded recommendation
+Engineering artifacts        incidents · pull requests · reviews · tickets · runbooks · CODEOWNERS
+        │
+        ▼  AI semantic extraction          what does this artifact demonstrate, about whom?
+Structured evidence          (engineer, capability, evidence_role, strength, provenance)
+        │
+        ▼  deterministic aggregation       strength · diversity · repetition · freshness
+Readiness                    NONE · EXPOSED · ASSISTED · PRACTICED · VALIDATED
+        │
+        ▼  deterministic rules             criticality × coverage shape
+Exposure + Continuity Risk   COVERED · DEGRADED · CRITICAL_GAP · INSUFFICIENT_EVIDENCE
+        │
+        ▼  counterfactual                  same rules, one engineer's coverage excluded
+Capability loss analysis  →  backup candidates  →  knowledge-transfer plan  →  human approval
 ```
 
-AI interprets unstructured artifacts (incidents, pull requests, tickets, runbooks) into typed
-evidence. It never assigns readiness, risk, employee value, or a chosen candidate — a
-deterministic rule engine owns those, and every conclusion traces back to source evidence.
+### Where the boundary sits, and why
 
-Expand with: the architecture diagram, the AI provider abstraction, structured-output validation,
-and hidden-ground-truth evaluation.
+AI interprets unstructured text. It never assigns readiness, exposure, continuity risk, employee
+value, or a chosen candidate. The `AIProvider` interface (`app/ai/provider.py`) has four methods —
+`extract_artifact_semantics`, `summarize_simulation`, `explain_candidate`,
+`generate_mitigation_plan` — and deliberately no `assess_readiness` or `score_risk`. **The interface
+shape is itself the guardrail:** there is no method through which a model could return a score, so
+no amount of prompt drift can produce one.
+
+Everything downstream is deterministic and reproducible, which is what makes a "Why?" drawer
+possible at all. A model cannot explain why it output 72; a rule engine can show that a CRITICAL
+capability with one adequate engineer anchors at 70, plus one for the sole-expert dependency, plus
+one because the best alternative has only assisted.
+
+### Extraction is closed-world and validated
+
+A provider receives the capability taxonomy it is allowed to attribute evidence to, and every
+response is validated before anything reaches the database (`app/ai/validation.py`). Four rejection
+classes:
+
+| Rejected | Why it matters |
+|---|---|
+| Unknown capability | An invented capability is a hallucination entering the graph |
+| Cross-system attribution | Gateway work credited to the refund service is a mis-mapping |
+| Unknown engineer | An identity that does not exist cannot have demonstrated anything |
+| **Claim against a non-participant** | The most damaging output available to this product: an unsupported claim against a named person |
+
+Evidence strength is derived from the evidence role rather than trusted from the model, so a
+provider that returns "STRONG" for a code review is corrected, not believed.
+
+### Two providers, one interface
+
+| `AI_PROVIDER` | What it does |
+|---|---|
+| `deterministic` | Offline rule-based extraction. No credential, fully repeatable. **The shipped default.** |
+| `watsonx` | IBM watsonx.ai (`ibm/granite-4-h-small`) reads each artifact and returns structured claims |
+| `cached` | Replays committed watsonx output from `data/extraction/`, so a model-derived graph seeds offline |
+
+Both real providers pass through the same validation gate and feed the same deterministic engine.
+Swapping them changes extraction quality and changes no conclusion path — which is the property the
+interface exists to guarantee.
+
+**The rule-based provider is the default, and its ceiling is worth stating plainly.** It finds what
+the text *names*: it resolves capabilities by matching capability names and aliases, scoped to the
+artifact's system, then maps the participant role the source system recorded onto an evidence role. It
+cannot read "restarted the workers and traffic recovered" and infer incident recovery without the
+phrase present.
+
+### What the model measurably adds
+
+The watsonx provider was run over the corpus and diffed against the rule-based one
+(`data/extraction/comparison_report.md`). Over the 313 artifacts extracted before the account's token
+quota was spent:
+
+| Measure | Count |
+|---|---|
+| Artifacts where both produced identical output | 291 / 313 |
+| Claims both agree on | 50 |
+| Claims found only by the model | 0 |
+| Claims found only by the rules | 5 |
+| Same `(capability, engineer)` pair, different evidence role | 17 |
+
+The disagreements are the interesting part, and they are all in one direction: 14 cases of
+`CONTRIBUTION → INDEPENDENT_EXECUTION` and 3 of `CONTRIBUTION → KNOWLEDGE_CAPTURE`. The model read
+the narrative and concluded the person acted alone, or authored operational guidance, where the rule
+saw only that they changed something. That is precisely the judgement a string match cannot make —
+and precisely the judgement that most needs checking, because promoting a contribution to an
+independent execution is what moves an engineer toward `PRACTICED` and therefore what closes or opens
+a coverage gap.
+
+**Which is more accurate is an open question, and the harness can answer it.** Seed and evaluate under
+each provider and compare reconstruction against the hidden ground truth. That comparison is not yet
+run because the watsonx account's token quota was exhausted at 49% coverage, and `cached` deliberately
+refuses to run on a partial cache: a graph half derived by a model and half by string matching would be
+neither, and no number in it could be explained by reference to a single method.
+
+So the honest position today: the model-backed path is implemented, credential-verified, rate-limit
+aware, resumable, and measured against the rules on half the corpus — and the graph the API serves is
+still rule-derived. [`RECOMMENDATIONS.md`](RECOMMENDATIONS.md) R-01 tracks finishing it.
+
+### Module layout
+
+```
+backend/app/
+  ingestion/     source adapters → normalised artifacts
+  ai/            provider interface, deterministic provider, validation, versioned prompt spec
+  evidence/      strength, freshness, aggregation, evidence confidence
+  continuity/    readiness rules, exposure rules, risk index and class, reason codes, aggregation
+  graph/         typed nodes and edges assembled from relational tables
+  simulation/    the counterfactual
+  recommendation/ backup candidate comparison
+  mitigation/    knowledge-transfer plan generation and approval
+  challenge/     manager attestation, evidence linking, mapping correction
+  services/      facts loader, read services, recompute
+  evaluation/    hidden-ground-truth comparison (the only package that may read the answer key)
+```
+
+A modular monolith on FastAPI with SQLite behind a typed graph abstraction. No graph database: the
+graph semantics live in Python so traversal and simulation do not depend on a storage product.
+
+## Evidence model
+
+Readiness is computed from evidence and never written directly. There is no code path anywhere —
+including the manager challenge workflow — that accepts a readiness value.
+
+| Level | Requires |
+|---|---|
+| `VALIDATED` | 2+ independent executions, across 2+ artifact types among the strong evidence, at least one still fresh, no conflicts |
+| `PRACTICED` | 1+ independent execution that has not gone stale, plus a supporting item |
+| `ASSISTED` | 2+ items including assisted execution, a contribution, or authored documentation |
+| `EXPOSED` | Any qualifying evidence, none of it execution |
+| `NONE` | No qualifying evidence |
+
+The `EXPOSED → ASSISTED → PRACTICED` progression turns on **independence, never volume** — the rules
+read `independent_execution_count`, not a total. Twenty code reviews stay `EXPOSED`. That is the
+"artifact, not activity" principle expressed as code. `PRACTICED → VALIDATED` additionally requires
+repetition *and* source diversity: two incidents from the same pager rotation are one kind of proof;
+an incident plus an authored runbook are two.
+
+Uncertainty is a first-class answer. Fewer than two evidence records returns
+`INSUFFICIENT_EVIDENCE` with a null index and null class rather than a manufactured classification,
+and conflicting evidence — an attempt that was reverted — is retained, shown separately, and drops
+confidence to `LOW` while leaving the other evidence's conclusions intact.
+
+## Continuity risk engine
+
+The risk **class** is the authoritative rule output. The **index** is a derived comparison number,
+anchored on the class and clamped to its band so a modifier can never silently reclassify anything.
+It is not a probability of outage, of departure, or of anything else.
+
+Adequate coverage means `PRACTICED` or better, on evidence that has not gone stale.
+
+| Adequate engineers | CRITICAL capability | HIGH capability | MEDIUM / LOW |
+|---|---|---|---|
+| 0 | `CRITICAL_GAP` / CRITICAL | `CRITICAL_GAP` / HIGH | `DEGRADED` / MODERATE |
+| 1 | `DEGRADED` / HIGH | `DEGRADED` / MODERATE | `COVERED` / MODERATE |
+| 2+ | `COVERED` / LOW with a VALIDATED engineer, else MODERATE | same | same |
+
+Separating `DEGRADED` (coverage exists, resilience does not) from `CRITICAL_GAP` (no adequate
+coverage remains) is what makes the counterfactual able to *create* a gap. Under the original rule
+shape a sole-expert capability was already a critical gap, so removing the expert could not change
+anything — the defect that the Phase 0 contract audit found and fixed.
+
+Bands are LOW 0–39, MODERATE 40–59, HIGH 60–79, CRITICAL 80–100, anchored at 20 / 50 / 70 / 90.
+Worked example, Incident Recovery: CRITICAL capability, one adequate engineer, best alternative only
+assisted → class HIGH, anchor 70, +1 sole adequate engineer, +1 best alternative assisted = **72**.
+Every fired rule is returned as a machine-readable reason code, and the modifier arithmetic is
+returned alongside it, so the number is inspectable rather than merely reproducible.
+
+System risk is the **maximum** across a system's capabilities, never an average: nine healthy
+capabilities must not dilute one critical gap. Platforms get no index of their own — a platform row
+shows its highest system index, total critical gaps, and drift.
+
+## Counterfactual simulation
+
+The hero capability, and the smallest piece of code in the system:
+
+```python
+before = assess(facts)
+after  = assess(facts.without(engineer_id))
+```
+
+`CapabilityFacts` is a frozen dataclass and `.without()` returns a new instance, so two properties
+hold structurally rather than by discipline. Baseline state **cannot** be corrupted — nothing is
+written and there is no snapshot to restore. And before and after **cannot** disagree, because there
+is only one assessment implementation rather than a separate "simulate" path that could drift.
+
+The result is specific rather than vague. Simulating the sole expert on the seeded Payment Gateway:
+
+```
+Incident Recovery        DEGRADED → CRITICAL_GAP   (best remaining: ASSISTED)
+Provider Failover        COVERED  → DEGRADED       (best remaining: PRACTICED)
+Certificate Management   DEGRADED → CRITICAL_GAP   (best remaining: EXPOSED)
+Retry Logic              COVERED  → COVERED        (best remaining: VALIDATED)
+Monitoring               COVERED  → COVERED        (best remaining: VALIDATED)
+
+system  74 HIGH → 93 CRITICAL
+```
+
+Reporting the unchanged capabilities is the point, not noise: "Retry Logic stays covered" is what
+makes this an analysis rather than the observation that a person is important. The simulation
+identifies coverage loss and does not predict an outage.
+
+## Human correction
+
+An assessment can be disputed, and a manager never edits a score. They change the **evidence** —
+link an artifact extraction missed, attest to something no artifact captured, or correct a
+mis-mapped record — and readiness, exposure, and risk are recomputed from it through the same code
+path the seed uses. Previous and new assessments are both persisted, because a correctable
+assessment that cannot be audited is worse than one that cannot be corrected.
+
+Manager attestation is capped at moderate strength and always visibly labelled as an attestation, so
+no quantity of assertions can manufacture a `VALIDATED` expert.
+
+## Evaluation
+
+Because real employee and incident data is sensitive and unavailable, the prototype is validated
+against a synthetic organisation with **hidden ground truth**. A generator reads the true readiness
+distribution and emits artifacts from it; the application receives only the artifacts and must
+re-derive everything.
+
+The isolation is enforced, not asserted. Application configuration exposes no path to the answer
+key, only `app/evaluation/` resolves one, and a test parses every module under `app/` and fails if
+any of them names the directory, imports the evaluation package, or reaches it through settings.
+Without that test the product's central claim would be unfalsifiable.
+
+Results on the seeded dataset — 640 artifacts, 126 evidence records, 56 coverage relationships:
+
+| Check | Result |
+|---|---|
+| Knowledge reconstruction (engineer-capability readiness) | 56 / 56 |
+| Capability exposure classification | 25 / 25 |
+| Critical gap detection (no misses, no false positives) | 2 / 2 |
+| Declared-versus-demonstrated ownership mismatch | 1 / 1 |
+| Counterfactual simulation | 25 / 25 |
+| Backup candidate recommendation | 2 / 2 |
+| Evidence grounding (every coverage claim cites a source) | 56 / 56 |
+
+**These are not accuracy figures and must not be quoted as such.** The generator emits evidence
+patterns chosen to be classifiable, so what they measure is that the pipeline is self-consistent end
+to end — ingestion, extraction, aggregation, readiness, exposure, risk, simulation, candidates — and
+that no stage drops or invents information. They say nothing about whether the readiness heuristics
+match real human expertise; those are prototype thresholds for transparent demo logic, not
+calibrated competency standards. The caveat is printed inside the generated report.
+
+### What real public data showed
+
+The corpus is hybrid, as the data strategy requires: 520 synthetic private enterprise records
+(incidents, tickets, runbooks) plus 120 real merged pull requests and reviews from a public
+repository, ingested through the same pipeline.
+
+Exactly one of those 120 real artifacts produced capability evidence. That is a finding rather than a
+failure. A public SDK repository's vocabulary is library maintenance — support, error handling,
+tests, packaging — while the capabilities this product assesses are demonstrated in *private
+operational* records: incidents, runbooks, on-call history. It is direct evidence for why the hybrid
+data strategy is necessary, and a concrete measurement of the rule-based extractor's ceiling.
+
+Contributor identities in that public data are pseudonymised onto the synthetic organisation and the
+real logins are never written to disk, including `@mentions` scrubbed from pull request bodies. This
+product infers capability readiness about named people; doing that to real engineers who never
+consented would breach its own responsible-AI boundary. Artifacts stay traceable through their real
+URLs — the attribution is what is synthetic, and the manifest says so.
 
 ## Challenge theme
 
-*TODO.* Wildcard Challenge — Build Intelligent Systems for the Future of Work.
+*Draft — judging-criteria mapping to be expanded jointly.* Wildcard Challenge — Build Intelligent
+Systems for the Future of Work.
 
-Expand with: how the product addresses planning, coordination, decision-making, and execution,
-and how it maps to the judging criteria.
+The product addresses the four capabilities the brief names: it **plans** targeted
+knowledge-transfer work for specific capability gaps, **coordinates** by identifying primary and
+backup coverage and preparing work for approval, supports **decision-making** through the
+counterfactual simulator, and prepares **execution** as structured tasks a human approves. It is
+decision support for an engineering manager, not workflow automation — every staffing decision
+stays human.
 
 ## Development tooling
 
-*TODO.* How the prototype was built — see [`BUILD_WITH_BOB.md`](BUILD_WITH_BOB.md) for the
-development log covering planning, implementation, testing, debugging, and documentation.
+*Draft.* See [`BUILD_WITH_BOB.md`](BUILD_WITH_BOB.md) for the development log: what was built, which
+requirement each unit implements, how it was validated, and what remains open. It records the three
+specification defects the build surfaced, including a rule that made the frozen demo state
+unreachable.
 
 ## Setup
 
-Prerequisites: Node 20+ and Python 3.11+ (3.9 will not work — the DTOs use `int | None` syntax).
+Prerequisites: Node 20+ and Python 3.10+ (the DTOs use `int | None`, so 3.9 will not work).
 
 **Backend** — http://localhost:8000, interactive docs at `/docs`:
 
 ```bash
-cd backend && python3.11 -m venv .venv && .venv/bin/pip install -r requirements.txt && .venv/bin/python -m uvicorn app.main:app --reload
+cd backend
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python -m uvicorn app.main:app --reload
 ```
+
+The database is created and seeded on first boot, so there is no separate setup step. Set
+`AUTO_SEED=false` to manage it yourself.
 
 **Frontend** — http://localhost:3000:
 
 ```bash
-cd frontend && npm install && npm run dev
+cd frontend && npm install
+cp .env.local.example .env.local     # NEXT_PUBLIC_USE_MOCKS=false points at the live backend
+npm run dev
 ```
 
-The frontend starts in fixture mode. To point it at the live backend, copy
-`frontend/.env.local.example` to `.env.local` and set `NEXT_PUBLIC_USE_MOCKS=false`.
+### Commands
 
-**Checks:**
+All from `backend/`, with `PYTHONPATH=.`:
+
+| Command | Purpose |
+|---|---|
+| `python -m scripts.seed_demo` | Rebuild the demo database from scratch. Deterministic and idempotent |
+| `python -m scripts.run_evaluation` | Compare inferred state against the hidden ground truth; writes `data/generated/evaluation_report.md` |
+| `python -m scripts.verify_golden_path` | Walk every endpoint, diff each response against its fixture, and report latency against AC-14 |
+| `python -m scripts.refresh_fixtures --check` | Fail if any fixture has drifted from live output |
+| `python -m scripts.generate_synthetic_data` | Regenerate the synthetic corpus from the hidden model |
+| `python -m scripts.fetch_public_github` | Refetch and re-anonymise the real public GitHub corpus (needs `gh`) |
+
+Neither regeneration command is needed for normal work: both corpora are committed.
+
+### Configuration
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `DATABASE_URL` | `sqlite:///backend/continuity.db` | Demo database |
+| `AUTO_SEED` | `true` | Seed automatically when the database is empty |
+| `AI_PROVIDER` | `deterministic` | Extraction provider. Only the offline provider ships |
+| `API_TOKEN` | *(empty)* | When set, `/api/v1` requires `Authorization: Bearer <token>`. Empty leaves the API open, which is the local default |
+| `REFERENCE_DATE` | `2026-08-15` | The clock freshness is judged against, so a seeded demo cannot age into different classifications |
+
+### Checks
 
 ```bash
-cd backend && .venv/bin/python -m pytest -q && cd ../frontend && npm run typecheck && npm run build
+cd backend && .venv/bin/python -m pytest -q                 # 131 tests, ~3 seconds
+cd ../frontend && npm run typecheck && npm run build
 ```
 
-*TODO before submission:* the deterministic seed command and a clean-clone walkthrough.
+### Clean-clone walkthrough
+
+```bash
+git clone <repo> && cd ContinuityAI
+cd backend && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+PYTHONPATH=. .venv/bin/python -m scripts.seed_demo          # 640 artifacts -> 126 evidence records
+PYTHONPATH=. .venv/bin/python -m scripts.run_evaluation     # every check should pass
+.venv/bin/python -m uvicorn app.main:app --reload
+```
+
+The seeded organisation, the hidden ground truth, and both artifact corpora are committed, so the
+demo reproduces byte for byte from a fresh clone with no network access.
 
 ## Demo
 
@@ -116,8 +428,13 @@ never as inability. Staffing decisions remain human decisions.
 | Path | Contents |
 |---|---|
 | [`docs/`](docs/) | Specifications. Start at [`docs/README.md`](docs/README.md); load [`docs/ENGINEERING_RULES.md`](docs/ENGINEERING_RULES.md) before any task. |
-| [`fixtures/`](fixtures/) | Shared mock payloads — the contract fixtures both sides validate against. |
+| [`fixtures/`](fixtures/) | Shared contract payloads both sides validate against. Regenerated from live output by `scripts/refresh_fixtures.py`. |
+| `data/org/` | The NovaPay organisation structure: platforms, systems, components, capabilities, engineers. |
+| `data/synthetic/` | Generated private enterprise corpus — 520 incidents, pull requests, reviews, issues, tickets, runbooks. Committed for reproducibility. |
+| [`data/public/`](data/public/) | 120 real merged pull requests and reviews from a public repository, contributor identities pseudonymised. |
+| [`data/ground_truth/`](data/ground_truth/) | Hidden readiness labels. Readable by the generator and the evaluator only, never by application runtime. |
 | `frontend/` | Next.js / React / TypeScript application. |
-| `backend/` | FastAPI / Python application. |
+| `backend/` | FastAPI / Python application. Engines under `app/{evidence,continuity,simulation,recommendation,mitigation,challenge}/`. |
+| [`RECOMMENDATIONS.md`](RECOMMENDATIONS.md) | Open concerns and improvements, ranked by risk. |
 | [`BUILD_WITH_BOB.md`](BUILD_WITH_BOB.md) | Development log. |
 | [`HANDOFF.md`](HANDOFF.md) | Session handoff notes. |
