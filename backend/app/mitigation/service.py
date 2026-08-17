@@ -19,7 +19,7 @@ preserves edit-before-approve without an eleventh endpoint or plan-mutation sema
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
@@ -142,7 +142,7 @@ class MitigationPlanService:
             simulation_id=request.simulation_id,
             status=MitigationPlanStatus.DRAFT.value,
             target_readiness=target_readiness.value,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
         )
         for index, task in enumerate(draft.tasks, start=1):
             plan.tasks.append(
@@ -200,7 +200,7 @@ class MitigationPlanService:
 
         plan.status = MitigationPlanStatus.APPROVED.value
         plan.approved_by = request.approved_by
-        plan.approved_at = datetime.utcnow()
+        plan.approved_at = datetime.now(timezone.utc)
         self.session.commit()
 
         return ApprovePlanResponse(

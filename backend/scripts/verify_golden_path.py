@@ -67,6 +67,9 @@ def main() -> None:
     failures: list[str] = []
 
     def check(label: str, fixture: str, response) -> Any:
+        # elapsed is measured by httpx and covers the full request/response cycle, which is what
+        # AC-14 is about. Reads target < 800 ms local p95, deterministic simulation < 2 s.
+        timings.append((label, response.elapsed.total_seconds() * 1000))
         if response.status_code >= 400:
             failures.append(f"{label}: HTTP {response.status_code} {response.text[:200]}")
             return None
@@ -77,6 +80,7 @@ def main() -> None:
             differences[label] = found
         return body
 
+    timings: list[tuple[str, float]] = []
     print("golden path\n" + "=" * 72)
 
     check("GET /platforms", "platforms", client.get("/api/v1/platforms"))
@@ -159,6 +163,17 @@ def main() -> None:
             print(f"  {label}")
             for item in found:
                 print(f"    - {item}")
+
+    print("\nlatency (AC-14: reads < 800 ms, simulation < 2 s)")
+    breaches = []
+    for label, milliseconds in timings:
+        budget = 2000.0 if "simulations" in label else 800.0
+        status = "ok" if milliseconds <= budget else "OVER"
+        if status == "OVER":
+            breaches.append(f"{label} {milliseconds:.0f} ms > {budget:.0f} ms")
+        print(f"  [{status:>4}] {milliseconds:7.1f} ms  {label}")
+    if breaches:
+        print("\n  AC-14 breaches: " + "; ".join(breaches))
 
     print("\n" + "=" * 72)
     print("Differences are not automatically failures. Decide per item whether the fixture or the")

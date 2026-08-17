@@ -165,6 +165,31 @@ PINNED_HERO_ARTIFACTS: list[dict] = [
     },
 ]
 
+# An attempt that did not hold. The extraction layer marks it conflicting, so it never supports a
+# claim, it appears separately in the provenance drawer, and it drags Evidence Confidence down to
+# LOW — demonstrating that "risk HIGH, confidence LOW" is a state the product can actually reach.
+#
+# Deliberately placed on Authorization rather than Payment Gateway: it must exercise the path
+# without moving any number the frozen fixtures pin. Daniel keeps PRACTICED (his two qualifying
+# records are untouched) and Policy Rollback stays DEGRADED at 54, so the Identity Platform still
+# reports a highest system index of 68.
+PINNED_CONFLICT_ARTIFACTS: list[dict] = [
+    {
+        "kind": "incidents",
+        "reference": "INC-259",
+        "title": "P2 Authorization — Policy Rollback attempt",
+        "body": (
+            "Daniel Kim attempted Policy Rollback after a bad policy release. The change was "
+            "rolled back after the decision cache failed to invalidate, leaving stale entitlements "
+            "in place, and the incident was handed off unresolved to the following shift."
+        ),
+        "date": "2026-01-22",
+        "system_id": "system_authorization",
+        "participants": [{"engineer_id": "eng_daniel_kim", "participant_role": "RESOLVER"}],
+        "file_paths": [],
+    },
+]
+
 # Evidence pattern per true readiness label. Each entry is (kind, participant_role).
 RECIPES: dict[str, list[tuple[str, str]]] = {
     "VALIDATED": [
@@ -359,12 +384,13 @@ def generate() -> dict[str, list[dict]]:
     buckets: dict[str, list[dict]] = {kind: [] for kind in REFERENCE_PREFIX}
     problems: list[str] = []
 
-    # 1. Authored hero artifacts.
-    for artifact in PINNED_HERO_ARTIFACTS:
+    # 1. Authored artifacts: the hero capability, plus the one conflicting record.
+    pinned = [*PINNED_HERO_ARTIFACTS, *PINNED_CONFLICT_ARTIFACTS]
+    for artifact in pinned:
         record = {k: v for k, v in artifact.items() if k != "kind"}
         buckets[artifact["kind"]].append(record)
 
-    allocator = ReferenceAllocator({a["reference"] for a in PINNED_HERO_ARTIFACTS})
+    allocator = ReferenceAllocator({a["reference"] for a in pinned})
 
     # 2. Generated artifacts, one pass per ground-truth coverage entry, sorted for determinism.
     entries = sorted(

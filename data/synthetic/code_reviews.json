@@ -1514,19 +1514,5 @@
       }
     ],
     "file_paths": []
-  },
-  {
-    "reference": "REV-806",
-    "title": "Upgrade base container image (Authentication)",
-    "body": "Tom Becker made a routine maintenance change with no operational significance.",
-    "date": "2025-08-08",
-    "system_id": "system_authentication",
-    "participants": [
-      {
-        "engineer_id": "eng_tom_becker",
-        "participant_role": "AUTHOR"
-      }
-    ],
-    "file_paths": []
   }
 ]

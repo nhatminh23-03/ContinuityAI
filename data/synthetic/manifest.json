@@ -3,9 +3,9 @@
   "random_seed": 20260815,
   "reference_date": "2026-08-15",
   "counts": {
-    "code_reviews": 108,
+    "code_reviews": 107,
     "documents": 15,
-    "incidents": 61,
+    "incidents": 62,
     "issues": 107,
     "pull_requests": 125,
     "tickets": 104

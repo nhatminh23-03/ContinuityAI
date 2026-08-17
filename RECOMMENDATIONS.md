@@ -229,32 +229,39 @@ formally cut it and mark those requirements as descoped. The one thing not to do
 
 ---
 
-## R-10 — Performance has not been measured against AC-14
+## R-10 — Performance measured against AC-14 — **RESOLVED 2026-08-17**
 
-**Status today.** Reads are served from precomputed assessment rows and the full test suite runs in
-under two seconds, so the targets are almost certainly met. But "almost certainly" is not a
-measurement, and AC-14 names specific numbers: reads under 800 ms local p95, deterministic
-simulation under 2 s.
+`scripts/verify_golden_path.py` now records per-endpoint latency and flags anything over budget.
+Measured on the seeded dataset:
 
-**Recommendation.** Add a small timing check to `scripts/verify_golden_path.py` that prints
-per-endpoint latency. Ten lines, and it turns an assumption into a number that can be quoted.
+| Endpoint group | Measured | AC-14 budget |
+|---|---|---|
+| Reads (six GET endpoints) | 2.5 - 26 ms | < 800 ms local p95 |
+| `POST /simulations` | 6.1 ms | < 2 s |
+| Candidate comparison, plan generation, approval | 3 - 6 ms | < 12 s (AI operations) |
 
-**Impact:** low · **Effort:** 30 minutes · **Owner:** Person A · **Decision:** A
+Two orders of magnitude of headroom, because assessments are precomputed at seed time and reads are
+indexed lookups. The 26 ms on the first call is import and connection warm-up, not query cost.
 
 ---
 
-## R-11 — Conflicting evidence is implemented but never exercised by the seed
+## R-11 — Conflicting evidence now exercised by the seed — **RESOLVED 2026-08-17**
 
-**Status today.** Conflict detection works (`_CONFLICT_MARKERS` in the provider, `is_conflicting` on
-evidence, confidence dropping to LOW, `conflicting_evidence` in the response). No seeded artifact
-triggers it, so the array is always empty and the UI path is untested against real data.
+`INC-259` was added to the corpus: a Policy Rollback attempt that was itself rolled back and handed
+off unresolved. It produces a record the extractor marks conflicting, which means:
 
-**Recommendation.** Add one incident whose recovery was later reverted. It exercises the
-`CONFLICTING_EVIDENCE` reason code, gives Person B something to render, and demonstrates the
-uncertainty story better than an empty array does.
+- the record is retained and shown separately in `conflicting_evidence`, never in `evidence`
+- `cap_policy_rollback` reports `CONFLICTING_EVIDENCE` and `LOW_EVIDENCE_CONFIDENCE`
+- confidence drops to `LOW` while exposure stays `DEGRADED` at index 54
 
-**Impact:** low-medium (an untested UI path) · **Effort:** 1 hour · **Owner:** Person A ·
-**Decision:** A
+That last line is the point: **`Risk: MODERATE` with `Confidence: LOW` is now reachable in the
+seeded data**, which is the clearest demonstration available that the two are orthogonal (PRD
+section 5.6). Daniel keeps `PRACTICED` because his two qualifying records are untouched — the
+conflict changes how much the assessment can be trusted, not what the other evidence shows.
+
+Placed on Authorization deliberately so it exercises the path without moving any number the frozen
+fixtures pin. Verified: Payment Gateway still 74 / HIGH with HIGH confidence, Identity Platform
+still reports a highest system index of 68.
 
 ---
 
@@ -314,13 +321,12 @@ Acceptable for the MVP. Worth a README line so nobody is surprised.
 
 ---
 
-## R-16 — `datetime.utcnow()` is deprecated in Python 3.12+
+## R-16 — `datetime.utcnow()` replaced — **RESOLVED 2026-08-17**
 
-`app/simulation/service.py` and `app/mitigation/service.py` use `datetime.utcnow()`, which is
-deprecated from 3.12. The venv runs 3.10 so nothing warns today, but the fix is
-`datetime.now(timezone.utc)` and takes a minute.
-
-**Effort:** 5 minutes.
+`app/simulation/service.py` and `app/mitigation/service.py` now use `datetime.now(timezone.utc)`.
+Timestamps are timezone-aware, so `approved_at` serialises with an explicit offset rather than a
+naive local-looking value — which also makes the API contract's ISO-8601 requirement true rather
+than approximately true.
 
 ---
 

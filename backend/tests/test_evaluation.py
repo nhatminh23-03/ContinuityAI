@@ -98,3 +98,47 @@ def test_at_least_one_capability_reports_insufficient_evidence(session) -> None:
         if capabilities.assessment(c.capability_id)
     ]
     assert "INSUFFICIENT_EVIDENCE" in states
+
+
+def test_conflicting_evidence_is_seeded_and_lowers_confidence_without_erasing_coverage(
+    client, session
+) -> None:
+    """PRD section 16.5 and R-11. `Risk: MODERATE` with `Confidence: LOW` is a legitimate state, and
+    the seed now exercises it: a Policy Rollback attempt that was itself rolled back.
+
+    The record is retained and surfaced separately rather than discarded. It never supports a claim,
+    so Daniel keeps PRACTICED on the strength of his two qualifying records — the conflict changes
+    how much the assessment can be trusted, not what the other evidence shows.
+    """
+    from app.models import Evidence
+
+    conflicting = [e for e in session.query(Evidence).all() if e.is_conflicting]
+    assert conflicting, "the seed should exercise the conflicting-evidence path, not merely allow it"
+
+    body = client.get("/api/v1/capabilities/cap_policy_rollback").json()
+    assert body["exposure"] == "DEGRADED"
+    assert body["evidence_confidence"] == "LOW"
+    assert "CONFLICTING_EVIDENCE" in body["rules_triggered"]
+    assert "LOW_EVIDENCE_CONFIDENCE" in body["rules_triggered"]
+
+    readiness = {c["engineer_id"]: c["readiness"] for c in body["engineer_coverage"]}
+    assert readiness["eng_daniel_kim"] == "PRACTICED"
+
+    evidence = client.get("/api/v1/capabilities/cap_policy_rollback/evidence").json()
+    assert evidence["conflicting_evidence"], "a conflicting record must be visible in the drawer"
+    supporting = {e["evidence_id"] for e in evidence["evidence"]}
+    conflicted = {e["evidence_id"] for e in evidence["conflicting_evidence"]}
+    assert not supporting & conflicted, "a conflicting record must never also support the claim"
+
+
+def test_the_hero_scenario_is_unaffected_by_the_conflicting_record(client) -> None:
+    """The conflict was placed on Authorization precisely so it exercises the path without moving a
+    number the frozen fixtures pin."""
+    gateway = client.get("/api/v1/systems/system_payment_gateway").json()
+    assert gateway["continuity_risk_index"] == 74
+    assert gateway["continuity_risk_class"] == "HIGH"
+    assert gateway["evidence_confidence"] == "HIGH"
+
+    platforms = {p["platform_id"]: p for p in client.get("/api/v1/platforms").json()["platforms"]}
+    assert platforms["platform_payments"]["highest_system_risk_index"] == 74
+    assert platforms["platform_identity"]["highest_system_risk_index"] == 68

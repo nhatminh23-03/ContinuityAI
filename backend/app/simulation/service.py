@@ -23,7 +23,7 @@ be forgotten by a backend code path.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
@@ -109,7 +109,7 @@ class SimulationService:
                 engineer_id=engineer.engineer_id,
                 scope_type=SimulationScopeType.SYSTEM.value,
                 scope_id=system.system_id,
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(timezone.utc),
                 result_json=response.model_dump(mode="json", exclude_unset=False),
             )
         )
