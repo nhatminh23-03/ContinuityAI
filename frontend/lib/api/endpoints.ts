@@ -1,7 +1,7 @@
 /**
- * The 10 frozen endpoints. docs/API_CONTRACT.md section 7.
- *
- * Adding an 11th is a Category C decision.
+ * The 10 frozen endpoints (docs/API_CONTRACT.md section 7) plus the 11th —
+ * the challenge workflow, a Category C addition logged as DEC-10 and
+ * acknowledged by Person B. Adding a 12th is the same class of decision.
  */
 
 import { request } from './client';
@@ -11,6 +11,8 @@ import type {
   BackupCandidateRequest,
   BackupCandidateResponse,
   CapabilityDetail,
+  ChallengeRequest,
+  ChallengeResponse,
   EvidenceResponse,
   GraphResponse,
   MitigationPlanRequest,
@@ -30,7 +32,7 @@ export const api = {
   /** 2 */
   listPlatformSystems: (platformId: string) =>
     request<SystemListResponse>(`/platforms/${platformId}/systems`, {
-      fixture: 'payments-systems',
+      fixture: platformId === 'platform_identity' ? 'identity-systems' : 'payments-systems',
     }),
 
   /** 3 */
@@ -87,6 +89,14 @@ export const api = {
       method: 'POST',
       body,
       fixture: 'mitigation-plan-approved',
+    }),
+
+  /** 11 — challenge workflow (DEC-10). The manager changes evidence, never a score. */
+  challengeAssessment: (capabilityId: string, body: ChallengeRequest) =>
+    request<ChallengeResponse>(`/capabilities/${capabilityId}/challenge`, {
+      method: 'POST',
+      body,
+      fixture: 'challenge-attest-jordan',
     }),
 };
 

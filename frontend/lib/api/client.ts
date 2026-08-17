@@ -26,10 +26,11 @@ export class ApiError extends Error {
   }
 }
 
-/** Fixture file backing each endpoint while the engines are being built. */
+/** Fixture file backing each endpoint in mock mode. */
 export type FixtureName =
   | 'platforms'
   | 'payments-systems'
+  | 'identity-systems'
   | 'payment-gateway'
   | 'payment-gateway-graph'
   | 'incident-recovery'
@@ -37,7 +38,8 @@ export type FixtureName =
   | 'alex-simulation'
   | 'backup-candidates'
   | 'mitigation-plan'
-  | 'mitigation-plan-approved';
+  | 'mitigation-plan-approved'
+  | 'challenge-attest-jordan';
 
 async function readFixture<T>(name: FixtureName): Promise<T> {
   const response = await fetch(`/fixtures/${name}.json`);
