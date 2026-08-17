@@ -85,6 +85,15 @@ def get_provider(name: str | None = None) -> AIProvider:
     requested = (name or settings.ai_provider or "deterministic").lower()
     if requested in {"deterministic", "none", "", "stub"}:
         return DeterministicProvider()
+    if requested in {"watsonx", "ibm", "granite"}:
+        from app.ai.watsonx import WatsonxProvider
+
+        return WatsonxProvider()
+    if requested == "cached":
+        # Extraction replayed from a committed cache: model-derived evidence, offline seeding.
+        from app.ai.cache import CachedProvider
+
+        return CachedProvider()
     raise ValueError(
         f"Unknown AI_PROVIDER '{requested}'. Implement the AIProvider protocol in app/ai/ and "
         f"register it here. Do not call a model from outside this package."

@@ -21,38 +21,73 @@ Ordering is by **risk to the submission**, not by size. Nothing here blocks the 
 
 # Concerns — things that could hurt the submission
 
-## R-01 — The shipped "AI" layer is rule-based extraction, not a language model
+## R-01 — Model-backed extraction is built but blocked on the watsonx token quota
 
-**Status today.** `app/ai/deterministic.py` implements the full `AIProvider` interface, but it
-resolves capabilities by matching capability names and aliases in artifact text, scoped to the
-artifact's system, and maps `(source_type, participant_role)` onto an evidence role. It finds what
-the text *names* and nothing more. It cannot read "restarted the workers and traffic recovered" and
-infer incident recovery without the phrase being present.
+**Status 2026-08-17 — partially resolved, one external blocker.**
 
-**Why it matters.** Two reasons, and the second is the sharper one:
+`app/ai/watsonx.py` implements the full `AIProvider` interface against IBM watsonx.ai
+(`ibm/granite-4-h-small`). Credentials verified, chat endpoint working, versioned runtime prompt in
+`app/ai/prompts/extraction_system.txt`, 16 tests covering parsing and the closed-world guards without
+touching the network. `AI_PROVIDER=cached` replays committed model output so a model-derived graph can
+seed offline with no credential.
 
-1. Judging criteria include Technical Execution and Innovation. "AI-generated evidence-backed
-   knowledge graph" is the stated primary innovation (PRD section 1). A keyword matcher is a
-   defensible engineering choice, but it is not what the phrase implies.
-2. **The README and the demo script must not overstate it.** Saying "AI interprets engineering
-   artifacts" while shipping string matching is the kind of claim a judge can check in ninety
-   seconds. That is a credibility risk far larger than the technical gap.
+**The blocker is the account plan, not the code.** Two limits surfaced:
 
-**What is already right.** The seam is real, not cosmetic. Extraction output is validated against a
-closed taxonomy (`app/ai/validation.py`), claims against non-participants are rejected, and every
-downstream conclusion — readiness, exposure, risk, simulation, candidates — is deterministic and
-unchanged by which provider runs. A model can be dropped in without touching a single conclusion
-path, and `app/ai/prompts/extraction.md` already specifies what it must satisfy.
+| Limit | Effect | Handled by |
+|---|---|---|
+| 2 requests/second per instance | Eight parallel workers made the run *slower* — 429 fails the whole burst | Client-side pacing plus `Retry-After` handling |
+| Capped token quota | Run stopped at 313 of 640 artifacts with HTTP 403 `token_quota_reached` | A distinct non-retryable error, and a resumable cache |
 
-**Recommendation.** Implement one model-backed provider behind the same interface, run it over the
-520-artifact corpus once, cache the extracted evidence into the seed, and keep the deterministic
-provider as the offline fallback. `ARCHITECTURE.md` sections 85-86 already sanction precomputing
-extraction so the live demo cannot fail on provider latency. If time runs out instead, say plainly
-in the README that extraction is currently rule-based with a model-ready interface — that reads as
-engineering judgement, whereas an overstated claim reads as something else.
+Extraction is now resumable: cached artifacts are skipped, so re-running after a quota reset continues
+where it stopped. The cache sits at **49% coverage**, and `cached` refuses to run below full coverage
+on purpose — a graph half model-derived and half string-matched would be neither.
 
-**Impact:** high (judging + credibility) · **Effort:** ~half a day · **Owner:** Person A ·
-**Decision:** B — tell Person B before merging
+### What the partial run already measured
+
+`data/extraction/comparison_report.md`, over 313 artifacts:
+
+- **291 / 313 artifacts identical** to the rule-based extractor
+- 50 claims agreed, **0 found only by the model**, 5 found only by the rules
+- **17 role disagreements, all in one direction:** 14 × `CONTRIBUTION → INDEPENDENT_EXECUTION`,
+  3 × `CONTRIBUTION → KNOWLEDGE_CAPTURE`
+
+That is a genuinely useful finding for the submission. The model reads narrative and concludes someone
+acted *alone* where the rule saw only that they changed something — the judgement a string match cannot
+make, and the one that matters most, because promoting a contribution to an independent execution is
+what moves an engineer toward `PRACTICED` and therefore closes or opens a coverage gap.
+
+The 5 claims found only by the rules are worth a look before trusting the model further: the rule-based
+matcher is aggressive on alias hits, so some may be rule false-positives rather than model misses.
+
+### What is needed to finish
+
+**One of:** wait for the quota window to reset, raise the watsonx plan limit, or supply a key on an
+account with headroom. Then:
+
+```bash
+python -m scripts.extract_with_provider --provider watsonx --compare   # resumes from 49%
+AI_PROVIDER=cached python -m scripts.seed_demo && python -m scripts.run_evaluation
+```
+
+The evaluation then answers the question that actually matters — **does model extraction reconstruct
+the hidden ground truth better than the rules?** — and whichever wins becomes the default, with the
+measurement quotable either way. Roughly 30 minutes of runtime plus a reseed.
+
+**Risk to note if the model does win:** LLM extraction may shift readiness for some pairs, which can
+move the frozen fixture numbers. That is a contract change to coordinate, not a surprise to absorb
+quietly. The evaluation harness will show exactly which pairs moved.
+
+**Impact:** high (it is the headline innovation claim) · **Effort:** 30 minutes once quota exists ·
+**Owner:** Person A · **Decision:** C if the numbers move
+
+---
+
+## R-01a — Until then, the README wording carries the honesty
+
+The README now states which provider ships, what the model measurably adds, and that the served graph
+is rule-derived. Keep it that way. A judge can check the claim in ninety seconds, and "we built the
+model path, measured it against the rules, and ran out of quota at 49%" is a stronger story than an
+overstatement — it is a real engineering result with a real constraint.
 
 ---
 
@@ -434,3 +469,35 @@ attest to genuinely old work without it appearing current. Small, and it makes t
 coherent across both evidence sources.
 
 **Effort:** 30 minutes · **Decision:** C, it touches the challenge contract.
+
+---
+
+## R-23 — Live credentials were sitting in an untracked, un-ignored file
+
+**Found 2026-08-17. Contained, but it needs one decision from you.**
+
+`keys.md` at the repository root held live watsonx, Tavily, and Gemini credentials in plaintext. It
+was **untracked and in no commit**, so nothing reached GitHub — but it was not gitignored either, so a
+single `git add .` would have published all three. That is roughly one keystroke away from a real
+incident, and secrets in git history cannot be removed by deleting the file afterwards; the only fix
+at that point is rotation.
+
+**Done:**
+
+- `.gitignore` now excludes `keys.md`, `keys.txt`, `secrets.md`, `*credentials*.json`, `*.pem`, `*.key`
+- The watsonx values were copied into `backend/.env`, which was already ignored, and which is where
+  the application reads them from
+- `backend/.env.example` documents every variable with no real values
+
+**Two things for you:**
+
+1. **Delete `keys.md`,** or accept that credentials now exist in two local places. I left it alone
+   because it is your file — but one copy is better than two.
+2. **Consider rotating the three keys.** They were pasted into a chat transcript, so treat them as
+   disclosed even though they never reached the repository. Rotation is cheap; assuming disclosure did
+   not matter is the expensive assumption. The Tavily and Gemini keys are not used by this project at
+   all, so those two are pure exposure with no upside.
+
+**Worth noting for the submission:** `docs/DOMAIN_MODEL.md` and the PRD both commit to strong data
+boundaries, and a judge who finds credentials in the repository will weigh that against the
+responsible-data claims regardless of what the code does. Keeping this clean is part of the story.

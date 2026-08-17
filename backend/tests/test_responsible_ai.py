@@ -92,7 +92,14 @@ def test_no_response_schema_declares_a_prohibited_field() -> None:
 
 def test_no_prohibited_phrase_appears_in_generated_text() -> None:
     """Applies to templates and literals in the AI layer and the services, which is where
-    user-visible prose is produced."""
+    user-visible prose is produced — including model instructions, since those shape output.
+
+    Scope note: prompt files under `app/ai/prompts/` and the specification documents are excluded.
+    They legitimately quote prohibited wording *in order to prohibit it* ("`cannot recover the
+    system` is prohibited"), and an allowlist for that would make the check fragile in exactly the
+    place it needs to be blunt. Runtime instruction strings in code are therefore phrased to avoid
+    the banned words rather than to quote them.
+    """
     offenders: list[str] = []
     for directory in ("ai", "services", "recommendation", "mitigation", "simulation", "continuity"):
         for path in sorted((APP_ROOT / directory).rglob("*.py")):

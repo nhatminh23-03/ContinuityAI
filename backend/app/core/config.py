@@ -21,9 +21,23 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     database_url: str = f"sqlite:///{REPO_ROOT / 'backend' / 'continuity.db'}"
 
+    # Extraction provider: `deterministic` (offline, reproducible) or `watsonx` (IBM watsonx.ai).
     ai_provider: str = "deterministic"
     ai_model: str = ""
     ai_api_key: str = ""
+
+    # IBM watsonx.ai. Credentials live in backend/.env, which is gitignored; nothing here has a
+    # real default, so a missing credential fails loudly rather than silently degrading.
+    watsonx_api_key: str = ""
+    watsonx_project_id: str = ""
+    watsonx_api_url: str = "https://us-south.ml.cloud.ibm.com"
+    watsonx_model_id: str = "ibm/granite-4-h-small"
+    # A model call is slower and less predictable than a rule. Bound both.
+    watsonx_timeout_seconds: float = 60.0
+    watsonx_max_retries: int = 2
+    # Hard service ceiling per instance — 2/s on the plan this was developed against. Exceeding it
+    # returns 429 for the whole burst, so the client paces itself rather than discovering the limit.
+    watsonx_requests_per_second: float = 2.0
 
     # Shared contract fixtures, jointly owned. Contract decision CI-14.
     fixtures_path: Path = REPO_ROOT / "fixtures"

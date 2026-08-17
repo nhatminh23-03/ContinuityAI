@@ -103,24 +103,55 @@ classes:
 Evidence strength is derived from the evidence role rather than trusted from the model, so a
 provider that returns "STRONG" for a code review is corrected, not believed.
 
-### Honest statement about the shipped provider
+### Two providers, one interface
 
-The provider that ships (`app/ai/deterministic.py`) is **rule-based, not a language model**. It
-resolves capabilities by matching capability names and aliases in artifact text, scoped to the
-artifact's system, and maps the participant role the source system recorded — resolver, assisting
-responder, author, reviewer — onto an evidence role. It performs the same closed-world resolution a
-model would be prompted for, and it is validated by the same gate.
+| `AI_PROVIDER` | What it does |
+|---|---|
+| `deterministic` | Offline rule-based extraction. No credential, fully repeatable. **The shipped default.** |
+| `watsonx` | IBM watsonx.ai (`ibm/granite-4-h-small`) reads each artifact and returns structured claims |
+| `cached` | Replays committed watsonx output from `data/extraction/`, so a model-derived graph seeds offline |
 
-It ships as the default for three reasons: the live demo must not depend on provider latency or
-availability, the hidden-ground-truth evaluation is only meaningful if extraction is repeatable, and
-the interface is the part that matters architecturally.
+Both real providers pass through the same validation gate and feed the same deterministic engine.
+Swapping them changes extraction quality and changes no conclusion path — which is the property the
+interface exists to guarantee.
 
-Its ceiling is real and worth stating: it finds what the text *names*. It cannot read "restarted the
-workers and traffic recovered" and infer incident recovery without the phrase present. Ingesting 120
-real public pull requests produced capability evidence from one of them — see
-[Evaluation](#evaluation) — which is the clearest available measurement of that limit. Swapping in a
-model changes extraction quality and changes no conclusion path;
-[`RECOMMENDATIONS.md`](RECOMMENDATIONS.md) R-01 tracks it as the highest-value upgrade available.
+**The rule-based provider is the default, and its ceiling is worth stating plainly.** It finds what
+the text *names*: it resolves capabilities by matching capability names and aliases, scoped to the
+artifact's system, then maps the participant role the source system recorded onto an evidence role. It
+cannot read "restarted the workers and traffic recovered" and infer incident recovery without the
+phrase present.
+
+### What the model measurably adds
+
+The watsonx provider was run over the corpus and diffed against the rule-based one
+(`data/extraction/comparison_report.md`). Over the 313 artifacts extracted before the account's token
+quota was spent:
+
+| Measure | Count |
+|---|---|
+| Artifacts where both produced identical output | 291 / 313 |
+| Claims both agree on | 50 |
+| Claims found only by the model | 0 |
+| Claims found only by the rules | 5 |
+| Same `(capability, engineer)` pair, different evidence role | 17 |
+
+The disagreements are the interesting part, and they are all in one direction: 14 cases of
+`CONTRIBUTION → INDEPENDENT_EXECUTION` and 3 of `CONTRIBUTION → KNOWLEDGE_CAPTURE`. The model read
+the narrative and concluded the person acted alone, or authored operational guidance, where the rule
+saw only that they changed something. That is precisely the judgement a string match cannot make —
+and precisely the judgement that most needs checking, because promoting a contribution to an
+independent execution is what moves an engineer toward `PRACTICED` and therefore what closes or opens
+a coverage gap.
+
+**Which is more accurate is an open question, and the harness can answer it.** Seed and evaluate under
+each provider and compare reconstruction against the hidden ground truth. That comparison is not yet
+run because the watsonx account's token quota was exhausted at 49% coverage, and `cached` deliberately
+refuses to run on a partial cache: a graph half derived by a model and half by string matching would be
+neither, and no number in it could be explained by reference to a single method.
+
+So the honest position today: the model-backed path is implemented, credential-verified, rate-limit
+aware, resumable, and measured against the rules on half the corpus — and the graph the API serves is
+still rule-derived. [`RECOMMENDATIONS.md`](RECOMMENDATIONS.md) R-01 tracks finishing it.
 
 ### Module layout
 

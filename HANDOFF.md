@@ -487,3 +487,84 @@ every endpoint and prints latency if you want to see the whole surface at once.
 
 **Me:** wire a model-backed provider the moment there is a key, and otherwise hold. The backend has
 no remaining work that does not need a decision from you.
+
+---
+
+## 2026-08-17 (later) — Model-backed extraction wired to IBM watsonx (Person A)
+
+Short version: the watsonx provider is **built, credential-verified, and measured against the
+rule-based one**. The graph the API serves is still rule-derived, because the watsonx account's token
+quota ran out at 49% of the corpus. Nothing for you to change — the API surface is identical.
+
+### What exists now
+
+| `AI_PROVIDER` | Behaviour |
+|---|---|
+| `deterministic` | Offline rule-based extraction. **Still the default.** |
+| `watsonx` | IBM watsonx.ai `ibm/granite-4-h-small` reads each artifact and returns structured claims |
+| `cached` | Replays committed model output from `data/extraction/`, so a model-derived graph seeds offline |
+
+Both real providers pass the same validation gate and feed the same deterministic engine, so which one
+ran changes extraction quality and changes nothing downstream. No endpoint, DTO, or fixture changed.
+
+### What the model measurably adds — worth knowing for the demo narrative
+
+Over the 313 artifacts extracted before the quota ran out
+(`data/extraction/comparison_report.md`):
+
+- **291 of 313 artifacts: identical output** to the rule-based extractor
+- 50 claims agreed on, **0 found only by the model**, 5 found only by the rules
+- **17 role disagreements, all one direction:** 14 × `CONTRIBUTION → INDEPENDENT_EXECUTION`,
+  3 × `CONTRIBUTION → KNOWLEDGE_CAPTURE`
+
+That last line is the interesting one and it is worth a sentence on stage. The model read the incident
+narrative and concluded the person acted *alone*, where the rule only saw that they changed something.
+That is the judgement a string match cannot make — and it is the judgement that matters most, because
+promoting a contribution to an independent execution is what moves an engineer toward `PRACTICED`, and
+therefore what closes or opens a coverage gap.
+
+Which is more *accurate* is still open. The hidden-ground-truth harness can decide it, and will, once
+the quota allows the remaining 51% to be extracted.
+
+### Two limits we hit, both now handled
+
+| Limit | What happened | Fix |
+|---|---|---|
+| 2 requests/second per instance | Eight parallel workers made the run *slower* — a 429 fails the whole burst | Client-side pacing plus `Retry-After` |
+| Capped token quota | Stopped at 313/640 with HTTP 403 `token_quota_reached` | Distinct non-retryable error, and a resumable cache |
+
+Re-running `scripts.extract_with_provider` skips what is already cached, so finishing it later costs
+only the remaining artifacts.
+
+`AI_PROVIDER=cached` deliberately **refuses** to run below full coverage. A graph half model-derived and
+half string-matched would be neither, and no number in it could be explained by reference to a single
+method.
+
+### Security note — please action one thing
+
+`keys.md` at the repo root held live credentials in plaintext. It was untracked and in no commit, so
+nothing leaked, but it was not gitignored either — one `git add .` from being published. It is
+gitignored now, and the watsonx values live in `backend/.env` (also ignored) where the app reads them.
+
+**Please delete `keys.md` and consider rotating those three keys**, since they were pasted into a chat
+transcript. The Tavily and Gemini ones are not used by this project at all. Details in
+`RECOMMENDATIONS.md` R-23.
+
+### Verification
+
+147 tests pass — 16 new ones covering the watsonx provider with the network stubbed, so the suite still
+runs with no credential and no quota. All seven evaluation checks remain at 100%. No fixture changed.
+
+One of my own tests caught something worth mentioning: `test_responsible_ai.py` flagged the *prompt* I
+wrote for the model, because an instruction saying "never call anyone irreplaceable" contains the banned
+word. The test was right to be blunt, so I reworded the prompt rather than adding an exception. Runtime
+instruction strings now avoid the prohibited vocabulary instead of quoting it.
+
+### Still open for us
+
+| Item | Needs |
+|---|---|
+| Finish watsonx extraction (R-01) | Quota headroom: wait for the reset, raise the plan, or a key with room. ~30 min runtime after that |
+| If the model wins on accuracy | Some readiness values may shift, which can move frozen fixture numbers — a contract change to coordinate, not to absorb quietly |
+| DEC-10 — keep the eleventh endpoint? | Your yes or no |
+| Delete `keys.md`, rotate keys | Yours |

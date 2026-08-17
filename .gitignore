@@ -44,6 +44,17 @@ htmlcov/
 .env.*
 !.env.example
 
+# --- Credentials: never commit ---
+# Anything matching these stays local. Real values belong in backend/.env (already ignored above),
+# never in a tracked file. If a credential ever does reach a commit, rotating it is the only fix —
+# removing the file afterwards does not remove it from history.
+keys.md
+keys.txt
+secrets.md
+*credentials*.json
+*.pem
+*.key
+
 # --- Editors ---
 .vscode/
 .idea/
