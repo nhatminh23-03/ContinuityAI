@@ -92,26 +92,53 @@ def load_synthetic_corpus(data_path: Path) -> list[ArtifactInput]:
     return artifacts
 
 
+PUBLIC_KIND_TO_SOURCE = {
+    "pull_requests": EvidenceSourceType.PULL_REQUEST,
+    "code_reviews": EvidenceSourceType.CODE_REVIEW,
+    "issues": EvidenceSourceType.ISSUE,
+    "commits": EvidenceSourceType.COMMIT,
+}
+
+
 def load_normalised_github_export(path: Path) -> list[ArtifactInput]:
-    """Real public GitHub evidence, normalised offline into the shape above.
+    """Real public GitHub evidence, normalised offline into the internal artifact shape.
 
     Expected record fields: `reference`, `title`, `body`, `date`, `system_id`, `participants`
-    (with `participant_role` of AUTHOR or REVIEWER), `file_paths`, optional `source_url`, and
-    `kind` of `pull_requests`, `code_reviews`, `issues`, or `commits`.
+    (with `participant_role` of AUTHOR or REVIEWER), `file_paths`, `source_url`, and `kind` of
+    `pull_requests`, `code_reviews`, `issues`, or `commits`.
+
+    Normalisation happens offline in `scripts/fetch_public_github.py` rather than here, so seeding
+    never depends on a third party being reachable — a demo that can fail on a rate limit is a demo
+    that can fail for reasons unrelated to the product (ARCHITECTURE.md section 85).
     """
     if not path.exists():
         return []
 
-    kind_map = {
-        "pull_requests": EvidenceSourceType.PULL_REQUEST,
-        "code_reviews": EvidenceSourceType.CODE_REVIEW,
-        "issues": EvidenceSourceType.ISSUE,
-        "commits": EvidenceSourceType.COMMIT,
-    }
     artifacts: list[ArtifactInput] = []
     for record in json.loads(path.read_text()):
-        source_type = kind_map.get(record.get("kind", "pull_requests"), EvidenceSourceType.PULL_REQUEST)
+        source_type = PUBLIC_KIND_TO_SOURCE.get(
+            record.get("kind", "pull_requests"), EvidenceSourceType.PULL_REQUEST
+        )
         artifacts.append(_to_artifact(record, source_type, "public_github_export"))
+    return artifacts
+
+
+def load_public_github_corpus(data_path: Path) -> list[ArtifactInput]:
+    """Every normalised public export under `data/public/`.
+
+    Returns an empty list when the directory is absent, so the seed works with synthetic data alone.
+    Real public activity is additive evidence, not a prerequisite.
+    """
+    public_dir = data_path / "public"
+    if not public_dir.exists():
+        return []
+
+    artifacts: list[ArtifactInput] = []
+    for path in sorted(public_dir.glob("*.json")):
+        if path.name == "manifest.json":
+            continue
+        artifacts.extend(load_normalised_github_export(path))
+    artifacts.sort(key=lambda a: (a.artifact_date, a.source_reference))
     return artifacts
 
 

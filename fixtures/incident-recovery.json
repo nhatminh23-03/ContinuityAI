@@ -14,6 +14,16 @@
     "SINGLE_VALIDATED_ENGINEER",
     "NO_PRACTICED_OR_VALIDATED_BACKUP"
   ],
+  "index_modifiers": [
+    {
+      "code": "SOLE_ADEQUATE_ENGINEER",
+      "delta": 1
+    },
+    {
+      "code": "BEST_ALTERNATIVE_ASSISTED",
+      "delta": 1
+    }
+  ],
   "primary_engineer": {
     "engineer_id": "eng_alex_chen",
     "name": "Alex Chen",

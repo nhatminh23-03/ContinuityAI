@@ -277,3 +277,116 @@ different numbers.
 `RECOMMENDATIONS.md` carries twenty items. The four worth deciding before the README is written:
 R-01 (the AI claim), R-02 (how the 100% figures are quoted), R-03 (no authentication), and R-09 (the
 challenge workflow, now costed at 2-3 hours and the main outstanding scope call).
+
+---
+
+## 2026-08-17 — Closing the remaining backend scope
+
+**What was built.** The five backend items that were still open, plus the technical half of the
+submission README. `FR-020` and `AC-11` move from unbuilt to passing, and the PRD's hybrid data
+strategy is satisfied for the first time.
+
+**Implements.** `FR-020`, `AC-11`, `PRD.md` section 21 (challenge workflow); `PRD.md` section 14.1
+(real public GitHub evidence); `ARCHITECTURE.md` section 50 (security posture) and section 54
+(challenge architecture); `TEAM_WORKFLOW_PERSON_A_B.md` section 27 (Person A's README draft).
+
+### The refactor that made the challenge workflow cheap
+
+`CI-13` deferred the challenge workflow on the grounds that it "re-runs extraction, aggregation,
+readiness, and risk on demand — the most expensive unbuilt feature in the register". That was true
+when it was written and false by the time it was revisited, because the seed already did all of it.
+
+Extracting `app/services/recompute.py` from the seed turned the feature into a thin layer over tested
+machinery, and gave something more valuable than reuse: **one implementation.** A recomputed
+capability and a freshly seeded baseline now cannot disagree, because there is no second code path
+for them to disagree through. Three callers share it — the seed, the challenge workflow, and the
+evaluator reading what they wrote.
+
+### Designing a correction workflow that cannot become a back door
+
+The obvious way to let a manager fix a wrong assessment is to let them set the right value. That
+would have quietly destroyed the product: every number would become an opinion, the evidence graph
+would be decorative, and "risk is derived from evidence" would be false.
+
+So the request object has no field for a readiness level, an exposure state, a confidence, or a risk
+index, and a test asserts their absence. A manager supplies *evidence* — an artifact extraction
+missed, a statement no artifact captured, or a correction to a mis-mapping — and the rules recompute.
+The abuse case still had to be closed: a manager who can attest to anything can attest their way to a
+`VALIDATED` expert. Attested evidence is therefore capped at moderate strength, which means it never
+counts toward the strong-source diversity `VALIDATED` requires. It can establish `ASSISTED` or
+contribute to `PRACTICED` — a manager who watched someone do the work can say so — but it cannot
+manufacture an expert.
+
+The result is a satisfying demo beat. Attesting that Jordan once recovered the gateway alone moves him
+`EXPOSED → PRACTICED`, Incident Recovery `DEGRADED → COVERED`, and its index 72 → 15. The *system*
+index stays at 74, because Certificate Management is now the binding constraint. The engine is
+reasoning about which capability drives the system rather than moving one number, which is difficult
+to fake and easy to show.
+
+### Real public GitHub data, and what it actually taught us
+
+The PRD commits to "real public GitHub + synthetic private enterprise data". Only the second half had
+been built, so 120 merged pull requests and reviews were fetched from a public repository, normalised,
+committed, and ingested through the same pipeline.
+
+Two problems surfaced immediately, both worth recording.
+
+**The privacy problem.** This product infers capability readiness about named people. Doing that to
+real engineers who never consented, from a repository they do not work on, mapped onto an invented
+company, is exactly the behaviour the responsible-AI boundary exists to prevent — and the PRD had
+anticipated it, asking for public evidence to be "normalized/anonymized". Contributor identities are
+now mapped deterministically onto synthetic engineers and the real logins are never written to disk.
+A second pass was needed after the first: pull request *bodies* routinely name other contributors
+through `@mentions` and profile links, so pseudonymising the participant field alone still leaked
+identities into text that later gets summarised on screen. Artifacts stay traceable through their real
+URLs; the attribution is what is synthetic, and the manifest says so rather than leaving it to be
+discovered.
+
+**The more interesting problem.** Exactly one of the 120 real artifacts produced capability evidence.
+
+That is not an extraction failure. A public SDK repository's vocabulary is library maintenance —
+support, error handling, tests, packaging — while the capabilities this product assesses are
+demonstrated in private operational records: incidents, runbooks, on-call history. The finding is
+direct evidence for *why* the hybrid data strategy is necessary rather than merely convenient, and it
+is the most concrete available measurement of the rule-based extractor's ceiling.
+
+The temptation was to loosen the matcher until the number looked better. Resisted, and a test now
+asserts the match rate stays low: a high rate here would mean the matcher had become credulous, not
+that the corpus had improved. The single match is itself instructive — it surfaces as `EXPOSED / STALE
+/ LOW`, which is the correct reading of a years-old third-party pull request.
+
+### Security, without pretending
+
+`ARCHITECTURE.md` descopes enterprise IAM, correctly. But "the manager approves the plan" rested on a
+caller-supplied string, so shipping with no option at all left a responsible-AI claim resting on
+nothing. A single shared bearer token was added, **off by default** so the frontend developer never
+has to coordinate a secret, with constant-time comparison and `/health` never gated.
+
+Worth being precise about what it does not do, and this is now stated in the README: it controls
+*access*, not *attribution*. `approved_by` and `submitted_by` remain caller-supplied. Real identity is
+post-MVP, and claiming otherwise would be the same category of overstatement the AI section is careful
+to avoid.
+
+### Validation
+
+- **131 tests, under three seconds.** New coverage: the challenge workflow including the attestation
+  abuse case and the non-participant rejection, optional auth, and public-data privacy scrubbing
+  asserted against the committed corpus.
+- **All seven hidden-ground-truth checks still at 100%** after adding 120 real artifacts — which was
+  the point of keeping public data off the four engineers whose coverage the ground truth labels.
+- **Every frozen number unchanged.** Three fixtures regenerated, all additive.
+- **AC-14 measured** rather than assumed: reads 2.5–26 ms against an 800 ms budget, simulation 6 ms
+  against 2 s.
+
+One class of failure was caused entirely by test infrastructure rather than behaviour: the challenge
+tests reseed to undo their mutations, and the session-scoped database fixture kept referring to tables
+that reseeding had dropped. Thirty-one failures and eighteen errors in modules that had nothing to do
+with the change — a good reminder that a fixture's lifetime is part of its contract.
+
+### Open questions
+
+`RECOMMENDATIONS.md` R-01 is now the only item that materially affects what the submission can claim:
+the shipped extraction provider is rule-based, and the README says so plainly. Wiring a model needs a
+provider choice and a credential, and changes no conclusion path. R-20 lists the ten decisions awaiting
+Person B's acknowledgement, of which DEC-10 — the eleventh endpoint — is the only one needing a yes or
+no.

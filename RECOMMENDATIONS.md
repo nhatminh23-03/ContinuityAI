@@ -81,23 +81,21 @@ is a much stronger claim than 100%.
 
 ---
 
-## R-03 — The API has no authentication at all
+## R-03 — Optional bearer authentication added — **RESOLVED 2026-08-17**
 
-**Status today.** Every endpoint is open. CORS allows `http://localhost:3000`. There is no
-identity: `approved_by` is a string the caller supplies, so anyone can approve a plan as anyone.
+`API_TOKEN` is unset by default, leaving every endpoint open exactly as before, so the frontend and
+local development are unaffected and nobody has to coordinate a secret to run the demo. Set it and
+`/api/v1` requires `Authorization: Bearer <token>`; `/health` is never gated so a container can still
+report ready. Comparison is constant-time.
 
-**Why it matters.** `ARCHITECTURE.md` section 50 explicitly descopes enterprise IAM for the MVP,
-and that is the right call for a hackathon. But the product handles per-person capability
-assessments — precisely the data that should not be world-readable — and "the manager approves"
-is a core responsible-AI claim that currently rests on an unauthenticated string field.
+Deliberately not attempted: SSO, roles, sessions, or token rotation. A shared token is honest about
+being a demo control rather than pretending to be authorisation. Enterprise IAM stays descoped per
+`ARCHITECTURE.md` section 50, and the README now says so explicitly instead of leaving it unstated.
+Logged as DEC-13.
 
-**Recommendation.** Do not build SSO or RBAC. Do add two cheap things before any deployment beyond
-localhost: a single shared demo token checked by a FastAPI dependency, and a note in the README
-stating that authentication is deliberately out of MVP scope. If it stays localhost-only for the
-demo, the note alone is enough.
-
-**Impact:** high if deployed, low if localhost-only · **Effort:** 1 hour · **Owner:** Person A ·
-**Decision:** C — it touches the responsible-AI story
+**Still true and worth stating in the submission:** identity is not modelled. `approved_by` remains a
+caller-supplied string, so the token controls *access*, not *attribution*. Real per-user identity is
+a post-MVP item.
 
 ---
 
@@ -165,23 +163,34 @@ input — a checklist, a template conformance check — not an inference.
 
 ---
 
-## R-07 — No real public GitHub data is ingested
+## R-07 — Real public GitHub evidence ingested — **RESOLVED 2026-08-17**
 
-**Status today.** `app/ingestion/adapters.py` provides `load_normalised_github_export`, which reads
-a public GitHub export already flattened to the internal artifact shape. Nothing calls it; the
-seeded corpus is entirely synthetic.
+`scripts/fetch_public_github.py` fetches merged pull requests and reviews through the `gh` CLI,
+normalises them, and commits them to `data/public/`. The seed ingests them alongside the synthetic
+corpus through the same pipeline: **640 artifacts total — 520 synthetic private records, 120 real
+public ones.** Seeding itself stays offline, so the demo cannot fail on a rate limit.
 
-**Why it matters.** `PRD.md` section 14.1 and the scope-freeze checklist both commit to "real
-public GitHub + synthetic private enterprise data". Shipping only synthetic data narrows the
-"realistic activity patterns and source ingestion credibility" claim.
+Identities are pseudonymised onto the synthetic organisation and real logins are never written to
+disk, including `@mentions` scrubbed from pull request bodies. That is a substantive requirement
+rather than a formality: this product infers capability readiness about named people, and doing that
+to real engineers who never consented would breach its own responsible-AI boundary. Artifacts stay
+traceable through their real URLs. Bots are excluded. Logged as DEC-14.
 
-**Recommendation.** Cheap version: export pull requests and reviews from one public repository,
-normalise them offline into `data/public/`, map them onto one seeded system, and ingest through the
-existing adapter. No live API call, so the demo cannot fail on a rate limit. If that is cut,
-amend the PRD rather than leaving a commitment unmet — this is a Category C scope change.
+### The finding, which is more useful than the feature
 
-**Impact:** medium (a frozen scope commitment) · **Effort:** 2-3 hours · **Owner:** Person A ·
-**Decision:** C
+**Exactly one of the 120 real artifacts produced capability evidence.**
+
+That is not a defect. A public SDK repository's vocabulary is library maintenance — support, error
+handling, tests, packaging — while the capabilities this product assesses are demonstrated in
+*private operational* records: incidents, runbooks, on-call history. It is direct evidence for why
+the hybrid data strategy in PRD section 14.1 is necessary rather than merely convenient, and it is a
+concrete measurement of the ceiling described in R-01.
+
+Two things follow. In the submission, say what real public data actually contributes — realistic,
+messy text that extraction must mostly *decline* — rather than implying it drives the assessments.
+And resist raising the match rate by loosening the matcher: a high match rate here would mean the
+matcher had become credulous, not that the corpus had improved. A test asserts the rate stays low for
+that reason.
 
 ---
 
@@ -204,28 +213,39 @@ code agree.
 
 ---
 
-## R-09 — The challenge / correct workflow is still unbuilt
+## R-09 — Challenge / correct / learn workflow built — **RESOLVED 2026-08-17**
 
-**Status today.** `FR-020`, `AC-11`, and `PRD.md` section 21 remain in the specifications.
-`OPEN-01` in `DECISIONS.md` defers the costing to "the Phase 7 checkpoint". Nothing is implemented,
-and the provenance drawer deliberately has no "Challenge Assessment" action.
+`POST /api/v1/capabilities/{id}/challenge` closes `FR-020`, `AC-11`, user scenario S5, the
+`AssessmentChallenge` domain entity, and `PRD.md` section 21. It is an eleventh endpoint on a
+ten-endpoint frozen contract, so it is logged as DEC-10 and **needs Person B's acknowledgement**.
 
-**Why it matters.** Two things. It is a named acceptance criterion, so leaving it silently unbuilt
-means AC-11 fails. And the Phase 7 checkpoint it is deferred to arrives after the deadline at the
-current pace, so the deferral is decaying into an omission by default.
+Three actions: link an artifact extraction missed, attest to something no artifact captured, or
+correct a mis-mapped record. All three change *evidence*; readiness, exposure, and risk are then
+recomputed through the same `app/services/recompute.py` the seed uses. `ChallengeRequest` has no
+field for a readiness level, exposure, confidence, or a risk index, and a test asserts their
+absence — which is how "scores change because evidence changes" became a property of the design
+rather than a sentence in a document.
 
-**Cost, now that the engine exists.** Much lower than when it was deferred. Recording a
-`MANAGER_ATTESTATION` evidence record and recomputing one capability is roughly: one endpoint, one
-evidence row with `source_type=MANAGER_ATTESTATION`, and a call to the existing
-`assess()` + `aggregate_system()` path. The recompute machinery is already written and already used
-by the seed. Estimate 2-3 hours including a test.
+Attestation is capped at MODERATE strength, so no quantity of assertions can manufacture a
+`VALIDATED` expert. That was the abuse case that would have made the evidence model decorative.
 
-**Recommendation.** Decide today rather than at a checkpoint. Either build the minimal version — it
-is now cheap and it closes AC-11, FR-020, a user scenario, and a domain entity in one go — or
-formally cut it and mark those requirements as descoped. The one thing not to do is leave it open.
+**Verified live**, and it makes a good demo beat:
 
-**Impact:** high (a failing acceptance criterion) · **Effort:** 2-3 hours · **Owner:** Person A ·
-**Decision:** C
+```
+attest Jordan, INDEPENDENT_EXECUTION
+  Jordan             EXPOSED  → PRACTICED
+  Incident Recovery  DEGRADED → COVERED,  72/HIGH → 15/LOW
+  system             74 HIGH  → 74 HIGH,  degraded 2 → 1, covered 3 → 4
+  rules  [CRITICAL_CAPABILITY, SINGLE_VALIDATED_ENGINEER, NO_PRACTICED_OR_VALIDATED_BACKUP]
+      →  [CRITICAL_CAPABILITY, ADEQUATE_BACKUP_PRESENT]
+```
+
+Worth noticing that the system index stays at 74: Certificate Management is now the binding
+constraint. The engine is reasoning about which capability drives the system rather than moving a
+single number — a detail worth pointing at if the challenge beat makes the demo cut.
+
+**Frontend note:** additive. Nothing that previously worked changes, and the provenance drawer can
+gain a "Challenge Assessment" action whenever Person B is ready.
 
 ---
 
@@ -267,32 +287,36 @@ still reports a highest system index of 68.
 
 # Improvements — worth doing if time allows
 
-## R-12 — Index modifiers are computed and stored but never exposed
+## R-12 — Index modifiers exposed on the wire — **RESOLVED 2026-08-17**
 
-`capability_assessments.index_modifiers` holds the full arithmetic behind every index
-(`[{"code": "SOLE_ADEQUATE_ENGINEER", "delta": 1}, ...]`). No DTO carries it, so the "Why this
-risk?" drawer can name the fired rules but cannot show how 72 was reached.
+`CapabilityDetail` now carries an optional `index_modifiers` array. Incident Recovery returns:
 
-Adding it would make the index genuinely inspectable rather than merely reproducible, which is the
-strongest available answer to "the risk score looks arbitrary" (PRD section 30). It is an additive
-optional field, so it costs the frontend nothing until used. Category C, because it is a contract
-change.
+```json
+"index_modifiers": [
+  { "code": "SOLE_ADEQUATE_ENGINEER", "delta": 1 },
+  { "code": "BEST_ALTERNATIVE_ASSISTED", "delta": 1 }
+]
+```
 
-**Effort:** 1 hour backend, and Person B decides whether to render it.
+With the HIGH class anchor of 70, that is the entire derivation of 72. The index is now inspectable
+rather than merely reproducible, which is the strongest available answer to "the risk score appears
+arbitrary" (PRD section 30, listed there as a high-severity risk). Additive and optional, so it costs
+the frontend nothing until rendered. Logged as DEC-11.
 
 ---
 
-## R-13 — `missing_evidence` only covers engineers below ASSISTED
+## R-13 — `missing_evidence` widened to everyone below PRACTICED — **RESOLVED 2026-08-17**
 
-Currently a "no qualifying evidence found" note is emitted only for engineers whose readiness is
-below `ASSISTED`, which in the hero scenario means Jordan alone. Maria is `ASSISTED` and therefore
-absent — yet "Maria has assisted but has no independent recovery evidence" is exactly what a manager
-choosing a backup needs to read.
+Previously emitted only below `ASSISTED`, which meant Jordan alone. Maria is `ASSISTED` and is the
+leading backup candidate, so the drawer was least informative about the person the decision is
+actually about. It now reads:
 
-Widening it to anyone below `PRACTICED` would improve the Why drawer. It changes fixture content, so
-coordinate with Person B.
+```
+Jordan Lee   No qualifying independent incident recovery evidence found.
+Maria Gomez  No qualifying independent incident recovery evidence found.
+```
 
-**Effort:** 30 minutes.
+Descriptive, never evaluative — absence of evidence, not inability. Logged as DEC-12.
 
 ---
 
@@ -359,17 +383,54 @@ simulation URL, the storage is already there and it is a one-endpoint Category C
 | `README.md` claimed Python 3.9 will not work and 3.11 is required | Corrected; 3.10 is verified working |
 | `data/generated/` (evaluation output) | Gitignored |
 
-## R-20 — The specification and the implementation now disagree in eight places
+## R-20 — Ten decisions need Person B's acknowledgement
 
-All eight are logged in `docs/DECISIONS.md` as DEC-05 through DEC-09 plus the fixture amendments,
-with the reasoning for each. None was decided silently, but **all of them need Person B's
-acknowledgement** because four are contract-visible:
+All are logged in `docs/DECISIONS.md` as DEC-05 through DEC-14 with reasoning. None was made
+silently, but seven are contract-visible and one adds an endpoint, so they need a joint read rather
+than a merge:
 
-- reason-code spelling (`API_CONTRACT.md` wins over `ARCHITECTURE.md` section 29)
-- AI extraction output shape (per-claim, not the flat form in `API_CONTRACT.md` section 10.2)
-- risk class scaling with operational criticality
-- `SUPPORTED_BY` edge origin, since the frozen node enum has no `COVERAGE` type
-- nine regenerated fixtures
+| Decision | What changed | Blast radius for the frontend |
+|---|---|---|
+| DEC-05 | Reason-code spelling follows `API_CONTRACT.md` over `ARCHITECTURE.md` section 29 | None — display copy was already going to use this spelling |
+| DEC-06 | AI extraction uses the per-claim shape from `ARCHITECTURE.md` section 21 | None — internal only |
+| DEC-07 | Risk class scales with operational criticality | None — exposures, counts, and the hero scenario unchanged |
+| DEC-08 | `SUPPORTED_BY` edges originate at the engineer, since no `COVERAGE` node type exists | Read `capability_id` from edge metadata |
+| DEC-09 | Mitigation task ids scoped to their plan | None |
+| **DEC-10** | **An eleventh endpoint for the challenge workflow** | **Additive. Adopt when the drawer is ready** |
+| DEC-11 | `index_modifiers` on capability detail | Additive optional field |
+| DEC-12 | `missing_evidence` widened to below PRACTICED | One more entry in an existing array |
+| DEC-13 | Optional bearer auth, off by default | None while `API_TOKEN` is unset |
+| DEC-14 | Real public GitHub ingested, identities pseudonymised | One extra graph edge |
+| — | Twelve fixtures regenerated across the two builds | Build against the current fixtures |
 
-**Recommendation.** Walk these five bullets at the next sync. It is fifteen minutes and it is the
-difference between "we decided" and "Person A changed things".
+**Recommendation.** Walk the table at the next sync — fifteen minutes, and DEC-10 is the only one
+that genuinely needs a yes or no. It is the difference between "we decided" and "Person A changed
+things".
+
+---
+
+## R-21 — Identity is still not modelled
+
+`API_TOKEN` (DEC-13) controls *access*. It does not establish *attribution*: `approved_by` on a plan
+approval and `submitted_by` on a challenge are both caller-supplied strings, so the audit trail
+records what the caller claimed rather than who they were.
+
+For a single-user demo this is fine and is the documented MVP posture. It is worth one sentence in
+the submission rather than left implicit, because "the manager approves" and "the manager attested
+this" are both responsible-AI claims that a reader might reasonably assume are authenticated.
+
+**Effort:** real identity is a post-MVP item. Saying so costs a sentence.
+
+---
+
+## R-22 — Attestation evidence is dated the day it was made
+
+A manager attesting to something that happened eighteen months ago produces evidence dated today, so
+it reads as `FRESH`. That is convenient for the demo and slightly wrong in principle: the freshness of
+a claim should follow the work, not the paperwork.
+
+Adding an optional `occurred_on` to the challenge request would fix it, and would let a manager
+attest to genuinely old work without it appearing current. Small, and it makes the freshness model
+coherent across both evidence sources.
+
+**Effort:** 30 minutes · **Decision:** C, it touches the challenge contract.

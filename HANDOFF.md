@@ -331,3 +331,159 @@ for the shape in the regenerated fixtures, not the old ones.
 implement whichever wins. Both are small now; both are on the critical path for what we can claim.
 
 Before either: skim `RECOMMENDATIONS.md` R-01 and R-20.
+
+---
+
+## 2026-08-17 — Person A scope closed (Person A)
+
+Backend is finished. Everything on Person A's list in `TEAM_WORKFLOW_PERSON_A_B.md` section 2 is
+built, tested, and verified, and the remaining `RECOMMENDATIONS.md` items that were backend-only are
+resolved. **131 tests, all seven evaluation checks at 100%, no fixture drift.**
+
+### What changed since the last handoff
+
+| Item | Effect on you |
+|---|---|
+| **Challenge workflow — an eleventh endpoint** | Additive. Adopt when the drawer is ready |
+| `index_modifiers` on capability detail | Additive optional field |
+| `missing_evidence` widened to below PRACTICED | One more entry in an existing array |
+| Optional bearer auth, off by default | None while `API_TOKEN` is unset |
+| Real public GitHub data ingested | One extra graph edge |
+| 3 fixtures regenerated | Build against the current ones |
+
+### The eleventh endpoint — this is the one to look at
+
+```
+POST /api/v1/capabilities/{capability_id}/challenge   →  201
+```
+
+The contract froze ten endpoints and says an eleventh is a Category C decision, so **this needs your
+yes or no.** Logged as DEC-10 with full reasoning. I built it rather than deferring again because
+`FR-020`, `AC-11`, scenario S5, and a domain entity all depend on it, and the "Phase 7 checkpoint" it
+was parked at arrives after our deadline — the deferral was turning into an omission by default. It
+also became cheap: the recompute path already existed and the seed already exercised it.
+
+Three actions, all of which change *evidence* rather than a score:
+
+```jsonc
+// 1. The manager attests to something no artifact captured
+{ "challenge_type": "MANAGER_ATTESTATION", "engineer_id": "eng_jordan_lee",
+  "submitted_by": "eng_manager_sarah", "evidence_role": "INDEPENDENT_EXECUTION",
+  "comment": "Jordan restored the gateway alone in March; never written up." }
+
+// 2. The manager points at an artifact extraction missed
+{ "challenge_type": "LINK_EVIDENCE", "engineer_id": "eng_jordan_lee",
+  "submitted_by": "eng_manager_sarah", "source_reference": "INC-221",
+  "comment": "This covered gateway recovery." }
+
+// 3. The manager moves a mis-mapped record (no engineer_id; target is the URL capability)
+{ "challenge_type": "CORRECT_CAPABILITY_MAPPING", "submitted_by": "eng_manager_sarah",
+  "evidence_id": "evidence_inc_312", "comment": "This was retry behaviour, not monitoring." }
+```
+
+The response gives you before/after for both the capability and its system, so the drawer can show
+the recomputation rather than just refetching:
+
+```
+capability_before / capability_after   exposure, index, class, confidence, readiness, rules_triggered
+system_before / system_after           index, class, exposure, gap + degraded + covered counts
+recomputed                             boolean
+evidence_created / evidence_moved      what actually changed
+```
+
+Verified live, and it is a strong demo beat if you want one:
+
+```
+attest Jordan (INDEPENDENT_EXECUTION)
+  Jordan             EXPOSED  → PRACTICED
+  Incident Recovery  DEGRADED → COVERED     72/HIGH → 15/LOW
+  system             74 HIGH  → 74 HIGH     degraded 2 → 1, covered 3 → 4
+```
+
+The system index *staying* at 74 is the interesting part: Certificate Management is now the binding
+constraint. Worth a sentence on stage if this beat makes the cut.
+
+Two guardrails you can rely on when writing the copy. There is **no request field that can set a
+readiness level, exposure, confidence, or a risk index** — a test asserts their absence — so "the
+manager corrects the evidence, not the score" is literally true. And attestations are capped at
+moderate strength, so no number of them can produce a `VALIDATED` engineer.
+
+### `index_modifiers` — for the "Why this risk?" drawer
+
+`GET /api/v1/capabilities/cap_incident_recovery` now also returns:
+
+```json
+"index_modifiers": [
+  { "code": "SOLE_ADEQUATE_ENGINEER", "delta": 1 },
+  { "code": "BEST_ALTERNATIVE_ASSISTED", "delta": 1 }
+]
+```
+
+Read with the class anchor — LOW 20, MODERATE 50, HIGH 70, CRITICAL 90 — that is the whole derivation
+of 72. If you render it, `70 + 1 + 1 = 72` is a much better answer to "why 72?" than a list of rule
+names. Suggested copy for the two codes above: "Only one engineer has demonstrated this" and "The
+next-strongest engineer has only assisted". Optional field, so ignore it freely.
+
+### Auth — nothing to do
+
+`API_TOKEN` is unset by default and the API stays open exactly as before. You do not need a token and
+you do not need to change the adapter. If we ever host this beyond localhost, setting `API_TOKEN`
+makes `/api/v1` require `Authorization: Bearer <token>` and returns the usual envelope with
+`code: "UNAUTHORIZED"` — worth having the client handle 401 eventually, but not now.
+
+### Real public GitHub data is now in the corpus
+
+640 artifacts total: 520 synthetic private records plus **120 real merged pull requests and reviews**
+from a public repository, ingested through the same pipeline. Contributor identities are pseudonymised
+onto our synthetic engineers and real logins are never stored — we infer readiness about named people,
+so assessing real engineers who never consented would breach our own boundary.
+
+The honest headline: **one of those 120 produced capability evidence.** A public SDK repo talks about
+packaging and error handling, not about recovering a payment gateway. That is a finding worth telling
+rather than hiding — it is the argument for why the hybrid data strategy exists. You will see it as one
+extra graph edge: Lena Novak on Retry Logic at `EXPOSED / STALE / LOW`, which is a nice illustration
+that old third-party activity reads as stale low-confidence exposure rather than as capability.
+
+### Fixtures regenerated (3)
+
+- `incident-recovery.json` — gains `index_modifiers`
+- `incident-recovery-evidence.json` — gains the Maria `missing_evidence` entry
+- `payment-gateway-graph.json` — gains the one public-derived `DEMONSTRATES` edge
+
+All additive. **Every frozen number is unchanged:** 72/HIGH, 74/HIGH with 0/2/3, 74 → 93 and
+HIGH → CRITICAL with 2/1/2, Payments 74, Identity 68, Maria HIGH, Jordan MEDIUM.
+
+Run `PYTHONPATH=. python -m scripts.refresh_fixtures --check` from `backend/` any time you suspect
+drift; it fails if a fixture no longer matches live output.
+
+### README
+
+I drafted the technical sections — AI approach and architecture, evidence model, continuity risk
+engine, counterfactual simulation, human correction, evaluation. Per
+`TEAM_WORKFLOW_PERSON_A_B.md` section 27 the product narrative is yours: problem framing, product
+story, user journey, screenshots, demo flow, impact, UX. I left those marked as drafts with notes on
+what to expand, and I did not touch your responsible-use section.
+
+One thing to read before you write copy: the **AI approach** section states plainly that the shipped
+extraction provider is rule-based rather than a language model. That is deliberate and I would keep it
+that way unless we wire a model in. It is `RECOMMENDATIONS.md` R-01 and it is the top open item — a
+judge can check the claim in ninety seconds, and an overstated one costs more than the honest version.
+
+### What is still open
+
+| Item | Needs |
+|---|---|
+| **R-01 — model-backed extraction provider** | A provider choice and an API key. The interface, validation, and a versioned prompt spec are all ready; nothing downstream changes |
+| DEC-10 — keep the eleventh endpoint? | Your yes or no |
+| R-21 — identity is not modelled | One sentence in the submission |
+| R-22 — attestations are dated today, not when the work happened | 30 minutes if we want it |
+| Demo video, screenshots, product narrative | Yours |
+
+### Recommended next task
+
+**You:** the dashboard and system detail against live data, then the graph. Everything you need is
+live and the fixtures match it exactly. `python -m scripts.verify_golden_path` from `backend/` walks
+every endpoint and prints latency if you want to see the whole surface at once.
+
+**Me:** wire a model-backed provider the moment there is a key, and otherwise hold. The backend has
+no remaining work that does not need a decision from you.

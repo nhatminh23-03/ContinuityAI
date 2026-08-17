@@ -159,6 +159,11 @@
       "engineer_id": "eng_jordan_lee",
       "engineer_name": "Jordan Lee",
       "description": "No qualifying independent incident recovery evidence found."
+    },
+    {
+      "engineer_id": "eng_maria_gomez",
+      "engineer_name": "Maria Gomez",
+      "description": "No qualifying independent incident recovery evidence found."
     }
   ],
   "conflicting_evidence": [],

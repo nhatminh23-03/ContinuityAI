@@ -36,6 +36,13 @@ class Settings(BaseSettings):
     # a one-command start for the frontend developer.
     auto_seed: bool = True
 
+    # Optional shared bearer token. Empty by default, which leaves the API open exactly as it was —
+    # the frontend is unaffected and nobody has to coordinate a secret to run the demo locally.
+    # Set it before exposing the API beyond localhost. Enterprise IAM is deliberately out of MVP
+    # scope (ARCHITECTURE.md section 50); this is the minimum that makes "the manager approves"
+    # mean something. See RECOMMENDATIONS.md R-03.
+    api_token: str = ""
+
     # Freshness is evaluated against this date so a seeded demo does not silently age
     # into different classifications between now and judging. Set to a real date to
     # observe drift. docs/DOMAIN_MODEL.md section 18.

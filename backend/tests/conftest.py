@@ -41,6 +41,11 @@ def seeded_database():
 
 @pytest.fixture(scope="session")
 def client(seeded_database):
+    """Shared across the session.
+
+    Safe even though the challenge tests reseed: each request opens its own session through the
+    `get_session` dependency, so the client holds no database state of its own.
+    """
     from fastapi.testclient import TestClient
 
     from app.main import app
@@ -49,8 +54,15 @@ def client(seeded_database):
         yield test_client
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def session(seeded_database):
+    """Function-scoped on purpose.
+
+    `scripts.seed_demo` drops and recreates every table, and the challenge tests reseed to undo
+    their own mutations. A session held open across that would keep referring to tables that no
+    longer exist, which surfaced as `OperationalError` in unrelated modules — a test failure caused
+    by fixture lifetime rather than by any behaviour under test.
+    """
     from app.db.session import SessionLocal
 
     with SessionLocal() as db_session:

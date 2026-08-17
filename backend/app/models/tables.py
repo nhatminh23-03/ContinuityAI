@@ -304,6 +304,38 @@ class MitigationPlan(Base):
     )
 
 
+class AssessmentChallenge(Base):
+    """Audit trail for a manager disputing an assessment. PRD section 21, DOMAIN_MODEL section 33.
+
+    Stores the previous assessment, the stated reason, what changed in the evidence layer, and the
+    new result. That record is the point: an assessment that can be corrected but not audited is
+    worse than one that cannot be corrected at all, because nobody can later ask why it moved.
+
+    There is deliberately no column here for a readiness level or a risk index. A manager changes
+    evidence; the rules recompute the rest.
+    """
+
+    __tablename__ = "assessment_challenges"
+
+    challenge_id: Mapped[str] = mapped_column(String, primary_key=True)
+    capability_id: Mapped[str] = mapped_column(
+        ForeignKey("capabilities.capability_id"), nullable=False
+    )
+    engineer_id: Mapped[str | None] = mapped_column(ForeignKey("engineers.engineer_id"))
+    challenge_type: Mapped[str] = mapped_column(String, nullable=False)
+    comment: Mapped[str] = mapped_column(Text, nullable=False)
+    submitted_by: Mapped[str] = mapped_column(String, nullable=False)
+    submitted_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+
+    evidence_created_id: Mapped[str | None] = mapped_column(String)
+    evidence_moved_id: Mapped[str | None] = mapped_column(String)
+    moved_from_capability_id: Mapped[str | None] = mapped_column(String)
+
+    # Full before/after snapshots, so the trail survives later recomputations.
+    previous_assessment: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    new_assessment: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+
+
 class MitigationTask(Base):
     """A task identifier is scoped to its plan, not globally unique.
 

@@ -144,9 +144,24 @@ class CriticalitySource(StrEnum):
     AI_SUGGESTED = "AI_SUGGESTED"
 
 
+class ChallengeType(StrEnum):
+    """How a manager disputes an assessment. PRD section 21, contract decision CI-13.
+
+    A manager never edits a readiness value or a risk score. They change the *evidence*, and the
+    assessment is recomputed from it — which is why every value in this enum names an evidence
+    operation rather than an outcome.
+    """
+
+    LINK_EVIDENCE = "LINK_EVIDENCE"
+    MANAGER_ATTESTATION = "MANAGER_ATTESTATION"
+    CORRECT_CAPABILITY_MAPPING = "CORRECT_CAPABILITY_MAPPING"
+
+
 class ErrorCode(StrEnum):
     NOT_FOUND = "NOT_FOUND"
     VALIDATION_ERROR = "VALIDATION_ERROR"
+    # Only reachable when API_TOKEN is configured; the API is open by default. RECOMMENDATIONS R-03.
+    UNAUTHORIZED = "UNAUTHORIZED"
     INSUFFICIENT_EVIDENCE = "INSUFFICIENT_EVIDENCE"
     AI_EXTRACTION_FAILED = "AI_EXTRACTION_FAILED"
     GRAPH_INCONSISTENCY = "GRAPH_INCONSISTENCY"

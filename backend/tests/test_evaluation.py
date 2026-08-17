@@ -17,8 +17,9 @@ from app.evaluation import evaluate, load_ground_truth
 from app.repositories import CapabilityRepository, EvidenceRepository
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def report(session):
+    """Function-scoped to match the `session` fixture, which cannot outlive a reseed."""
     return evaluate(session, load_ground_truth())
 
 

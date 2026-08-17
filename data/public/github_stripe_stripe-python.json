@@ -1,0 +1,1922 @@
+[
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-4",
+    "title": "Updated tests to pass",
+    "body": "Corrected dupe functions and added functionality that allowed the tests to pass on a new account. Shortened all lines to 80 cols re PEP-8. Replaced repeated lines with reusable objects to comply with DRY.",
+    "date": "2011-09-17",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/4"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-8",
+    "title": "Add events",
+    "body": "",
+    "date": "2012-01-27",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/8"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-9",
+    "title": "Change the description format, support events correctly",
+    "body": "",
+    "date": "2012-01-30",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/9"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-19",
+    "title": "Fixes for issues #17 and #18",
+    "body": "Fixes two issues involved in serializing StripeObjects.",
+    "date": "2012-05-31",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/19"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-20",
+    "title": "Testing",
+    "body": "",
+    "date": "2012-06-02",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/20"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-21",
+    "title": "Add Account API resource.",
+    "body": "",
+    "date": "2012-08-17",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/21"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-22",
+    "title": "Invoice paying and updating methods.",
+    "body": "",
+    "date": "2012-08-31",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/22"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-27",
+    "title": "Add API version setting.",
+    "body": "",
+    "date": "2013-01-15",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/27"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-30",
+    "title": "Support expand in python retrieval.",
+    "body": "",
+    "date": "2013-02-05",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/30"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-31",
+    "title": "Some minor fixes and improvements.",
+    "body": "I was using the library so I checked out the source, and I couldn't help but clean up the first couple things I saw. I love Stripe. Thanks for making it awesome, guys.",
+    "date": "2013-02-20",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/31"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-33",
+    "title": "Python 3 support",
+    "body": "As promised, here's a pull request which adds support for Python 3. I have modified the tox.ini file to test against Python 3.3 (I have not tested with 3.0 or 3.1 or 3.2 though it should work with those as well). I also configured tox to test against Python 2.5, since you mentioned you had customers using 2.5. The unit tests seem to work with 2.5, 2.6, 2.7, pypy, and 3.3, and I tested using my account to send a test charge with 2.5 and 3.3 and it worked in both cases. The most significant change I made was to move the test directory to live within the actual stripe package itself. I didn't want to have to do this; I also like keeping unit tests separate when possible instead of bundling them as a sub-package. However, I had to do this so that tox would run tests against the proper 2to3 source code, as a workaround for this unresolved tox issue: https://code.google.com/p/pytox/issues/detail?id=21 As indicated, I'm using 2to3 in setup.py, so you can still just have one single source code base which is automatically converted on install. Let me know if you have any questions - I'll be using this for my own Python 3 project, which is in the process of switching over from Paypal to Stri",
+    "date": "2013-04-25",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/33"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-36",
+    "title": "Cards API changes",
+    "body": "",
+    "date": "2013-07-12",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/36"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-39",
+    "title": "Support property deletion",
+    "body": "Changes to support property deletion in the API (e.g. deleting description on customer) - Setting attributes to None passes an empty string to the API, leading to legal properties being deleted - Setting an attribute to an empty string is an error to avoid accidental unsets",
+    "date": "2013-08-12",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/39"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-42",
+    "title": "Update __init__.py",
+    "body": "Typo in one of the error messages.",
+    "date": "2013-08-24",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/42"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-46",
+    "title": "Support for closing disputes",
+    "body": "reviewer: @contributor",
+    "date": "2013-09-19",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/46"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-47",
+    "title": "adds close method to init",
+    "body": "",
+    "date": "2013-10-09",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/47"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-48",
+    "title": "Metadata API support",
+    "body": "",
+    "date": "2013-10-11",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/48"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-52",
+    "title": "Application fees",
+    "body": "",
+    "date": "2013-12-02",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/52"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-51",
+    "title": "Refactor of Python bindings",
+    "body": "On recent planes and trains I've undertaken to refactor the Python bindings to make them more readable and maintainable. The primary changes are to: - Improve testing with unit tests and further functional tests - Make the code more Pythonic in structure and PEP8 compliant - Abstract out HTTP client logic - Make `StripeObject` a dict subclass and expunge direct access to `__dict__` The goal was to avoid making significant backwards incompatible changes so that this wouldn't need to be a major version change. Several things were deprecated but the only incompatibilities should be: - The `to_dict` and `values` methods on resources no longer recursively convert objects to plain dicts (but objects are now themselves dicts). - The `previous_metadata` attribute on resources is now private. - Timezone aware `datetime` objects passed to the API will now be encoded in a way that does not depend on the local system time. This may change the value passed to the API. Questions for the reviewer: - Are you happy with the delineation between modules? - Are you concerned about any of the backwards incompatible changes? (especially w.r.t. TZ aware datetimes) There are some outstanding items: - [x] ",
+    "date": "2013-12-05",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/51"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-55",
+    "title": "Add multiple subscription support",
+    "body": "The proposed syntax is outlined here: https://gist.github.com/mikez/7881317 Two notes: - this change will remain backwards compatible with the old subscription methods; - in the test files, the `STRIPE_API_KEY` might need to get updated. Thoughts? Eager for feedback on areas of improvement!",
+    "date": "2014-01-30",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/55"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-58",
+    "title": "Ms",
+    "body": "",
+    "date": "2014-01-30",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/58"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-59",
+    "title": "Fix pycurl linking in tests",
+    "body": "Need to set a `PYCURL_SSL_LIBRARY` environment variable in tox and travis configurations for pycurl to link correctly against libcurl.",
+    "date": "2014-01-30",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/59"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-61",
+    "title": "Various bug fixes",
+    "body": "Addresses #60, #54, #45 and #49. Review: @contributor",
+    "date": "2014-03-13",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/61"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-66",
+    "title": "Update CA certificates bundle to 20130906.",
+    "body": "http://www.ubuntu.com/usn/usn-2154-1/ https://gist.github.com/ab/9756531",
+    "date": "2014-04-09",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/66"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-68",
+    "title": "Implement certificate blacklists",
+    "body": "",
+    "date": "2014-04-09",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/68"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-69",
+    "title": "der encoded blacklist",
+    "body": "reviewer: random.choice(@contributor, @contributor)",
+    "date": "2014-04-10",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/69"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-75",
+    "title": "Add support for Google App Engine dev server",
+    "body": "## Summary Currently the stripe library is not compatible with the App Engine dev server, this fixes that by disabling the ssl revoked cert check when running on the dev app server. ## More detail Google App Engine blocks access to many C modules including the `socket` module. It provides its own implementation but this causes a `TypeError` when used with the `ssl` C module. This PR skips the ssl preflight check when a `TypeError` occurs on the App Engine server, this doesn't add much risk as the attacker would have to be in control of the connection between the user and stripe and also have a copy of the pre-heartbleed ssl private key. In any case the check can be bypassed since connections aren't reused and the check is only done once for the lifetime of an instance so an attacker would simply trigger a stripe request on the target website (buy something with a dummy card) to get the check out the way and then start the MITM attack then trigger another stripe transaction and get the secret key. ## Why catch the exception rather than detect the environment? If a fix for the underlying issue with the App Engine dev server gets released then the check will work again. ## Feedback No",
+    "date": "2014-05-12",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/75"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-76",
+    "title": "Add Travis CI build status to the README",
+    "body": "I noticed that while we test with Travis, we don't have the badge in the README.",
+    "date": "2014-05-19",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/76"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-78",
+    "title": "generalized Card and added tests for customer and recipient cards",
+    "body": "R? @contributor @contributor",
+    "date": "2014-05-22",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/78"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-77",
+    "title": "Add information about testing to the README",
+    "body": "The testing documentation was non-existent. I'm also hoping to fix issues with running PyCurl tests in Tox in this PR. review: @contributor",
+    "date": "2014-05-23",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/77"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-80",
+    "title": "Added support for cancelling transfer",
+    "body": "@contributor cc/ @contributor Added python support for canceling transfers",
+    "date": "2014-05-28",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/80"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-82",
+    "title": "Deprecate Python 2.5",
+    "body": "Neither of our testing tools (Travis and tox) support Python 2.5 anymore. This means that continuing to claim support is either (a) onerous or (b) a lie. Based on our data, almost no one is currently using Python 2.5 in production and none of them have updated their bindings this year. I'd like to officially deprecate Python 2.5 without doing anything to intentionally break it. For the time being, we won't refactor the code to use `with`, `except ... as` or libraries unavailable in 2.5. We simply won't commit to maintaining that compatibility in the future. @contributor @contributor does this seem fair given the context from our email thread?",
+    "date": "2014-06-10",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/82"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-83",
+    "title": "Add Refunds",
+    "body": "Add Refund as a resource that can be created and retrieved. r? @contributor",
+    "date": "2014-06-17",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/83"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-91",
+    "title": "Adding a description for PyPI.",
+    "body": "This should provide some descriptive things about what Stripe's python bindings do and where to find the docs when downloading from PyPI. Should fix #84.",
+    "date": "2014-07-14",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/91"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-87",
+    "title": "Fix ssl import error in GAE",
+    "body": "This avoids an `ImportError` when loading the SSL library in a Google App Engine dev environment. For more details, see: https://code.google.com/p/googleappengine/issues/detail?id=9246 This PR is a followup from an internal ticket. I'll merge once the reporter has confirmed that this fixes the issue in his environment.",
+    "date": "2014-07-15",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/87"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-90",
+    "title": "Adding a content type header for all api requests.",
+    "body": "I'm adding the default POST content type of `application/x-www-form-urlencoded` to all requests made to the Stripe API. Should fix issue #85 cc @contributor",
+    "date": "2014-07-15",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/90"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-89",
+    "title": "Remove deprecation warnings from the top level module",
+    "body": "As per discussion in #72, we're removing the deprecation warnings for common tasks. We'll re-visit deprecations once a design for the next major version of the helper library is discussed.",
+    "date": "2014-07-18",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/89"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-94",
+    "title": "Unit test resource classes instead of hitting the API",
+    "body": "On my machine, tests now take 10 seconds instead of 70. r? @contributor @contributor",
+    "date": "2014-07-18",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/94"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-97",
+    "title": "Fixed typos",
+    "body": "",
+    "date": "2014-07-22",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/97"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-98",
+    "title": "make ApplicationFee.refunds a list object instead of array",
+    "body": "r@ @contributor, @contributor",
+    "date": "2014-07-29",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/98"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-101",
+    "title": "Make coupons updateable",
+    "body": "",
+    "date": "2014-08-21",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/101"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-107",
+    "title": "Delurk certificate blacklisting",
+    "body": "Python makes TLS fallback directly on the ssl module incredibly painful, and having moved to much shorter issuance certificates, this offers much less utility. r? @contributor",
+    "date": "2014-10-24",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/107"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-112",
+    "title": "Add fraud reporting methods",
+    "body": "Adds methods for reporting charges as fraudulent or safe. r? @contributor",
+    "date": "2014-12-13",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/112"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-115",
+    "title": "Add support for per-request headers",
+    "body": "r? @contributor",
+    "date": "2014-12-17",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/115"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-116",
+    "title": "Add `idempotency_key` keyword argument",
+    "body": "Implement idempotent requests. r? @contributor",
+    "date": "2014-12-19",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/116"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-113",
+    "title": "Creating the FileUpload resource.",
+    "body": "This PR adds support for posting multipart/form data and file uploads. It does a number of things in order to allow file uploads to be included in the python bindings. These are: 1. It allows subclasses of StripeObjects to specify an api_base url from which the base endpoint will be directed. This allows a method to point to something other than `https://api.stripe.com`. 2. By specifying `Content-Type: multipart/form-data` in the headers of a post request, a multipart request will be created. To send a file, one simply needs to pass a file like object as a value for one of the parameters. 3. Creates the FileUpload resource which can be used to create and retrieve file uploads from the Stripe upload API. r? @contributor",
+    "date": "2014-12-20",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/113"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-117",
+    "title": "Added Bitcoin Reeceiver & Transaction objects",
+    "body": "Added Bitcoin Receiver & Transaction objects",
+    "date": "2015-01-07",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/117"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-118",
+    "title": "[WIP] Unexpose BitcoinTransaction routes",
+    "body": "Removed interface to query BitcoinTransactions -- only it should only be a child property of BitcoinReceiver",
+    "date": "2015-01-12",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/118"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-119",
+    "title": "Add functionality for listing file uploads.",
+    "body": "This allows the python bindings to access the new list method for file uploads. r? @contributor",
+    "date": "2015-01-12",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/119"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-120",
+    "title": "BitcoinTransaction Sublist tests",
+    "body": "Added tests to ensure: 1) the BitcoinTransaction sublist is queryable from a bitcoin receiver 2) charge creation requests with source tokens are well formed",
+    "date": "2015-01-20",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/120"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-125",
+    "title": "Add support for listing and updating reversals",
+    "body": "",
+    "date": "2015-02-19",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/125"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-126",
+    "title": "Add support for creating and listing accounts",
+    "body": "I had to do some gross things here to fix nested updating. Instead of a complete refactor, I just took what we were doing for the metadata key and applied it to all keys. I need to make sure that this doesn't try to pass along keys for expanded parameters.",
+    "date": "2015-02-19",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/126"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-128",
+    "title": "Add support for the Stripe-Account header",
+    "body": "cc @contributor",
+    "date": "2015-02-19",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/128"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-129",
+    "title": "Remove sys import hack",
+    "body": "I'm a bit worried that this change will mean we're just testing the latest version of stripe on PyPI.",
+    "date": "2015-02-19",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/129"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-130",
+    "title": "Deprecate code.stripe.com.",
+    "body": "r? @contributor",
+    "date": "2015-02-19",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/130"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-127",
+    "title": "added structure to support unified customer sources api",
+    "body": "cc @contributor @contributor",
+    "date": "2015-02-20",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/127"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-131",
+    "title": "setup.py url should point to URL of package",
+    "body": "https://docs.python.org/2/distutils/setupscript.html#additional-meta-data \"home page for the package\"",
+    "date": "2015-02-24",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/131"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-132",
+    "title": "bitcoin receiver test consistency",
+    "body": "made bitcoin receiver creation in test consistent with backend (email is actually required) r? @contributor",
+    "date": "2015-02-27",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/132"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-136",
+    "title": "Support arrays of StripeObjects",
+    "body": "r? @contributor Because the iteration syntax between lists and dicts are different, I couldn't globally make the list-is-now-a-dict change. Hardcoding it to `additional_owners` for now until we can figure out a better solution.",
+    "date": "2015-03-23",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/136"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-137",
+    "title": "Balance.retrieve support for managed accounts.",
+    "body": "Makes sure the \"stripe_account\" parameter to the Balance.retrieve query gets passed all the way to the API call",
+    "date": "2015-03-30",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/137"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-140",
+    "title": "Fix saving managed accounts",
+    "body": "r? @contributor Fixes #139",
+    "date": "2015-04-08",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/140"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-141",
+    "title": "Ultra verbose logging should be in DEBUG",
+    "body": "Log output of the entire HTTP response should be in DEBUG not in INFO. Putting everything in INFO gives me no ability to allow stripe to log without completely clobbering the logs in other ways.",
+    "date": "2015-04-20",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/141"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-144",
+    "title": "Add a BankAccount object",
+    "body": "Currently, bank accounts that were added as a source to Customers cannot be deleted in the same way as Cards. This patch takes care of that.",
+    "date": "2015-05-20",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/144"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-146",
+    "title": "Add support for additional_owners and saving accounts",
+    "body": "r? @contributor",
+    "date": "2015-06-04",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/146"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-150",
+    "title": "Fix stripeobject update",
+    "body": "Resolves https://github.com/stripe/stripe-python/issues/149",
+    "date": "2015-06-15",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/150"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-152",
+    "title": "Fix mutation side effect in Card and BankAccount",
+    "body": "fix accidental 'self' reference causing mutation side effect on methods meant to be a functions was causing `InvalidRequestError: A parameter provided in the URL (customer) was repeated as a GET or POST parameter. You can only provide this information as a portion of the URL.` fixes: https://github.com/stripe/stripe-python/issues/151",
+    "date": "2015-06-15",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/152"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-161",
+    "title": "Added the ability to delete an account",
+    "body": "R? @contributor",
+    "date": "2015-07-29",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/161"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-164",
+    "title": "Fix python 2.6 'zero length field name in format' error",
+    "body": "",
+    "date": "2015-08-04",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/164"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-173",
+    "title": "add 429 rate limit error and tests",
+    "body": "r? @contributor",
+    "date": "2015-09-10",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/173"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-175",
+    "title": "Jim orders",
+    "body": "",
+    "date": "2015-09-14",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/175"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-170",
+    "title": "Stop LICENSE being installed in site-packages root",
+    "body": "The LICENSE file currently gets installed in the root site-packages directory. It shouldn't :)",
+    "date": "2015-09-22",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/170"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-171",
+    "title": "Add LICENSE to PyPI source distribution",
+    "body": "Allows downstream packagers and porters to include the LICENSE in resulting OS packages",
+    "date": "2015-09-22",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/171"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-177",
+    "title": "Python 3.4 & 3.5",
+    "body": "Added tests for Python 3.4 & 3.5 Also upgraded .travis.yml to use new container-based infrastructure",
+    "date": "2015-09-22",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/177"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-176",
+    "title": "Allow unicode error messages in `StripeError`",
+    "body": "This PR fixes https://github.com/stripe/stripe-python/issues/165.",
+    "date": "2015-09-30",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/176"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-180",
+    "title": "Configurable default HTTP client",
+    "body": "You can now override the HTTP client that Stripe uses with your own client. Note that this client must implement the `HTTPClient` interface defined in `http_client.py`.",
+    "date": "2015-10-01",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/180"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-181",
+    "title": "Allow attributes to be deleted.",
+    "body": "Before this commit, you could very easily get a Stripe object into an unsaveable state. Now you can fix yourself. Fix #99.",
+    "date": "2015-10-01",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/181"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-183",
+    "title": "Auto pagination",
+    "body": "Supersedes #169 This pull request is a WIP.",
+    "date": "2015-10-12",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/183"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-185",
+    "title": "Add legacy rate limit error handling",
+    "body": "The stripe api pre-2015-09-18 returned rate limit errors as 400 with code 'rate_limit'. This change adds support for that legacy behavior.",
+    "date": "2015-11-05",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/185"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-191",
+    "title": "Cleaned test documentation and fixes testing for Python 3.x",
+    "body": "- Command to execute tests in the README reflected old directory structure. - test.resources module was ignored in Python 3.x such that not all tests were executed, see #188.",
+    "date": "2015-12-04",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/191"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-195",
+    "title": "Make calls to `instance_url` side-effect free.",
+    "body": "Calling instance_url shouldn't change the state of an object. Previously, we were setting properties in this method, which lead to some very strange failure cases. No more! If we called `save` and the request failed with a 400, the object would be left in an incossitent state. Since we set attributes when calling instance_url, these values would be counted as unsaved attributes the next time save was called.",
+    "date": "2015-12-17",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/195"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-198",
+    "title": "Simpler if/else",
+    "body": "Not a big deal, but more pythonic :+1:",
+    "date": "2016-01-04",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/198"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-199",
+    "title": "Fixed flake8 errors",
+    "body": "PR #196 introduced two flake8 errors: ``` stripe/error.py:33:9: E731 do not assign a lambda expression, use a def stripe/error.py:35:9: E731 do not assign a lambda expression, use a def ``` This PR changes the code to be flake8-compliant.",
+    "date": "2016-01-04",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/199"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-200",
+    "title": "Catch exceptions with modern syntax.",
+    "body": "Because it improves reading of source code.",
+    "date": "2016-01-05",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/200"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-203",
+    "title": "Support product and SKU deletion.",
+    "body": "r? @contributor cc @contributor",
+    "date": "2016-01-26",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/203"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-204",
+    "title": "Update CA bundle",
+    "body": "Also switches to the more readily available Mozilla bundle. See stripe/stripe-ruby#372 for details.",
+    "date": "2016-01-26",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/204"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-207",
+    "title": "Use latest mock version",
+    "body": "Fixes #189 and #205. This PR updates `setup.py` to use the latest mock version. It also updates two tests (`ChargeRefundTest.test_non_recursive_save()` and `UpdateableAPIResourceTests.test_save_nothing()`) to reflect the current behavior of the library (see #205 for more context on this). r? @contributor cc @contributor/api-libraries",
+    "date": "2016-02-23",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/207"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-210",
+    "title": "Add support for country specs",
+    "body": "r? @contributor cc @contributor/api-libraries Tests are failing at the moment because the test account for the bindings is being purged, but they should pass once that's done.",
+    "date": "2016-02-27",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/210"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-212",
+    "title": "Fix flake8 error",
+    "body": "I'm going to go ahead and merge this one since it's literally just an empty line :)",
+    "date": "2016-02-28",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/212"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-211",
+    "title": "Use latest mock version",
+    "body": "Missed some files in #207. r? @contributor",
+    "date": "2016-02-29",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/211"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-214",
+    "title": "Add bindings for account.reject",
+    "body": "Adds bindings for the [Account.reject](https://stripe.com/docs/api#reject_account) endpoint.",
+    "date": "2016-03-15",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/214"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-216",
+    "title": "Don't check for request ID on invalid credentials",
+    "body": "It seems that some middleware tweaks inside the API server have resulted in a request ID no longer being returned when invalid credentials are passed in. This patch removes the check given that it's currently failing our test suite. ~~/cc @contributor Would you mind reviewing this one? Thanks!~~",
+    "date": "2016-03-23",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/216"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-218",
+    "title": "Fix ASCII/Unicode handling in Python 2 and 3",
+    "body": "Fixes #217. This PR ensures that `MultipartDataGenerator` can handle keys and values of all encodings in both Python 2 and 3.",
+    "date": "2016-03-24",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/218"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-215",
+    "title": "Add \"CyberTrust Global Root\"",
+    "body": "This allows old OpenSSL versions (0.9.8 and 1.0.0) to successfully verify Stripe's certificate chain.",
+    "date": "2016-03-31",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/215"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-222",
+    "title": "Persist parameters with auto_paging_iter()",
+    "body": "This PR fixes #221: `auto_paging_iter()` should now persist parameters. r? @contributor cc @contributor/api-libraries",
+    "date": "2016-04-11",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/222"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-223",
+    "title": "Fixes FileUpload.list()",
+    "body": "`FileUpload.list()` (or `.all()`) fails because it tries to hit `https://api.stripe.com` instead of `https://uploads.stripe.com`. This PR fixes that. r? @contributor cc @contributor/api-libraries",
+    "date": "2016-04-12",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/223"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-225",
+    "title": "Fix deprecation warnings",
+    "body": "This PR fixes deprecation warnings: - updated `resource.py` to use `.list()` instead of `.all()` in some convenience methods - updated a lot of tests to use `.list()` instead of `.all()` - updated a couple tests for legacy methods to catch the warnings and assert their presence The test suite's output should now be much cleaner! :)",
+    "date": "2016-04-12",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/225"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-230",
+    "title": "Add support for Alipay accounts",
+    "body": "Fixes #229. r? @contributor/api-libraries",
+    "date": "2016-05-17",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/230"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-232",
+    "title": "Add OrderReturn object, Order.return_order method",
+    "body": "r? @contributor/api-libraries cc @contributor",
+    "date": "2016-05-25",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/232"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-236",
+    "title": "Added support for 3D Secure",
+    "body": "r? @contributor cc @contributor/api-libraries @contributor Support for the new server-side 3D Secure API (currently in private beta).",
+    "date": "2016-07-12",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/236"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-242",
+    "title": "Drop support for Python 3.2",
+    "body": "So 3.2 is failing our build matrix because our dependencies (like requests) are using \"u\" unicode prefixes which were originally dropped from Python 3, but were then re-added in 3.3 for compatibility reasons. I made a token attempt to get this fixed, but couldn't quite get there. Given that Python 3.2's been unsupported for 2+ years now, let's take the easy way out and drop it. [1] http://stackoverflow.com/questions/8679985/unicode-strings-syntax-in-python",
+    "date": "2016-08-24",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/242"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-247",
+    "title": "Apple Pay Domain bindings in python",
+    "body": "support for create, list, retrieve, and delete",
+    "date": "2016-09-15",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/247"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-250",
+    "title": "Expand pycurl tests",
+    "body": "Adds some basic assertions to pycurl tests to make sure that we have at least a basic idea that the right thing is happening.",
+    "date": "2016-10-04",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/250"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-245",
+    "title": "UPDATE: Stripe API proxy support for requests, pycurl, and urllib2 clients",
+    "body": "In complex enterprise environment, different proxies may be used for communication across the many enterprise network zones, the Internet. Obviously, the HTTP_PROXY and HTTPS_PROXY environment variables are more trouble than help there. A clean solution would be introducing API level proxy support that limits the proxy scope to just stripe communication. Everybody else would remain unaffected and could continue using either direct or own, different HTTP proxy configuration. This pull request introduces the proxy API support described. The new proxy-example.py file demonstrates the proxy API usage. Please consider prompt review of this pull request. Not having the proxy support will affect our project with an externally set, beyond our control hard deadline. Happy to address any questions or concerns. Thank you!",
+    "date": "2016-10-06",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/245"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-251",
+    "title": "Move examples to examples/ directory",
+    "body": "Re-organize the project a little bit so that examples are grouped together and not in root.",
+    "date": "2016-10-06",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/251"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-241",
+    "title": "UPDATED Oct 4 - Adds a configurable default timeout to the constructor for the requests http client",
+    "body": "",
+    "date": "2016-10-07",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/241"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-253",
+    "title": "Return values when creating/modifying subscriptions",
+    "body": "A bug was introduced with subscription items [1] that overrode methods on the subscription and model and resulted in create/modify no longer return objects. This patch addresses that problem by adding return statements. Fixes #252. r? @contributor Can you check this one out? Thanks! [1] https://github.com/stripe/stripe-python/pull/249/commits/48856aea2e35d82d5fa76d0ab4483513039883a0",
+    "date": "2016-10-10",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/253"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-254",
+    "title": "Adds support for sources",
+    "body": "r? @contributor cc @contributor/api-libraries It seems like we forgot to update the Python bindings when we switched to using [sources](https://stripe.com/docs/api#sources) for Bitcoin payments a few weeks ago. This PR fixes that.",
+    "date": "2016-10-12",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/254"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-256",
+    "title": "Fix lint like problems revealed by lgtm",
+    "body": "Details: - Rescue BaseException instead of default Exception so that we don't accidentally handle an exit or keyboard interrupt. - Make sure to call parent constructor of UrlFetchClient. - Don't mix explicit and implicit return values. - Remove unnecessary pass statement from OrderReturn. - Comment empty exception rescue. - Remove unused logger. r? @contributor Mind taking a look here? Thanks!",
+    "date": "2016-10-13",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/256"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-257",
+    "title": "Support 403 status codes",
+    "body": "r? @contributor",
+    "date": "2016-10-14",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_lena_novak",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/257"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-258",
+    "title": "Rename error class to be singular \"permissions\"",
+    "body": "The addition of this class was unreleased so this is not a breaking change.",
+    "date": "2016-10-14",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/258"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-260",
+    "title": "Implement copy overrides on StripeObject",
+    "body": "As described in #259, the fact that we have overridden the setter on StripeObject to throw an error on an empty string means that when copy or deepcopy are used on it, an exception is thrown. It makes sense to be able to able to copy a StripeObject, so here we override **copy** and **deepcopy** and add implementations that don't succumb to the same problem as the built-in versions. Fixes #259. r? @contributor Would you mind taking a look at this one? Thanks!",
+    "date": "2016-10-26",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/260"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-262",
+    "title": "Added a template for GitHub issues",
+    "body": "r? @contributor This adds a template for GitHub issues, similar to the one we added for stripe-php.",
+    "date": "2016-11-03",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/262"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-264",
+    "title": "Fix flake8 errors",
+    "body": "Fixes a couple of flake8 errors.",
+    "date": "2016-11-21",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/264"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-263",
+    "title": "Added 3DS retrieve method",
+    "body": "r? @contributor cc @contributor/api-libraries @contributor Adds a method for retrieving 3DS auths.",
+    "date": "2016-11-22",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/263"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-265",
+    "title": "flip conditional to prevent NameError on Python 3",
+    "body": "In Python 3 `unicode` is no longer a built-in function (as it is now `str`). I'm honestly unsure how the tests currently pass, as this most certainly will throw an exception. Let me know if you would like me to include a test :)",
+    "date": "2016-11-22",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/265"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-267",
+    "title": "Adds support for verify source endpoint",
+    "body": "r? @contributor cc @contributor/api-libraries @contributor This PR adds support for the `/verify` endpoint for sources, for use with ACH debit and other source types that require a verification.",
+    "date": "2016-11-30",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/267"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-270",
+    "title": "update compatible versions",
+    "body": "to reflect [https://travis-ci.org/stripe/stripe-python](url)",
+    "date": "2016-12-13",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/270"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-271",
+    "title": "PyPy3 support",
+    "body": "they will have full 3.5 support soon https://morepypy.blogspot.com/2016/08/pypy-gets-funding-from-mozilla-for.html https://morepypy.blogspot.com/2016/10/pypy3-550-released.html",
+    "date": "2016-12-14",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_priya_nair",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/271"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-276",
+    "title": "Use an internal Requests session for speed",
+    "body": "Improves performance for Requests by using an internal session that allows for connection pooling. Replaces #266.",
+    "date": "2017-01-06",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/276"
+  },
+  {
+    "kind": "pull_requests",
+    "reference": "GH-stripe-stripe-python-277",
+    "title": "Adds update source endpoint",
+    "body": "r? @contributor cc @contributor/api-libraries Adds support for source update requests.",
+    "date": "2017-01-17",
+    "system_id": "system_payment_gateway",
+    "participants": [
+      {
+        "engineer_id": "eng_tom_becker",
+        "participant_role": "AUTHOR"
+      }
+    ],
+    "file_paths": [],
+    "source_url": "https://github.com/stripe/stripe-python/pull/277"
+  }
+]

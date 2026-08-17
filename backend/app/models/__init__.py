@@ -3,6 +3,7 @@
 from .enums import ParticipantRole, RunbookState
 from .tables import (
     Artifact,
+    AssessmentChallenge,
     Capability,
     CapabilityAssessment,
     Component,
@@ -20,6 +21,7 @@ from .tables import (
 
 __all__ = [
     "Artifact",
+    "AssessmentChallenge",
     "Capability",
     "CapabilityAssessment",
     "Component",

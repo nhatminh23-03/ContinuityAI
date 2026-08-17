@@ -4,6 +4,7 @@ from .adapters import (
     artifact_id_for,
     load_declared_ownership,
     load_normalised_github_export,
+    load_public_github_corpus,
     load_synthetic_corpus,
     normalise_reference,
 )
@@ -15,6 +16,7 @@ __all__ = [
     "ingest",
     "load_declared_ownership",
     "load_normalised_github_export",
+    "load_public_github_corpus",
     "load_synthetic_corpus",
     "normalise_reference",
 ]

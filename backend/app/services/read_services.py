@@ -28,6 +28,7 @@ from app.schemas.capability import (
     CapabilityRef,
     EngineerCoverage,
     EngineerRef,
+    IndexModifier,
 )
 from app.schemas.enums import ReadinessLevel
 from app.schemas.evidence import (
@@ -51,10 +52,12 @@ from app.schemas.system import (
     SystemSummary,
 )
 
-# Below ASSISTED, the honest statement is that no qualifying execution evidence was found. At
-# ASSISTED and above there is something to point at, so a "missing evidence" note would read as
-# a criticism rather than a description.
-MISSING_EVIDENCE_BELOW = readiness_rank(ReadinessLevel.ASSISTED)
+# Anyone below PRACTICED has not demonstrated the capability unaided, and saying so is what the
+# provenance drawer is for. Previously this was set at ASSISTED, which meant Maria — the leading
+# backup candidate — showed no note at all, even though "has assisted but has no independent
+# recovery evidence" is exactly what a manager choosing a backup needs to read. Widened per
+# RECOMMENDATIONS.md R-13.
+MISSING_EVIDENCE_BELOW = readiness_rank(ReadinessLevel.PRACTICED)
 
 
 class PlatformService:
@@ -208,6 +211,12 @@ class CapabilityService:
             continuity_risk_class=assessment.continuity_risk_class,
             evidence_confidence=assessment.evidence_confidence,
             rules_triggered=list(assessment.rules_triggered),
+            # The arithmetic behind the index, so it is inspectable rather than merely
+            # reproducible. Optional and additive (DEC-11).
+            index_modifiers=[
+                IndexModifier(code=m["code"], delta=m["delta"])
+                for m in (assessment.index_modifiers or [])
+            ],
             primary_engineer=self._engineer_ref(assessment.primary_engineer_id, ordered, engineers),
             best_remaining_coverage=self._engineer_ref(
                 assessment.best_remaining_engineer_id, ordered, engineers

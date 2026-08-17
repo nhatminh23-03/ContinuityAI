@@ -323,6 +323,16 @@
       }
     },
     {
+      "source": "eng_lena_novak",
+      "target": "cap_retry_logic",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "EXPOSED",
+        "freshness": "STALE",
+        "evidence_confidence": "LOW"
+      }
+    },
+    {
       "source": "eng_maria_gomez",
       "target": "cap_retry_logic",
       "type": "DEMONSTRATES",

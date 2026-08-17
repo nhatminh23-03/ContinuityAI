@@ -35,6 +35,21 @@ class EngineerCoverage(BaseModel):
     last_demonstrated_at: date | None = None
 
 
+class IndexModifier(BaseModel):
+    """One adjustment that contributed to the Continuity Risk Index.
+
+    Added so the "Why this risk?" drawer can show *how* an index was reached rather than only which
+    rules fired — the strongest available answer to "the risk score looks arbitrary" (PRD section
+    30). The index is anchored on the risk class and clamped to its band, so these deltas explain
+    position within a band and can never move a capability out of one.
+
+    Optional and additive; contract decision DEC-11.
+    """
+
+    code: str
+    delta: int
+
+
 class CapabilityDetail(BaseModel):
     capability_id: str
     component_id: str
@@ -47,6 +62,7 @@ class CapabilityDetail(BaseModel):
     continuity_risk_class: ContinuityRiskClass | None = None
     evidence_confidence: EvidenceConfidence
     rules_triggered: list[str] = []
+    index_modifiers: list[IndexModifier] = []
     primary_engineer: EngineerRef | None = None
     best_remaining_coverage: EngineerRef | None = None
     engineer_coverage: list[EngineerCoverage]

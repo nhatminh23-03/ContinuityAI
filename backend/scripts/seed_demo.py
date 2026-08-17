@@ -37,27 +37,24 @@ from sqlalchemy.orm import Session  # noqa: E402
 
 from app.ai.provider import get_provider  # noqa: E402
 from app.ai.schemas import TaxonomyCapability  # noqa: E402
-from app.continuity.aggregation import aggregate_system  # noqa: E402
-from app.continuity.exposure import assess  # noqa: E402
-from app.continuity.readiness import classify  # noqa: E402
 from app.core.config import settings  # noqa: E402
 from app.db.session import create_all, drop_all, session_scope  # noqa: E402
-from app.evidence.aggregation import EvidenceItem, aggregate  # noqa: E402
-from app.ingestion import ingest, load_declared_ownership, load_synthetic_corpus  # noqa: E402
+from app.ingestion import (  # noqa: E402
+    ingest,
+    load_declared_ownership,
+    load_public_github_corpus,
+    load_synthetic_corpus,
+)
 from app.models import (  # noqa: E402
     Capability,
-    CapabilityAssessment,
     Component,
-    Coverage,
     DeclaredOwnership,
     Engineer,
-    Evidence,
     Platform,
     System,
-    SystemAssessment,
 )
-from app.repositories import CapabilityRepository, SystemRepository  # noqa: E402
-from app.services.facts import build_system_facts  # noqa: E402
+from app.repositories import SystemRepository  # noqa: E402
+from app.services.recompute import rebuild_all_coverage, recompute_system  # noqa: E402
 
 
 @dataclass
@@ -69,6 +66,7 @@ class SeedReport:
     engineers: int = 0
     declared_owners: int = 0
     artifacts: int = 0
+    public_artifacts: int = 0
     evidence: int = 0
     coverage: int = 0
     ingestion_summary: str = ""
@@ -83,7 +81,9 @@ class SeedReport:
                 f"  capabilities     {self.capabilities}",
                 f"  engineers        {self.engineers}",
                 f"  declared owners  {self.declared_owners}",
-                f"  artifacts        {self.artifacts}",
+                f"  artifacts        {self.artifacts} "
+                f"({self.artifacts - self.public_artifacts} synthetic, "
+                f"{self.public_artifacts} real public GitHub)",
                 f"  evidence         {self.evidence}",
                 f"  coverage edges   {self.coverage}",
                 f"  {self.ingestion_summary}",
@@ -193,101 +193,19 @@ def _persist_declared_ownership(session: Session, report: SeedReport) -> None:
     session.flush()
 
 
-def _build_coverage(session: Session, report: SeedReport) -> None:
-    """Aggregate evidence into coverage, then classify readiness from the aggregate.
+def _derive(session: Session, report: SeedReport) -> None:
+    """Aggregate evidence into coverage, classify readiness, then run the continuity rules.
 
-    Readiness is derived here and only here. Nothing writes a readiness value directly, which is
-    what makes DOMAIN_MODEL.md invariant 4 ("users cannot edit readiness") structural rather than
-    a convention.
+    Delegates to `app/services/recompute.py`, which is the same code path the challenge workflow
+    uses when a manager adds evidence. One implementation means a freshly seeded baseline and a
+    recomputed capability cannot disagree.
+
+    Assessments are precomputed rather than evaluated per request (ARCHITECTURE.md section 86).
     """
-    buckets: dict[tuple[str, str], list[EvidenceItem]] = {}
-    for row in session.query(Evidence).all():
-        buckets.setdefault((row.engineer_id, row.capability_id), []).append(EvidenceItem.from_row(row))
-
-    for (engineer_id, capability_id), items in sorted(buckets.items()):
-        summary = aggregate(engineer_id, capability_id, items)
-        readiness = classify(summary)
-        session.add(
-            Coverage(
-                engineer_id=engineer_id,
-                capability_id=capability_id,
-                readiness=readiness.readiness.value,
-                freshness=summary.freshness.value,
-                evidence_confidence=summary.evidence_confidence.value,
-                last_demonstrated_at=summary.last_demonstrated_at,
-                supporting_evidence_ids=summary.supporting_evidence_ids,
-                readiness_reasons=readiness.reasons,
-                aggregates=summary.as_dict(),
-            )
-        )
-        report.coverage += 1
+    report.coverage = rebuild_all_coverage(session)
+    for system in SystemRepository(session).list_all():
+        recompute_system(session, system.system_id, rebuild_coverage=False)
     session.flush()
-
-
-def _assess(session: Session) -> None:
-    """Run the continuity rules and persist the results.
-
-    Precomputed rather than evaluated per request (ARCHITECTURE.md section 86). The simulator
-    recomputes in memory from the same facts, so a precomputed baseline and a live counterfactual
-    cannot disagree.
-    """
-    systems = SystemRepository(session)
-    capabilities = CapabilityRepository(session)
-
-    for system in systems.list_all():
-        facts = build_system_facts(session, system.system_id)
-        results = {c.capability_id: assess(c) for c in facts.capabilities}
-
-        for capability_id, result in results.items():
-            session.add(
-                CapabilityAssessment(
-                    capability_id=capability_id,
-                    exposure=result.exposure.value,
-                    continuity_risk_index=result.continuity_risk_index,
-                    continuity_risk_class=(
-                        result.continuity_risk_class.value if result.continuity_risk_class else None
-                    ),
-                    evidence_confidence=result.evidence_confidence.value,
-                    rules_triggered=result.rules_triggered,
-                    index_modifiers=result.index_modifiers,
-                    primary_engineer_id=result.primary_engineer_id,
-                    best_remaining_engineer_id=result.best_remaining_engineer_id,
-                    adequate_engineer_count=result.adequate_engineer_count,
-                )
-            )
-
-        aggregate_result = aggregate_system(facts, results)
-
-        # Declared-versus-demonstrated is judged on the capability that drives the system's risk.
-        # Comparing against "whoever holds the most capabilities" would flag every system where the
-        # nominal owner is not also the busiest engineer, which is not the same finding at all.
-        driving = aggregate_result.driving_capability_id
-        strongest = results[driving].primary_engineer_id if driving in results else None
-        declared = systems.declared_owner(system.system_id)
-        mismatch = bool(declared and strongest and declared[0].engineer_id != strongest)
-
-        session.add(
-            SystemAssessment(
-                system_id=system.system_id,
-                exposure=aggregate_result.exposure.value,
-                continuity_risk_index=aggregate_result.continuity_risk_index,
-                continuity_risk_class=(
-                    aggregate_result.continuity_risk_class.value
-                    if aggregate_result.continuity_risk_class
-                    else None
-                ),
-                evidence_confidence=aggregate_result.evidence_confidence.value,
-                critical_gap_count=aggregate_result.critical_gap_count,
-                degraded_capability_count=aggregate_result.degraded_capability_count,
-                covered_capability_count=aggregate_result.covered_capability_count,
-                insufficient_evidence_count=aggregate_result.insufficient_evidence_count,
-                rules_triggered=aggregate_result.rules_triggered,
-                declared_owner_mismatch=mismatch,
-                strongest_coverage_engineer_id=strongest,
-            )
-        )
-    session.flush()
-    _ = capabilities  # repository retained for symmetry with the read path
 
 
 def seed(verbose: bool = True) -> SeedReport:
@@ -296,7 +214,11 @@ def seed(verbose: bool = True) -> SeedReport:
     create_all()
 
     org = _load_org()
-    artifacts = load_synthetic_corpus(settings.data_path)
+    # Both evidence classes the PRD calls for (section 14.1): real public GitHub activity where it
+    # exists, and synthetic private enterprise records for the operational context that is never
+    # public. They normalise to the same artifact shape and share one extraction path.
+    synthetic = load_synthetic_corpus(settings.data_path)
+    public = load_public_github_corpus(settings.data_path)
     provider = get_provider()
 
     with session_scope() as session:
@@ -304,13 +226,13 @@ def seed(verbose: bool = True) -> SeedReport:
         _persist_declared_ownership(session, report)
 
         engineer_names = {e["engineer_id"]: e["name"] for e in org["engineers"]}
-        ingestion = ingest(session, artifacts, taxonomy, engineer_names, provider)
+        ingestion = ingest(session, [*synthetic, *public], taxonomy, engineer_names, provider)
         report.artifacts = ingestion.artifacts_ingested
+        report.public_artifacts = len(public)
         report.evidence = ingestion.evidence_created
         report.ingestion_summary = ingestion.summary()
 
-        _build_coverage(session, report)
-        _assess(session)
+        _derive(session, report)
 
     if verbose:
         print(report.render())

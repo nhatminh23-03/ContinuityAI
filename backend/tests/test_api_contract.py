@@ -22,10 +22,15 @@ JORDAN = "eng_jordan_lee"
 MANAGER = "eng_manager_sarah"
 
 
-def test_all_ten_endpoints_are_mounted_under_api_v1() -> None:
+def test_the_api_surface_is_exactly_the_agreed_endpoints() -> None:
+    """Ten frozen endpoints plus the challenge endpoint added to close FR-020 and AC-11 (DEC-10).
+
+    Asserted as an exact set rather than a subset: a route appearing without a logged decision is
+    precisely the silent contract drift the change process exists to prevent.
+    """
     from app.main import app
 
-    expected = {
+    frozen = {
         "/api/v1/platforms",
         "/api/v1/platforms/{platform_id}/systems",
         "/api/v1/systems/{system_id}",
@@ -37,13 +42,11 @@ def test_all_ten_endpoints_are_mounted_under_api_v1() -> None:
         "/api/v1/mitigation-plans",
         "/api/v1/mitigation-plans/{plan_id}/approve",
     }
-    paths = {route.path for route in app.routes}
-    assert expected <= paths
-    assert len(expected) == 10
+    added_by_decision = {"/api/v1/capabilities/{capability_id}/challenge"}
 
-    # An eleventh endpoint is a Category C decision, so its absence is worth asserting.
-    versioned = {p for p in paths if p.startswith("/api/v1")}
-    assert versioned == expected
+    assert len(frozen) == 10
+    versioned = {p for p in {route.path for route in app.routes} if p.startswith("/api/v1")}
+    assert versioned == frozen | added_by_decision
 
 
 # ---------------------------------------------------------------------------------------
