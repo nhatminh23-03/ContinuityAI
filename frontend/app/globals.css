@@ -58,3 +58,24 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
+
+/* Semantic gradient tints. LOW/COVERED teal · MODERATE light ochre ·
+   HIGH deep ochre · CRITICAL rose. Capabilities and systems only. */
+.chip-low {
+  background: linear-gradient(135deg, rgba(61, 138, 128, 0.28), rgba(61, 138, 128, 0.12));
+}
+.chip-moderate {
+  background: linear-gradient(135deg, rgba(201, 153, 46, 0.26), rgba(201, 153, 46, 0.1));
+}
+.chip-high {
+  background: linear-gradient(135deg, rgba(168, 117, 44, 0.32), rgba(168, 117, 44, 0.14));
+}
+.chip-critical {
+  background: linear-gradient(135deg, rgba(166, 61, 87, 0.3), rgba(166, 61, 87, 0.13));
+}
+
+/* INSUFFICIENT_EVIDENCE: dashed grey outline, no fill. */
+.pill-insufficient {
+  border: 1.5px dashed var(--status-insufficient);
+  background: transparent;
+}
