@@ -82,6 +82,10 @@ def main() -> int:
         *load_synthetic_corpus(settings.data_path),
         *load_public_github_corpus(settings.data_path),
     ]
+    # Cache coverage is always reported against the whole corpus, never against a --limit slice.
+    # AI_PROVIDER=cached needs every artifact, so a percentage measured against a 3-artifact probe
+    # would answer a question nobody asked.
+    corpus_size = len(all_artifacts)
     if args.limit:
         all_artifacts = all_artifacts[: args.limit]
 
@@ -154,15 +158,15 @@ def main() -> int:
     for artifact_id, extraction in results.items():
         cache.put(by_id[artifact_id], extraction)
     cache.save(provider.name, getattr(provider, "model_id", ""))
-    coverage = len(cache) / len(all_artifacts) * 100
-    print(f"cache: {cache.path.relative_to(REPO_ROOT)} — {len(cache)}/{len(all_artifacts)} ({coverage:.0f}%)")
+    coverage = len(cache) / corpus_size * 100
+    print(f"cache: {cache.path.relative_to(REPO_ROOT)} — {len(cache)}/{corpus_size} ({coverage:.0f}%)")
 
     if quota_exhausted:
         print(
             "\nThe token quota is exhausted, so this run stopped early. Nothing is lost: re-run the\n"
             "same command once the quota resets and it will resume from the cache."
         )
-    if len(cache) < len(all_artifacts):
+    if len(cache) < corpus_size:
         print(
             f"\nAI_PROVIDER=cached needs full coverage and the cache is at {coverage:.0f}%. Until it\n"
             f"is complete, keep AI_PROVIDER=deterministic — a graph half derived by a model and half\n"
