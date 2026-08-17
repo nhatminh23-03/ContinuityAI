@@ -12,6 +12,7 @@ import { CoverageCard } from './CoverageCard';
 import { capabilitiesFromGraph, defaultCapabilityId } from './capabilities';
 import { EvidenceDrawer } from '@/features/evidence/EvidenceDrawer';
 import { SystemGraph } from '@/features/graph/SystemGraph';
+import { WhyPanel } from './WhyPanel';
 
 export function SystemDetailView({
   systemId,
@@ -19,12 +20,14 @@ export function SystemDetailView({
   evidenceOpen = false,
   engineerParam,
   focusParam,
+  whyOpen = false,
 }: {
   systemId: string;
   capabilityParam?: string;
   evidenceOpen?: boolean;
   engineerParam?: string;
   focusParam?: string;
+  whyOpen?: boolean;
 }) {
   const router = useRouter();
 
@@ -113,7 +116,15 @@ export function SystemDetailView({
       </div>
 
       <div className="mt-6">
-        <MetricStrip system={system} />
+        <MetricStrip
+          system={system}
+          onWhyClick={() =>
+            router.replace(
+              `/systems/${systemId}?capability=${selectedCapabilityId ?? ''}&why=1`,
+              { scroll: false },
+            )
+          }
+        />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -168,6 +179,18 @@ export function SystemDetailView({
           />
         </div>
       </div>
+
+      {whyOpen ? (
+        <WhyPanel
+          system={system}
+          capabilityId={selectedCapabilityId}
+          onClose={() =>
+            router.replace(`/systems/${systemId}?capability=${selectedCapabilityId ?? ''}`, {
+              scroll: false,
+            })
+          }
+        />
+      ) : null}
 
       {evidenceOpen && selectedCapabilityId ? (
         <EvidenceDrawer

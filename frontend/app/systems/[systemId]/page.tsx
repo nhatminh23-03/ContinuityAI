@@ -19,6 +19,7 @@ export default async function SystemDetailPage({
       evidenceOpen={query.evidence === '1'}
       engineerParam={engineer}
       focusParam={focus}
+      whyOpen={query.why === '1'}
     />
   );
 }
