@@ -1,0 +1,12 @@
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Only SYSTEM scope is implemented in the MVP.",
+    "details": {
+      "scope_type": "PLATFORM",
+      "supported": [
+        "SYSTEM"
+      ]
+    }
+  }
+}

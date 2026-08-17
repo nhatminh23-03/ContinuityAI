@@ -1,0 +1,32 @@
+{
+  "capability_id": "cap_permission_audit",
+  "component_id": "component_role_management",
+  "system_id": "system_authorization",
+  "name": "Permission Audit",
+  "description": "Ability to run and interpret the periodic permission audit",
+  "operational_criticality": "MEDIUM",
+  "exposure": "INSUFFICIENT_EVIDENCE",
+  "continuity_risk_index": null,
+  "continuity_risk_class": null,
+  "evidence_confidence": "LOW",
+  "rules_triggered": [
+    "INSUFFICIENT_EVIDENCE"
+  ],
+  "index_modifiers": [],
+  "primary_engineer": {
+    "engineer_id": "eng_grace_liu",
+    "name": "Grace Liu",
+    "readiness": "EXPOSED"
+  },
+  "best_remaining_coverage": null,
+  "engineer_coverage": [
+    {
+      "engineer_id": "eng_grace_liu",
+      "name": "Grace Liu",
+      "readiness": "EXPOSED",
+      "freshness": "FRESH",
+      "evidence_confidence": "LOW",
+      "last_demonstrated_at": "2026-06-04"
+    }
+  ]
+}

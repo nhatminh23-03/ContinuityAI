@@ -1,0 +1,63 @@
+{
+  "capability_id": "cap_incident_recovery",
+  "component_id": "component_gateway_integration",
+  "system_id": "system_payment_gateway",
+  "name": "Incident Recovery",
+  "description": "Ability to diagnose and restore Payment Gateway operation during production incidents",
+  "operational_criticality": "CRITICAL",
+  "exposure": "DEGRADED",
+  "continuity_risk_index": 72,
+  "continuity_risk_class": "HIGH",
+  "evidence_confidence": "HIGH",
+  "rules_triggered": [
+    "CRITICAL_CAPABILITY",
+    "SINGLE_VALIDATED_ENGINEER",
+    "NO_PRACTICED_OR_VALIDATED_BACKUP"
+  ],
+  "index_modifiers": [
+    {
+      "code": "SOLE_ADEQUATE_ENGINEER",
+      "delta": 1
+    },
+    {
+      "code": "BEST_ALTERNATIVE_ASSISTED",
+      "delta": 1
+    }
+  ],
+  "primary_engineer": {
+    "engineer_id": "eng_alex_chen",
+    "name": "Alex Chen",
+    "readiness": "VALIDATED"
+  },
+  "best_remaining_coverage": {
+    "engineer_id": "eng_maria_gomez",
+    "name": "Maria Gomez",
+    "readiness": "ASSISTED"
+  },
+  "engineer_coverage": [
+    {
+      "engineer_id": "eng_alex_chen",
+      "name": "Alex Chen",
+      "readiness": "VALIDATED",
+      "freshness": "FRESH",
+      "evidence_confidence": "HIGH",
+      "last_demonstrated_at": "2026-06-01"
+    },
+    {
+      "engineer_id": "eng_maria_gomez",
+      "name": "Maria Gomez",
+      "readiness": "ASSISTED",
+      "freshness": "FRESH",
+      "evidence_confidence": "MEDIUM",
+      "last_demonstrated_at": "2026-04-18"
+    },
+    {
+      "engineer_id": "eng_jordan_lee",
+      "name": "Jordan Lee",
+      "readiness": "EXPOSED",
+      "freshness": "AGING",
+      "evidence_confidence": "MEDIUM",
+      "last_demonstrated_at": "2024-08-05"
+    }
+  ]
+}

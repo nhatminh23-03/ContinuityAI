@@ -1,0 +1,10 @@
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Only a DRAFT plan can be approved.",
+    "details": {
+      "plan_id": "plan_001",
+      "status": "APPROVED"
+    }
+  }
+}

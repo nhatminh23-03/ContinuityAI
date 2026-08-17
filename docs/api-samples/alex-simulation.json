@@ -1,0 +1,70 @@
+{
+  "simulation_id": "sim_001",
+  "simulation_type": "ENGINEER_UNAVAILABLE",
+  "engineer": {
+    "engineer_id": "eng_alex_chen",
+    "name": "Alex Chen"
+  },
+  "scope": {
+    "type": "SYSTEM",
+    "id": "system_payment_gateway",
+    "name": "Payment Gateway"
+  },
+  "before": {
+    "continuity_risk_index": 74,
+    "continuity_risk_class": "HIGH",
+    "critical_gap_count": 0,
+    "degraded_capability_count": 2,
+    "covered_capability_count": 3
+  },
+  "after": {
+    "continuity_risk_index": 93,
+    "continuity_risk_class": "CRITICAL",
+    "critical_gap_count": 2,
+    "degraded_capability_count": 1,
+    "covered_capability_count": 2
+  },
+  "capability_impacts": [
+    {
+      "capability_id": "cap_incident_recovery",
+      "name": "Incident Recovery",
+      "operational_criticality": "CRITICAL",
+      "before": "DEGRADED",
+      "after": "CRITICAL_GAP",
+      "remaining_best_readiness": "ASSISTED"
+    },
+    {
+      "capability_id": "cap_provider_failover",
+      "name": "Provider Failover",
+      "operational_criticality": "HIGH",
+      "before": "COVERED",
+      "after": "DEGRADED",
+      "remaining_best_readiness": "PRACTICED"
+    },
+    {
+      "capability_id": "cap_certificate_management",
+      "name": "Certificate Management",
+      "operational_criticality": "CRITICAL",
+      "before": "DEGRADED",
+      "after": "CRITICAL_GAP",
+      "remaining_best_readiness": "EXPOSED"
+    },
+    {
+      "capability_id": "cap_retry_logic",
+      "name": "Retry Logic",
+      "operational_criticality": "HIGH",
+      "before": "COVERED",
+      "after": "COVERED",
+      "remaining_best_readiness": "VALIDATED"
+    },
+    {
+      "capability_id": "cap_monitoring",
+      "name": "Monitoring",
+      "operational_criticality": "MEDIUM",
+      "before": "COVERED",
+      "after": "COVERED",
+      "remaining_best_readiness": "VALIDATED"
+    }
+  ],
+  "summary": "Without Alex Chen, Payment Gateway moves from HIGH to CRITICAL: 2 capability gaps (Incident Recovery and Certificate Management) would have no adequate demonstrated coverage; Provider Failover would lose redundancy. Retry Logic and Monitoring remain covered."
+}

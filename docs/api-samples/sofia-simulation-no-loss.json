@@ -1,0 +1,29 @@
+{
+  "simulation_id": "sim_002",
+  "simulation_type": "ENGINEER_UNAVAILABLE",
+  "engineer": {
+    "engineer_id": "eng_sofia_ruiz",
+    "name": "Sofia Ruiz"
+  },
+  "scope": {
+    "type": "SYSTEM",
+    "id": "system_payment_gateway",
+    "name": "Payment Gateway"
+  },
+  "before": {
+    "continuity_risk_index": 74,
+    "continuity_risk_class": "HIGH",
+    "critical_gap_count": 0,
+    "degraded_capability_count": 2,
+    "covered_capability_count": 3
+  },
+  "after": {
+    "continuity_risk_index": 74,
+    "continuity_risk_class": "HIGH",
+    "critical_gap_count": 0,
+    "degraded_capability_count": 2,
+    "covered_capability_count": 3
+  },
+  "capability_impacts": [],
+  "summary": "Sofia Ruiz has no demonstrated capability coverage recorded in Payment Gateway, so no coverage would be lost."
+}

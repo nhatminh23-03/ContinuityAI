@@ -1,0 +1,244 @@
+[
+  {
+    "file": "health.json",
+    "method": "GET",
+    "path": "/health",
+    "status": 200,
+    "request_body": null
+  },
+  {
+    "file": "platforms.json",
+    "method": "GET",
+    "path": "/api/v1/platforms",
+    "status": 200,
+    "request_body": null
+  },
+  {
+    "file": "payments-systems.json",
+    "method": "GET",
+    "path": "/api/v1/platforms/platform_payments/systems",
+    "status": 200,
+    "request_body": null
+  },
+  {
+    "file": "identity-systems.json",
+    "method": "GET",
+    "path": "/api/v1/platforms/platform_identity/systems",
+    "status": 200,
+    "request_body": null
+  },
+  {
+    "file": "payment-gateway.json",
+    "method": "GET",
+    "path": "/api/v1/systems/system_payment_gateway",
+    "status": 200,
+    "request_body": null
+  },
+  {
+    "file": "payment-gateway-graph.json",
+    "method": "GET",
+    "path": "/api/v1/systems/system_payment_gateway/graph",
+    "status": 200,
+    "request_body": null
+  },
+  {
+    "file": "payment-gateway-graph-focused.json",
+    "method": "GET",
+    "path": "/api/v1/systems/system_payment_gateway/graph?focus_capability_id=cap_incident_recovery",
+    "status": 200,
+    "request_body": null
+  },
+  {
+    "file": "incident-recovery.json",
+    "method": "GET",
+    "path": "/api/v1/capabilities/cap_incident_recovery",
+    "status": 200,
+    "request_body": null
+  },
+  {
+    "file": "incident-recovery-evidence.json",
+    "method": "GET",
+    "path": "/api/v1/capabilities/cap_incident_recovery/evidence",
+    "status": 200,
+    "request_body": null
+  },
+  {
+    "file": "incident-recovery-evidence-alex.json",
+    "method": "GET",
+    "path": "/api/v1/capabilities/cap_incident_recovery/evidence?engineer_id=eng_alex_chen",
+    "status": 200,
+    "request_body": null
+  },
+  {
+    "file": "alex-simulation.json",
+    "method": "POST",
+    "path": "/api/v1/simulations",
+    "status": 200,
+    "request_body": {
+      "simulation_type": "ENGINEER_UNAVAILABLE",
+      "engineer_id": "eng_alex_chen",
+      "scope": {
+        "type": "SYSTEM",
+        "id": "system_payment_gateway"
+      }
+    }
+  },
+  {
+    "file": "backup-candidates.json",
+    "method": "POST",
+    "path": "/api/v1/recommendations/backup-candidates",
+    "status": 200,
+    "request_body": {
+      "simulation_id": "sim_001",
+      "capability_id": "cap_incident_recovery",
+      "limit": 3
+    }
+  },
+  {
+    "file": "mitigation-plan.json",
+    "method": "POST",
+    "path": "/api/v1/mitigation-plans",
+    "status": 201,
+    "request_body": {
+      "capability_id": "cap_incident_recovery",
+      "primary_engineer_id": "eng_alex_chen",
+      "selected_backup_engineer_id": "eng_maria_gomez",
+      "simulation_id": "sim_001"
+    }
+  },
+  {
+    "file": "permission-audit-insufficient.json",
+    "method": "GET",
+    "path": "/api/v1/capabilities/cap_permission_audit",
+    "status": 200,
+    "request_body": null
+  },
+  {
+    "file": "sofia-simulation-no-loss.json",
+    "method": "POST",
+    "path": "/api/v1/simulations",
+    "status": 200,
+    "request_body": {
+      "simulation_type": "ENGINEER_UNAVAILABLE",
+      "engineer_id": "eng_sofia_ruiz",
+      "scope": {
+        "type": "SYSTEM",
+        "id": "system_payment_gateway"
+      }
+    }
+  },
+  {
+    "file": "error-404-unknown-system.json",
+    "method": "GET",
+    "path": "/api/v1/systems/system_does_not_exist",
+    "status": 404,
+    "request_body": null
+  },
+  {
+    "file": "error-422-platform-scope.json",
+    "method": "POST",
+    "path": "/api/v1/simulations",
+    "status": 422,
+    "request_body": {
+      "simulation_type": "ENGINEER_UNAVAILABLE",
+      "engineer_id": "eng_alex_chen",
+      "scope": {
+        "type": "PLATFORM",
+        "id": "platform_payments"
+      }
+    }
+  },
+  {
+    "file": "error-422-candidate-limit.json",
+    "method": "POST",
+    "path": "/api/v1/recommendations/backup-candidates",
+    "status": 422,
+    "request_body": {
+      "capability_id": "cap_incident_recovery",
+      "limit": 9
+    }
+  },
+  {
+    "file": "mitigation-plan-approved.json",
+    "method": "POST",
+    "path": "/api/v1/mitigation-plans/plan_001/approve",
+    "status": 200,
+    "request_body": {
+      "approved_by": "eng_manager_sarah",
+      "tasks": [
+        {
+          "task_id": "task_001",
+          "title": "Review Payment Gateway Incident Recovery architecture (edited before approval)",
+          "description": "Review the Incident Recovery path in Gateway Integration, the current runbook, and the historical records INC-184 and INC-221.",
+          "type": "KNOWLEDGE_REVIEW",
+          "acceptance_criteria": [
+            "Walk the current Incident Recovery path end to end",
+            "Review the recorded Payment Gateway incidents that exercised it",
+            "Record the questions the existing material does not answer"
+          ],
+          "linked_evidence_ids": [
+            "evidence_inc_184",
+            "evidence_inc_221"
+          ]
+        },
+        {
+          "task_id": "task_002",
+          "title": "Shadow Incident Recovery with Alex Chen",
+          "description": "Observe Alex Chen working through Incident Recovery and capture the decision points that are not written down.",
+          "type": "SHADOWING",
+          "acceptance_criteria": [
+            "Attend a guided exercise end to end",
+            "Write down each decision point and what drove it"
+          ],
+          "linked_evidence_ids": []
+        },
+        {
+          "task_id": "task_003",
+          "title": "Execute Incident Recovery in staging",
+          "description": "Perform Incident Recovery in staging without step-by-step prompting and confirm normal operation is restored.",
+          "type": "PRACTICE",
+          "acceptance_criteria": [
+            "Complete Incident Recovery unaided in staging",
+            "Verify the system returns to normal operation",
+            "Note any step the runbook is missing"
+          ],
+          "linked_evidence_ids": []
+        },
+        {
+          "task_id": "task_004",
+          "title": "Update the Payment Gateway Incident Recovery runbook",
+          "description": "Fold the gaps found during the exercise back into the runbook so the next person does not rediscover them.",
+          "type": "DOCUMENTATION",
+          "acceptance_criteria": [
+            "Add the missing steps identified during practice",
+            "Add rollback guidance",
+            "Submit the runbook for review"
+          ],
+          "linked_evidence_ids": []
+        }
+      ]
+    }
+  },
+  {
+    "file": "error-double-approve.json",
+    "method": "POST",
+    "path": "/api/v1/mitigation-plans/plan_001/approve",
+    "status": 422,
+    "request_body": {
+      "approved_by": "eng_manager_sarah"
+    }
+  },
+  {
+    "file": "challenge-attest-jordan.json",
+    "method": "POST",
+    "path": "/api/v1/capabilities/cap_incident_recovery/challenge",
+    "status": 201,
+    "request_body": {
+      "challenge_type": "MANAGER_ATTESTATION",
+      "engineer_id": "eng_jordan_lee",
+      "submitted_by": "eng_manager_sarah",
+      "evidence_role": "INDEPENDENT_EXECUTION",
+      "comment": "Jordan restored the gateway alone in March; never written up."
+    }
+  }
+]

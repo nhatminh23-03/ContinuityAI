@@ -1,0 +1,69 @@
+{
+  "plan_id": "plan_001",
+  "status": "DRAFT",
+  "capability": {
+    "capability_id": "cap_incident_recovery",
+    "name": "Incident Recovery"
+  },
+  "source_engineer": {
+    "engineer_id": "eng_alex_chen",
+    "name": "Alex Chen"
+  },
+  "backup_candidate": {
+    "engineer_id": "eng_maria_gomez",
+    "name": "Maria Gomez"
+  },
+  "target_readiness": "PRACTICED",
+  "tasks": [
+    {
+      "task_id": "task_001",
+      "title": "Review Payment Gateway Incident Recovery architecture",
+      "description": "Review the Incident Recovery path in Gateway Integration, the current runbook, and the historical records INC-184 and INC-221.",
+      "type": "KNOWLEDGE_REVIEW",
+      "acceptance_criteria": [
+        "Walk the current Incident Recovery path end to end",
+        "Review the recorded Payment Gateway incidents that exercised it",
+        "Record the questions the existing material does not answer"
+      ],
+      "linked_evidence_ids": [
+        "evidence_inc_184",
+        "evidence_inc_221"
+      ]
+    },
+    {
+      "task_id": "task_002",
+      "title": "Shadow Incident Recovery with Alex Chen",
+      "description": "Observe Alex Chen working through Incident Recovery and capture the decision points that are not written down.",
+      "type": "SHADOWING",
+      "acceptance_criteria": [
+        "Attend a guided exercise end to end",
+        "Write down each decision point and what drove it"
+      ],
+      "linked_evidence_ids": []
+    },
+    {
+      "task_id": "task_003",
+      "title": "Execute Incident Recovery in staging",
+      "description": "Perform Incident Recovery in staging without step-by-step prompting and confirm normal operation is restored.",
+      "type": "PRACTICE",
+      "acceptance_criteria": [
+        "Complete Incident Recovery unaided in staging",
+        "Verify the system returns to normal operation",
+        "Note any step the runbook is missing"
+      ],
+      "linked_evidence_ids": []
+    },
+    {
+      "task_id": "task_004",
+      "title": "Update the Payment Gateway Incident Recovery runbook",
+      "description": "Fold the gaps found during the exercise back into the runbook so the next person does not rediscover them.",
+      "type": "DOCUMENTATION",
+      "acceptance_criteria": [
+        "Add the missing steps identified during practice",
+        "Add rollback guidance",
+        "Submit the runbook for review"
+      ],
+      "linked_evidence_ids": []
+    }
+  ]
+}

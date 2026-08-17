@@ -390,3 +390,206 @@ the shipped extraction provider is rule-based, and the README says so plainly. W
 provider choice and a credential, and changes no conclusion path. R-20 lists the ten decisions awaiting
 Person B's acknowledgement, of which DEC-10 — the eleventh endpoint — is the only one needing a yes or
 no.
+
+---
+
+## 2026-08-17 — Backend verification and API sample capture (Person B)
+
+**What was done.** A read-only verification of the merged backend against the amended
+`API_CONTRACT.md`, ahead of frontend work. All eleven route modules, every DTO schema module, the
+enum module, the error envelope, and the provider factory were read and compared against the
+contract and `ENGINEERING_RULES.md`. The database was reseeded, both verification scripts were run,
+and 21 live payloads — the ten frozen endpoints plus `/health`, the challenge endpoint, both
+designed empty states, and four error cases — were captured verbatim into `docs/api-samples/`.
+
+Two decisions from the session preceding this work, recorded here because they change scope:
+`DECISIONS.md` DEC-01's values (Payment Gateway 74/HIGH, simulation 74 → 93 HIGH → CRITICAL,
+Identity 68, five capabilities, Maria Gomez) are confirmed as the canonical demo values, and DEC-10
+is acknowledged — the eleventh endpoint stays, and the frontend will build a challenge action in
+the provenance drawer after the golden-path screens.
+
+**Files created.** `docs/api-samples/` — 21 payload files, `manifest.json`, `README.md`.
+
+**Implements.** The `API_CONTRACT.md` §19 integration check; AC-14 verification; the pre-frontend
+reality check preceding the gap register.
+
+**Validation.**
+
+- `scripts.verify_golden_path`: 10/10 endpoints matched the shared fixtures; the only difference is
+  the pinned `approved_at` fixture timestamp. Latency 2.0–12.2 ms against the 800 ms read budget.
+- `scripts.refresh_fixtures --check`: no stale fixture.
+- Enum values in `app/schemas/enums.py` are identical to the `ENGINEERING_RULES.md` tables, with
+  three additive extensions traceable to logged decisions: `CriticalitySource` (CI-19),
+  `ChallengeType` (DEC-10), `ErrorCode.UNAUTHORIZED` (DEC-13).
+- All identifiers observed on the wire follow typed snake_case, engineers in full-name form.
+- The challenge endpoint was exercised live (attest Jordan, `INDEPENDENT_EXECUTION`): Jordan
+  `EXPOSED → PRACTICED`, Incident Recovery `DEGRADED → COVERED` at 72/HIGH → 15/LOW, system held at
+  74/HIGH with degraded 2 → 1 — matching the HANDOFF account. The database was reseeded afterwards.
+
+**Open questions.**
+
+1. `single_expert_dependency_count` appears nowhere — not in the contract, the fixtures, the
+   backend, or the frontend types. The corrected dashboard design requires it on platform cards, so
+   it is a UX requirement with no transport (the SR-02 class of problem) and goes to the gap
+   register as the main contract question.
+2. The approve response does not echo the task list and no GET-plan endpoint exists, so a
+   post-approval plan view must render from client-held state. Worth an explicit note rather than
+   an accidental discovery.
+3. `drift_status` crosses the wire as `NEW_RISK / RISK_INCREASED / STABLE / RISK_REDUCED`; the
+   dashboard copy ("Drift: increasing / stable") needs a display mapping for all four values.
+4. The PRD §17.1 R1 table still assigns class CRITICAL to any CRITICAL-or-HIGH gap, which DEC-07
+   superseded (class scales with criticality). `ENGINEERING_RULES.md` carries the implemented
+   table; the PRD table is stale wording to amend at the next contract touch.
+
+---
+
+## 2026-08-17 — Gap register (Person B)
+
+**What was done.** `docs/BACKEND_GAPS.md` created: a three-way comparison of the PRD requirements
+(FR-001…025, AC-01…016, UX sections 11 and 20–21, the section 27 demo script) against the amended
+contract and against observed live behavior from the captured samples. Two additional live checks
+were run to make the register factual rather than inferred: AC-09 (a mitigation plan generates for
+the non-top candidate — Jordan, five tasks, DRAFT, target PRACTICED) and the capability-panel data
+path (graph CAPABILITY nodes carry `label`, `status`, and `operational_criticality`, which is the
+transport for the System Detail capability list). The database was reseeded afterwards.
+
+**Findings.** One BLOCKING gap: `single_expert_dependency_count` was never added to the contract
+and exists nowhere — a Category C amendment to `PlatformSummary` is proposed, with an explicit
+warning that summing `degraded_capability_count` is not a valid client-side substitute under
+DEC-07. Eight deferrable items (approved-plan read-back, missing challenge fixture, R-14 candidate
+confidence definition, three superseded-spec-text items, deliberately unimplemented PRD features
+not yet annotated, small DTO absences with client-side workarounds, a cosmetic envelope
+inconsistency, stale PRD example numbers). Eight design constraints recorded so screens are built
+against real data paths. All sixteen acceptance criteria have a data path; AC-16's product half
+remains Person B's post-build work. Enum and identifier audit: zero drift.
+
+**Files created.** `docs/BACKEND_GAPS.md`.
+
+**Implements.** The pre-build gap analysis the phase plan requires before frontend foundation work;
+SR-02 enforcement for the corrected dashboard.
+
+**Validation.** Every register claim cites either a live capture in `docs/api-samples/` or a
+specific document section; the two new live checks were observed directly rather than assumed.
+
+**Open questions.** GAP-01 needs a joint yes/no with Person A; GAP-03 (challenge fixture) and the
+GAP-05/06/09 document amendments ride on the same sync.
+
+---
+
+## 2026-08-17 — UI design review (Person B)
+
+**What was done.** All six mockups in `UI Design/` were reviewed against the binding design system
+and correction list, re-based onto the canonical DEC-01 values, and mapped to the endpoints that
+feed them. `docs/UI_REVIEW.md` created: per-mockup verdicts (usable as-is vs must change), the
+cross-cutting design-system restorations, a 20-item shared component inventory, and the list of
+seven screens that have no mockup and must be designed in the same visual language — including the
+challenge-assessment drawer, newly in scope.
+
+**Findings worth recording.** The six `DESIGN.md` files are byte-identical — one shared token
+sheet (Inter ramp, warm near-white neutrals) adopted as the starting tokens where it does not
+conflict with the design-system rules. The three product-inverting mockup defects were confirmed
+in the images: the simulation shows 93 → 58 with a "System Resilience Score" label (must be
+74 → 93 Continuity Risk Index), a "Critical Silo Detected" panel assigns a numeric knowledge level
+and risk color to a named person (deleted, replaced by a capability statement), and System Detail
+declares Maria Santos as owner via a registry sync (must be Jordan Lee via CODEOWNERS with the
+mismatch note). The mitigation-plan mockup additionally inverts the mentor/backup roles, and every
+mockup lost the mesh-gradient background layer.
+
+**Files created.** `docs/UI_REVIEW.md`.
+
+**Implements.** The pre-build design review phase; §C of the working brief as re-based; the §A
+design system as the binding reference for Phase 5 tokens.
+
+**Validation.** Every correction cites either a live payload in `docs/api-samples/` or a specific
+brief/spec clause; endpoint mappings cross-checked against `docs/BACKEND_GAPS.md` design
+constraints.
+
+**Open questions.** Three design decisions await approval before Phase 5: the risk-class chip
+color mapping, the sidebar navigation scope (Simulations/Plans destinations have no list
+endpoints), and whether engineer role labels from graph metadata appear on candidate cards.
+All three were resolved the same day and recorded in `docs/UI_REVIEW.md`: liquid-glass gradient
+chips on the semantic scale, the four-entry sidebar reinterpreted, and name + role on engineer
+rows.
+
+---
+
+## 2026-08-17 — App shell: ambient background and liquid-glass sidebar (Person B)
+
+**What was built.** The Phase 5 app shell, per Person B's direction. A full-viewport animated
+gradient background (the "Grainient" WebGL component from the React Bits registry, vendored as
+source into `frontend/components/Grainient/` with its stylesheet) renders behind every surface
+including the sidebar, with the exact parameter set chosen by Person B (#e98138 / #ffffff /
+#3B82F6, contrast 1.5, zoom 0.9, animated). The left navigation is a floating liquid-glass panel —
+translucent gradient fill, 24px backdrop blur with saturation, hairline light border, inset
+highlight — carrying the four entries resolved in the UI review (Dashboard, Systems, Simulations,
+Plans) with inline SVG icons and an active state. The layout moved from the create-next-app
+boilerplate to Inter (self-hosted via `next/font`), and `globals.css` now carries the first design
+tokens: warm near-white neutrals from the shared mockup token sheet, the four status colours, and
+three reusable surface treatments (`glass-panel`, `frosted-card`, `glass-chip`). The dashboard
+route holds a placeholder pair of frosted platform cards until Phase 6.
+
+**Library added (Category B):** `ogl` ^1.0.11 — the WebGL micro-library the vendored Grainient
+component requires. No other dependency changed.
+
+**Files created.** `frontend/components/Grainient/Grainient.tsx`, `.../Grainient.css` (vendored),
+`frontend/components/AppBackground.tsx`, `frontend/components/AppShell.tsx`,
+`frontend/components/SidebarNav.tsx`, `.claude/launch.json` (dev-server launch config).
+**Files changed.** `frontend/app/layout.tsx`, `frontend/app/globals.css`,
+`frontend/app/page.tsx`, `frontend/package.json` / `package-lock.json`.
+
+**Implements.** Phase 5 items 5–6 of the working plan (design tokens, app shell) as re-directed by
+Person B; the background respects `prefers-reduced-motion` by freezing the animation.
+
+**Validation.** `npm run typecheck` clean; rendered live in the browser against the running dev
+server — gradient underlays the full viewport, sidebar glass shows the background through the
+blur, nav active state and placeholder cards render as designed.
+
+**Open questions.** The contract layer (Phase 5 items 2–4: types reconciliation, Zod contract
+lock over `fixtures/`, adapter) is the next unit and still precedes any data-bound screen. The
+background palette is noticeably more saturated than the §A lilac/blush wash; the component's
+props make tuning trivial if it competes with the status colours once real screens land.
+
+---
+
+## 2026-08-17 — Contract layer: types reconciled, Zod contract lock, adapter completed (Person B)
+
+**What was built.** Phase 5 items 2–4.
+
+- `frontend/types/api.ts` reconciled with the amended contract as verified in the backend reality
+  check: `IndexModifier` + optional `index_modifiers` on `CapabilityDetail` (DEC-11), the full
+  challenge DTO group — `ChallengeType`, `ChallengeRequest`, `AssessmentSnapshot`,
+  `SystemSnapshot`, `ChallengeResponse` (DEC-10) — and `UNAUTHORIZED` in `ErrorCode` (DEC-13).
+- `frontend/lib/api/schemas.ts` — a Zod mirror of every DTO and all 19 enums plus the three logged
+  extensions. Objects are strict: an undeclared field fails validation rather than passing
+  silently, which is the point of a lock.
+- `frontend/tests/contract-lock.test.ts` — validates **every** `.json` in repository-root
+  `fixtures/` against its schema and asserts the coverage map matches the directory exactly in
+  both directions, so a fixture added or removed on either side breaks the test, not a screen.
+  **13 tests pass** (12 fixtures + the coverage assertion).
+- `frontend/lib/api/endpoints.ts` gains the eleventh adapter function `challengeAssessment`
+  (POST `/capabilities/{id}/challenge`), and `listPlatformSystems` now routes the Identity
+  platform to its own fixture in mock mode instead of returning Payments data.
+- Two fixtures added to the jointly owned root `fixtures/`, both captured verbatim from live
+  engine output on a freshly seeded database: `identity-systems.json` (the dashboard renders both
+  platforms' systems in mock mode) and `challenge-attest-jordan.json` (the challenge drawer works
+  in mock mode). `fixtures.contract.ts` compile-checks both against the TypeScript types.
+
+**Library added (Category B):** `vitest` (dev-only) — the project had no test runner and the
+contract lock requires one.
+
+**Files created.** `frontend/lib/api/schemas.ts`, `frontend/tests/contract-lock.test.ts`,
+`fixtures/identity-systems.json`, `fixtures/challenge-attest-jordan.json`.
+**Files changed.** `frontend/types/api.ts`, `frontend/lib/api/client.ts`,
+`frontend/lib/api/endpoints.ts`, `frontend/lib/api/fixtures.contract.ts`,
+`frontend/package.json` / lock file.
+
+**Implements.** Phase 5 items 2–4; the contract-lock gate that must pass before UI work; adapter
+coverage for FR-020/AC-11 (challenge) ahead of its Phase 6/7 screen.
+
+**Validation.** `npm test` — 13/13 pass. `npm run typecheck` clean (fixtures compile against the
+TypeScript types, including the two new ones). `npm run build` clean.
+
+**Open questions / for Person A at the next sync.** The two new fixtures are engine-captured but
+are **not yet wired into `scripts/refresh_fixtures.py`**, so `--check` does not guard them against
+drift; asking Person A to add both (GAP-03 already requested the challenge one). `fixtures/README.md`
+enumeration also needs the two new rows — jointly owned, so left for the sync.

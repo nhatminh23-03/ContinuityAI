@@ -1,0 +1,364 @@
+{
+  "scope": {
+    "type": "SYSTEM",
+    "id": "system_payment_gateway",
+    "name": "Payment Gateway"
+  },
+  "nodes": [
+    {
+      "id": "system_payment_gateway",
+      "type": "SYSTEM",
+      "label": "Payment Gateway",
+      "status": "DEGRADED",
+      "metadata": {
+        "business_criticality": "CRITICAL"
+      }
+    },
+    {
+      "id": "component_gateway_integration",
+      "type": "COMPONENT",
+      "label": "Gateway Integration",
+      "metadata": {}
+    },
+    {
+      "id": "component_transaction_processor",
+      "type": "COMPONENT",
+      "label": "Transaction Processor",
+      "metadata": {}
+    },
+    {
+      "id": "component_gateway_operations",
+      "type": "COMPONENT",
+      "label": "Gateway Operations",
+      "metadata": {}
+    },
+    {
+      "id": "cap_incident_recovery",
+      "type": "CAPABILITY",
+      "label": "Incident Recovery",
+      "status": "DEGRADED",
+      "metadata": {
+        "operational_criticality": "CRITICAL"
+      }
+    },
+    {
+      "id": "cap_provider_failover",
+      "type": "CAPABILITY",
+      "label": "Provider Failover",
+      "status": "COVERED",
+      "metadata": {
+        "operational_criticality": "HIGH"
+      }
+    },
+    {
+      "id": "cap_certificate_management",
+      "type": "CAPABILITY",
+      "label": "Certificate Management",
+      "status": "DEGRADED",
+      "metadata": {
+        "operational_criticality": "CRITICAL"
+      }
+    },
+    {
+      "id": "cap_retry_logic",
+      "type": "CAPABILITY",
+      "label": "Retry Logic",
+      "status": "COVERED",
+      "metadata": {
+        "operational_criticality": "HIGH"
+      }
+    },
+    {
+      "id": "cap_monitoring",
+      "type": "CAPABILITY",
+      "label": "Monitoring",
+      "status": "COVERED",
+      "metadata": {
+        "operational_criticality": "MEDIUM"
+      }
+    },
+    {
+      "id": "eng_alex_chen",
+      "type": "ENGINEER",
+      "label": "Alex Chen",
+      "metadata": {
+        "role": "Senior Payments Engineer",
+        "team": "Payments Engineering"
+      }
+    },
+    {
+      "id": "eng_maria_gomez",
+      "type": "ENGINEER",
+      "label": "Maria Gomez",
+      "metadata": {
+        "role": "Platform Engineer",
+        "team": "Payments Engineering"
+      }
+    },
+    {
+      "id": "eng_jordan_lee",
+      "type": "ENGINEER",
+      "label": "Jordan Lee",
+      "metadata": {
+        "role": "Payments Engineer",
+        "team": "Payments Engineering"
+      }
+    },
+    {
+      "id": "eng_lena_novak",
+      "type": "ENGINEER",
+      "label": "Lena Novak",
+      "metadata": {
+        "role": "Site Reliability Engineer",
+        "team": "Platform Reliability"
+      }
+    },
+    {
+      "id": "eng_omar_haddad",
+      "type": "ENGINEER",
+      "label": "Omar Haddad",
+      "metadata": {
+        "role": "Engineer",
+        "team": "Payments Engineering"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "system_payment_gateway",
+      "target": "component_gateway_integration",
+      "type": "HAS_COMPONENT",
+      "metadata": {}
+    },
+    {
+      "source": "system_payment_gateway",
+      "target": "component_transaction_processor",
+      "type": "HAS_COMPONENT",
+      "metadata": {}
+    },
+    {
+      "source": "system_payment_gateway",
+      "target": "component_gateway_operations",
+      "type": "HAS_COMPONENT",
+      "metadata": {}
+    },
+    {
+      "source": "component_gateway_integration",
+      "target": "cap_incident_recovery",
+      "type": "REQUIRES_CAPABILITY",
+      "metadata": {
+        "operational_criticality": "CRITICAL"
+      }
+    },
+    {
+      "source": "component_gateway_integration",
+      "target": "cap_provider_failover",
+      "type": "REQUIRES_CAPABILITY",
+      "metadata": {
+        "operational_criticality": "HIGH"
+      }
+    },
+    {
+      "source": "component_gateway_integration",
+      "target": "cap_certificate_management",
+      "type": "REQUIRES_CAPABILITY",
+      "metadata": {
+        "operational_criticality": "CRITICAL"
+      }
+    },
+    {
+      "source": "component_transaction_processor",
+      "target": "cap_retry_logic",
+      "type": "REQUIRES_CAPABILITY",
+      "metadata": {
+        "operational_criticality": "HIGH"
+      }
+    },
+    {
+      "source": "component_gateway_operations",
+      "target": "cap_monitoring",
+      "type": "REQUIRES_CAPABILITY",
+      "metadata": {
+        "operational_criticality": "MEDIUM"
+      }
+    },
+    {
+      "source": "eng_alex_chen",
+      "target": "cap_certificate_management",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "VALIDATED",
+        "freshness": "FRESH",
+        "evidence_confidence": "HIGH"
+      }
+    },
+    {
+      "source": "eng_maria_gomez",
+      "target": "cap_certificate_management",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "EXPOSED",
+        "freshness": "FRESH",
+        "evidence_confidence": "MEDIUM"
+      }
+    },
+    {
+      "source": "eng_alex_chen",
+      "target": "cap_incident_recovery",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "VALIDATED",
+        "freshness": "FRESH",
+        "evidence_confidence": "HIGH"
+      }
+    },
+    {
+      "source": "eng_jordan_lee",
+      "target": "cap_incident_recovery",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "EXPOSED",
+        "freshness": "AGING",
+        "evidence_confidence": "MEDIUM"
+      }
+    },
+    {
+      "source": "eng_maria_gomez",
+      "target": "cap_incident_recovery",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "ASSISTED",
+        "freshness": "FRESH",
+        "evidence_confidence": "MEDIUM"
+      }
+    },
+    {
+      "source": "eng_alex_chen",
+      "target": "cap_monitoring",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "PRACTICED",
+        "freshness": "FRESH",
+        "evidence_confidence": "MEDIUM"
+      }
+    },
+    {
+      "source": "eng_jordan_lee",
+      "target": "cap_monitoring",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "ASSISTED",
+        "freshness": "FRESH",
+        "evidence_confidence": "MEDIUM"
+      }
+    },
+    {
+      "source": "eng_lena_novak",
+      "target": "cap_monitoring",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "VALIDATED",
+        "freshness": "FRESH",
+        "evidence_confidence": "HIGH"
+      }
+    },
+    {
+      "source": "eng_maria_gomez",
+      "target": "cap_monitoring",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "VALIDATED",
+        "freshness": "FRESH",
+        "evidence_confidence": "HIGH"
+      }
+    },
+    {
+      "source": "eng_alex_chen",
+      "target": "cap_provider_failover",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "PRACTICED",
+        "freshness": "FRESH",
+        "evidence_confidence": "MEDIUM"
+      }
+    },
+    {
+      "source": "eng_jordan_lee",
+      "target": "cap_provider_failover",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "EXPOSED",
+        "freshness": "FRESH",
+        "evidence_confidence": "MEDIUM"
+      }
+    },
+    {
+      "source": "eng_maria_gomez",
+      "target": "cap_provider_failover",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "PRACTICED",
+        "freshness": "FRESH",
+        "evidence_confidence": "MEDIUM"
+      }
+    },
+    {
+      "source": "eng_alex_chen",
+      "target": "cap_retry_logic",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "VALIDATED",
+        "freshness": "FRESH",
+        "evidence_confidence": "HIGH"
+      }
+    },
+    {
+      "source": "eng_jordan_lee",
+      "target": "cap_retry_logic",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "VALIDATED",
+        "freshness": "FRESH",
+        "evidence_confidence": "HIGH"
+      }
+    },
+    {
+      "source": "eng_lena_novak",
+      "target": "cap_retry_logic",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "EXPOSED",
+        "freshness": "STALE",
+        "evidence_confidence": "LOW"
+      }
+    },
+    {
+      "source": "eng_maria_gomez",
+      "target": "cap_retry_logic",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "EXPOSED",
+        "freshness": "FRESH",
+        "evidence_confidence": "MEDIUM"
+      }
+    },
+    {
+      "source": "eng_omar_haddad",
+      "target": "cap_retry_logic",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "PRACTICED",
+        "freshness": "FRESH",
+        "evidence_confidence": "MEDIUM"
+      }
+    },
+    {
+      "source": "eng_jordan_lee",
+      "target": "system_payment_gateway",
+      "type": "DECLARED_OWNER",
+      "metadata": {
+        "source": "CODEOWNERS"
+      }
+    }
+  ]
+}
