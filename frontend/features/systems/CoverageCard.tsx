@@ -10,7 +10,13 @@ import { ConfidenceLabel } from '@/components/status';
  * Engineer coverage for the selected capability: monochrome ladders, no
  * numbers, no ranking — rows render in payload order.
  */
-export function CoverageCard({ capabilityId }: { capabilityId: string }) {
+export function CoverageCard({
+  capabilityId,
+  onViewEvidence,
+}: {
+  capabilityId: string;
+  onViewEvidence?: (engineerId: string, engineerName: string) => void;
+}) {
   const query = useQuery({
     queryKey: queryKeys.capability(capabilityId),
     queryFn: () => api.getCapability(capabilityId),
@@ -51,6 +57,15 @@ export function CoverageCard({ capabilityId }: { capabilityId: string }) {
                   </span>
                 </span>
                 <ConfidenceLabel confidence={coverage.evidence_confidence} />
+                {onViewEvidence ? (
+                  <button
+                    type="button"
+                    onClick={() => onViewEvidence(coverage.engineer_id, coverage.name)}
+                    className="rounded-lg px-2 py-1 text-[11px] font-medium text-slate-500 hover:bg-white/60 hover:text-slate-900"
+                  >
+                    View evidence
+                  </button>
+                ) : null}
               </span>
             </li>
           ))}

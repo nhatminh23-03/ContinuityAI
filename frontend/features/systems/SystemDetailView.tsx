@@ -10,13 +10,18 @@ import { OwnershipCard } from './OwnershipCard';
 import { CapabilityPanel } from './CapabilityPanel';
 import { CoverageCard } from './CoverageCard';
 import { capabilitiesFromGraph, defaultCapabilityId } from './capabilities';
+import { EvidenceDrawer } from '@/features/evidence/EvidenceDrawer';
 
 export function SystemDetailView({
   systemId,
   capabilityParam,
+  evidenceOpen = false,
+  engineerParam,
 }: {
   systemId: string;
   capabilityParam?: string;
+  evidenceOpen?: boolean;
+  engineerParam?: string;
 }) {
   const router = useRouter();
 
@@ -108,7 +113,17 @@ export function SystemDetailView({
           <div className="frosted-card flex h-80 items-center justify-center p-6">
             <span className="text-sm text-slate-500">Contextual graph (next unit)</span>
           </div>
-          {selectedCapabilityId ? <CoverageCard capabilityId={selectedCapabilityId} /> : null}
+          {selectedCapabilityId ? (
+            <CoverageCard
+              capabilityId={selectedCapabilityId}
+              onViewEvidence={(engineerId) =>
+                router.replace(
+                  `/systems/${systemId}?capability=${selectedCapabilityId}&evidence=1&engineer=${engineerId}`,
+                  { scroll: false },
+                )
+              }
+            />
+          ) : null}
         </div>
         <div className="space-y-6">
           <OwnershipCard ownership={system.declared_ownership} />
@@ -119,9 +134,31 @@ export function SystemDetailView({
             onSelect={(id) =>
               router.replace(`/systems/${systemId}?capability=${id}`, { scroll: false })
             }
+            onViewEvidence={(id) =>
+              router.replace(`/systems/${systemId}?capability=${id}&evidence=1`, {
+                scroll: false,
+              })
+            }
           />
         </div>
       </div>
+
+      {evidenceOpen && selectedCapabilityId ? (
+        <EvidenceDrawer
+          capabilityId={selectedCapabilityId}
+          engineerId={engineerParam}
+          engineerName={
+            engineerParam
+              ? graph.nodes.find((node) => node.id === engineerParam)?.label
+              : undefined
+          }
+          onClose={() =>
+            router.replace(`/systems/${systemId}?capability=${selectedCapabilityId}`, {
+              scroll: false,
+            })
+          }
+        />
+      ) : null}
     </div>
   );
 }

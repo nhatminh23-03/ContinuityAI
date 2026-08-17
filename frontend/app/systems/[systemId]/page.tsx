@@ -10,5 +10,13 @@ export default async function SystemDetailPage({
   const { systemId } = await params;
   const query = await searchParams;
   const capability = typeof query.capability === 'string' ? query.capability : undefined;
-  return <SystemDetailView systemId={systemId} capabilityParam={capability} />;
+  const engineer = typeof query.engineer === 'string' ? query.engineer : undefined;
+  return (
+    <SystemDetailView
+      systemId={systemId}
+      capabilityParam={capability}
+      evidenceOpen={query.evidence === '1'}
+      engineerParam={engineer}
+    />
+  );
 }
