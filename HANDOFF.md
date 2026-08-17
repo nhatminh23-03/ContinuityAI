@@ -334,7 +334,7 @@ Before either: skim `RECOMMENDATIONS.md` R-01 and R-20.
 
 ---
 
-## 2026-08-17 — Person A scope closed (Person A)
+## 2026-08-15 (same day, later) — Person A scope closed (Person A)
 
 Backend is finished. Everything on Person A's list in `TEAM_WORKFLOW_PERSON_A_B.md` section 2 is
 built, tested, and verified, and the remaining `RECOMMENDATIONS.md` items that were backend-only are
@@ -490,7 +490,7 @@ no remaining work that does not need a decision from you.
 
 ---
 
-## 2026-08-17 (later) — Model-backed extraction wired to IBM watsonx (Person A)
+## 2026-08-15 (same day, last session) — Model-backed extraction wired to IBM watsonx (Person A)
 
 Short version: the watsonx provider is **built, credential-verified, and measured against the
 rule-based one**. The graph the API serves is still rule-derived, because the watsonx account's token
@@ -568,3 +568,24 @@ instruction strings now avoid the prohibited vocabulary instead of quoting it.
 | If the model wins on accuracy | Some readiness values may shift, which can move frozen fixture numbers — a contract change to coordinate, not to absorb quietly |
 | DEC-10 — keep the eleventh endpoint? | Your yes or no |
 | Delete `keys.md`, rotate keys | Yours |
+
+### Where the code is — read this before you pull
+
+**All of the backend work is on `feature/backend-engines`. `main` is still at the scaffold commit
+(`5e3c112`), where every endpoint returns a static fixture.** So:
+
+```bash
+git fetch origin
+git checkout feature/backend-engines     # not main
+```
+
+If you pull `main` and point the frontend at `localhost:8000`, it will appear to work — the stubs
+return contract-shaped payloads — and you will be building against fake data without an error to tell
+you. That is the one mistake here that fails quietly, so it is worth the extra command.
+
+Five commits carry the backend: `4c30f2a` engines, `5dd2bfb` defect closure, `b71d227` challenge
+workflow and public data, `19d8e54` watsonx provider, `56ca862` a cache-reporting fix.
+
+I have deliberately not merged to `main`, because whether we merge or open a pull request is a joint
+call and merging is the harder one to undo. Say which you prefer and I will do it. If you would rather
+just branch your frontend work off `feature/backend-engines` and merge both at once, that works too.
