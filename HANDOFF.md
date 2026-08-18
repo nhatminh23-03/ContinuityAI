@@ -651,3 +651,38 @@ Backend: `cd backend && .venv/bin/python -m uvicorn app.main:app --reload` (:800
 Frontend: `cd frontend && npm run dev` (mock mode by default; `.env.local` with
 `NEXT_PUBLIC_USE_MOCKS=false` for live). Tests: `npm test` (contract lock + units),
 `npm run typecheck`, `npm run build` — all green at handoff.
+
+---
+
+## 2026-08-18 — Final phase complete: the product is demo-ready (Person B)
+
+### Completed
+
+Everything in the recommended-next-task list above, same session:
+
+- **Challenge drawer** built and verified live: attesting Jordan moves him EXPOSED → PRACTICED,
+  Incident Recovery 72/HIGH → 15/LOW COVERED, the system holds 74/HIGH (degraded 2 → 1) — the
+  strong demo beat from the backend handoff, now clickable. FR-020 and AC-11 closed front-to-end.
+- **State suite** complete on every screen; errors switch on `error.code` only.
+- **Live golden-path pass** on `NEXT_PUBLIC_USE_MOCKS=false`: zero payload divergences; the full
+  chain executed with real mutations (sim_002 74 → 93, candidates, plan generated, edited,
+  approved per CI-12). INSUFFICIENT_EVIDENCE, engineer-filtered evidence, and the focused graph's
+  seven evidence nodes all verified live. Database reseeded afterwards — demo state pristine.
+- **One environment finding:** the backend pins CORS to `http://localhost:3000` — the frontend
+  MUST run on :3000 against live. A stale dev server on :3002 was stopped; `frontend/.env.local`
+  (gitignored, local) now selects live mode.
+- **Responsive** verified at 1280×860, no horizontal overflow. **Demo script:** every product
+  beat of PRD §27 lands; the 0:00–0:18 opening and 2:30 architecture graphic are video assets.
+
+### Branch state
+
+`feature/frontend-screens`, 16 commits, not pushed. `main` untouched since PR #1. Merging or a PR
+is the joint call.
+
+### Remaining (submission work, not build work)
+
+Demo video and screenshots; README product-narrative half (Person A's technical half is drafted);
+the Person A sync items: GAP-01 (`single_expert_dependency_count`, the one blocking gap), wiring
+`identity-systems.json` + `challenge-attest-jordan.json` into `refresh_fixtures.py` and the
+fixtures README, doc amendments (PRD §17.1 class column, ARCHITECTURE §29 / CONTRACT §10.2, PRD
+§11.1 example numbers), and the R-23 key rotation (Person B only).

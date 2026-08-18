@@ -852,3 +852,61 @@ dashboard, system detail, evidence drawer, contextual graph, why panel, simulati
 backup candidates, mitigation plan, capability detail. The golden path is clickable end to end on
 fixtures. Remaining for the final phase: the challenge drawer, the full state suite, the live
 integration pass, responsive polish, and the demo-script walkthrough.
+
+---
+
+## 2026-08-18 — Final phase: challenge drawer, state suite, live integration pass (Person B)
+
+**What was built.** The challenge drawer (closing FR-020 and AC-11 front-to-end): three evidence
+operations with a required audit comment and structurally no score inputs; the result view
+renders the recomputation from the response snapshots and success invalidates every query so all
+screens refetch. State-suite fills across four components (partial-failure notice on the systems
+table, error codes on the coverage card, a why-panel error line, launcher loading state); every
+screen now has loading, empty, and error treatments switching on `error.code`.
+
+**Live integration pass** (`NEXT_PUBLIC_USE_MOCKS=false`, backend on :8000). Results:
+
+- **One divergence found and resolved without patching the frontend:** the backend pins CORS to
+  `http://localhost:3000`, and the dev server was running on :3002 (a leftover instance), so
+  every live call failed as a network error. Resolution: the stale server was stopped and the
+  frontend now runs on :3000 as the backend expects. Worth remembering: the frontend must run on
+  :3000 against the live backend.
+- Dashboard, system detail, graph values: identical to fixtures (as the fixture regeneration
+  guarantees). No payload divergences anywhere.
+- INSUFFICIENT_EVIDENCE verified live (`cap_permission_audit`): dashed treatment, em-dash index,
+  LOW confidence, Grace Liu's single EXPOSED row.
+- Engineer-filtered evidence verified live: Alex's view returns exactly INC-184, INC-221, DOC-17.
+- Focused graph verified live: seven EVIDENCE nodes with SUPPORTED_BY edges arrive server-side.
+- Full golden path executed live with real mutations: simulation `sim_002` (74 → 93,
+  HIGH → CRITICAL, five rows), candidates (Maria HIGH / Jordan MEDIUM), plan generated, task
+  edited, approved with the edit riding the call (CI-12) and a real timestamp.
+- Challenge verified live: attesting Jordan moved him EXPOSED → PRACTICED, Incident Recovery
+  DEGRADED 72/HIGH → COVERED 15/LOW, the system held at 74/HIGH with degraded 2 → 1 — matching
+  the backend handoff's account exactly — and the metric strip refetched to show the new counts.
+- The database was reseeded afterwards; the demo state is pristine.
+
+**Responsive.** All screens verified at 1280×860 throughout; no horizontal overflow.
+
+**Demo script (PRD section 27) walkthrough.** Every product beat lands: 0:18 dashboard (74, gap
+count), 0:30 system detail and graph, 0:50 Why + provenance cards, 1:08 simulation with Retry
+Logic preserved, 1:28 candidates, 1:50 plan with four actions and criteria, 2:15 approve. The
+0:00–0:18 opening (outage card, declared-owner intro) and the 2:30 architecture graphic are video
+assets, not product screens — the ownership card covers the declared-vs-demonstrated visual if
+wanted on screen. The optional challenge beat (Jordan attestation, system holding at 74) is
+strong and now demonstrable live.
+
+**Files created.** `frontend/features/challenge/ChallengeDrawer.tsx`.
+**Files changed.** `frontend/features/evidence/EvidenceDrawer.tsx`,
+`frontend/features/dashboard/SystemsTable.tsx`, `frontend/features/systems/{CoverageCard,WhyPanel}.tsx`,
+`frontend/app/simulations/page.tsx`; `frontend/.env.local` created locally (gitignored) pointing
+at the live backend.
+
+**Implements.** FR-020, AC-11 (challenge UI); AC-15's state suite; the live-integration and
+demo-walkthrough requirements of the final phase.
+
+**Validation.** 29 unit tests + contract lock green; typecheck and build clean; every live check
+above observed directly in the browser.
+
+**Open questions.** The four Person A sync items stand (GAP-01, fixture wiring, doc amendments,
+key rotation). Demo video, screenshots, and the README product narrative remain Person B's
+submission work.
