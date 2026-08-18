@@ -593,3 +593,262 @@ TypeScript types, including the two new ones). `npm run build` clean.
 are **not yet wired into `scripts/refresh_fixtures.py`**, so `--check` does not guard them against
 drift; asking Person A to add both (GAP-03 already requested the challenge one). `fixtures/README.md`
 enumeration also needs the two new rows — jointly owned, so left for the sync.
+
+---
+
+## 2026-08-17 — Phase 6 begins: branch, shared primitives, dashboard (Person B)
+
+**What was built.** Work moved to `feature/frontend-screens` with the accumulated Phase 2–5 output
+committed as three logical commits. Then the first two units of the screen plan:
+
+1. *Shared primitives.* `components/status.tsx` (ExposurePill with the dashed
+   INSUFFICIENT_EVIDENCE variant, liquid-glass RiskClassChip on the semantic gradient tints,
+   RiskIndex tabular numeral, DriftLabel, ConfidenceLabel), `components/people.tsx` (the
+   monochrome five-step ReadinessLadder with text label and aria-label, EngineerBadge initials
+   avatar), and `lib/copy.ts` — the frontend-owned display copy for all rule codes, index
+   modifiers, drift values, class anchors, and the two static simulation strings. A unit test
+   locks the maps, asserts unmapped codes render raw, and rejects prohibited vocabulary by regex.
+2. *Dashboard.* Platform cards (highest system risk, critical-gap count, drift text; no exposure
+   class per CI-10, no single-expert count pending GAP-01) and the merged systems table across
+   both platforms, sorted by `sortSystemsByRisk` (unit-tested pure display sort, nulls last),
+   with exposure pills, confidence, drift, tabular right-aligned indices, class chips, row
+   navigation, and a per-row Simulate entry point.
+
+**Implements.** §C.1 dashboard corrections in full; AC-01's visible-without-drill-down values;
+FR-002 as amended by CI-20.
+
+**Validation.** 18 unit tests + contract lock green; typecheck clean; verified in the browser at
+1280px against fixtures — Payments 74 / 1 gap / new-risk drift, Identity 68 / 1 / stable, systems
+ordered 74 · 71 · 68 · 54 · 52 with correct pills and chips.
+
+**Open questions.** None new. Next unit: System Detail.
+
+---
+
+## 2026-08-17 — System Detail (Person B)
+
+**What was built.** `/systems/{system_id}`: breadcrumb with the platform name, header with the
+primary "Simulate unavailability" action (disabled until the sandbox unit), the four-cell metric
+strip (Continuity Risk Index 74 + HIGH glass chip + "Why this risk?" placeholder · capabilities
+without resilient backup 2 · critical gaps 0 · evidence confidence HIGH), the declared-ownership
+card (Jordan Lee, CODEOWNERS, ochre "Differs from demonstrated coverage" note), the five-row
+capability panel (exposure pill + coverage summary per row, no ladders, no activity chips), and
+the coverage card for the URL-selected capability (engineer rows with monochrome readiness
+ladders, freshness, last-demonstrated date, confidence). The graph area is a placeholder pane
+until its own unit. Pure helpers `capabilitiesFromGraph`, `coverageSummary`, and
+`defaultCapabilityId` project the graph payload without deriving any domain value and are
+unit-tested against the shared graph fixture.
+
+**Files created.** `frontend/app/systems/[systemId]/page.tsx`,
+`frontend/features/systems/{SystemDetailView,MetricStrip,OwnershipCard,CapabilityPanel,CoverageCard}.tsx`,
+`frontend/features/systems/capabilities.ts`, `frontend/tests/capabilities.test.ts`.
+
+**Implements.** §C.2 corrections in full (valid class, relabels, no edit action, no activity
+proxies, ladder off capabilities, coverage card, ownership correction); AC-02.
+
+**Validation.** 22 unit tests + contract lock green; typecheck clean; page text verified in the
+browser against fixtures — every canonical value present, including the public-data EXPOSED edge
+appearing in Retry Logic's coverage summary.
+
+**Open questions.** None new. Next unit: the evidence drawer.
+
+---
+
+## 2026-08-17 — Evidence drawer (Person B)
+
+**What was built.** The provenance drawer, opened from capability rows (capability-wide) and
+coverage rows (engineer-filtered) via URL state. Assessment card: exposure pill, confidence,
+fired-rule display copy, declared-versus-demonstrated with the mismatch note. Seven typed
+evidence cards in server order — `evidence_inc_184` leads — each carrying role, strength, and
+freshness badges beside the source-type icon, reference, date, title, excerpt, and provenance
+line with `source_url` when present. Missing-evidence entries (Jordan, Maria) render in the
+dashed insufficient treatment; a conflicting-evidence section appears when the array is
+non-empty. Footer: Close plus a disabled "Challenge assessment" primary awaiting the challenge
+unit. Escape and scrim-click close with focus return.
+
+**Files created.** `frontend/features/evidence/{EvidenceDrawer,EvidenceCard,AssessmentCard}.tsx`.
+**Files changed.** `frontend/features/systems/{SystemDetailView,CapabilityPanel,CoverageCard}.tsx`,
+`frontend/app/systems/[systemId]/page.tsx`.
+
+**Implements.** §C.4 corrections (assessment card populated, typed model visible, no Acknowledge
+Pattern); AC-04; the §11.4 drawer sections.
+
+**Validation.** 22 tests + contract lock green; typecheck clean; full drawer text verified in the
+browser against the fixture — all seven records with correct badges, both missing-evidence
+entries, the mismatch comparison. Known mock-mode limit recorded: the fixture ignores the
+`engineer_id` filter (mocks are verbatim payloads); live filtering was verified in the Phase 2
+captures and re-checks in the Phase 7 live pass.
+
+**Open questions.** None new. Next unit: the contextual graph (timeboxed).
+
+---
+
+## 2026-08-17 — Contextual graph (Person B)
+
+**What was built.** The graph pane on System Detail, well inside its timebox because the layout
+is deterministic rather than automatic: `toFlow` (pure, unit-tested against the shared fixture)
+places nodes on fixed concentric bands — system centre, component ring, capability ring,
+engineer outer ring, evidence leaves — and maps edges by type: solid DEMONSTRATES with stroke
+width scaled from the received readiness label (VALIDATED 4 → NONE 1), the one dashed
+DECLARED_OWNER edge labelled "declared owner" (Jordan Lee → Payment Gateway), dotted
+SUPPORTED_BY, hairline structural edges. Focusing a capability — by clicking its node or via
+`?focus=` — dims everything outside its neighbourhood to 18% opacity and fetches the focused
+graph (`?focus_capability_id=`), which adds evidence nodes against the live backend. Tests cover
+position determinism, the dashed labelled ownership edge, width ordering, and dim behaviour.
+
+**Files created.** `frontend/features/graph/{layout.ts,SystemGraph.tsx}`,
+`frontend/tests/graph-layout.test.ts`.
+**Files changed.** `frontend/features/systems/SystemDetailView.tsx`,
+`frontend/app/systems/[systemId]/page.tsx`.
+
+**Implements.** §C.2's graph requirements (the solid-vs-dashed contrast, focus dimming); AC-03;
+§11.3.
+
+**Validation.** 26 tests + contract lock green; typecheck clean; verified in the browser — edge
+thickness visibly varies, the dashed ownership edge reads against the solid coverage edges, and
+focusing Incident Recovery keeps only Alex, Maria, Jordan, Gateway Integration, and the system at
+full opacity. Mock-mode note: the focused fixture is the unfocused payload, so evidence nodes
+appear only against the live backend (Phase 7 pass).
+
+**Open questions.** None new. Next unit: the Why-this-risk panel.
+
+---
+
+## 2026-08-17 — "Why this risk?" panel (Person B)
+
+**What was built.** The metric strip's "Why this risk?" link now opens a glass modal carrying the
+system-level fired rules ("A business-critical capability lacks a resilient backup", "Multiple
+capabilities depend on a single expert"), the selected capability's rules, and the index
+arithmetic: HIGH anchor 70, +1 only-one-engineer, +1 next-strongest-only-assisted, = 72/100 —
+every number the server's own (anchor from the received class, deltas from `index_modifiers`,
+total from the index field; nothing recomputed). The block is omitted when modifiers are absent,
+and the footnote reads "The index is a comparison number, not a probability." Escape/scrim close
+with focus return; URL-driven (`?why=1`).
+
+**Files created.** `frontend/features/systems/WhyPanel.tsx`.
+**Files changed.** `frontend/features/systems/{SystemDetailView,MetricStrip}.tsx` (link enabled),
+`frontend/app/systems/[systemId]/page.tsx`.
+
+**Implements.** AC-07's "Why?" surface; FR-013's contributing-factor display; DEC-11 rendered;
+missing-screen 2 from the UI review.
+
+**Validation.** 26 tests + contract lock green; typecheck clean; verified in the browser —
+70 + 1 + 1 = 72 renders with descriptive copy per line.
+
+**Open questions.** None new. Next unit: the simulation sandbox.
+
+---
+
+## 2026-08-17 — Simulation sandbox and launcher (Person B)
+
+**What was built.** The counterfactual overlay (URL-driven from System Detail's primary action and
+the dashboard row action) and the `/simulations` launcher. The overlay corrects every §C.0/§C.3
+defect: 74 → 93 in the right direction under the "Continuity Risk Index" label with the
+HIGH → CRITICAL class transition beside the numbers, "Nothing has changed in your real data." in
+the header, the grounded API summary in place of departure/urgency copy, all five capability
+impact rows — the two survivors marked "unchanged" — each with a best-remaining readiness ladder,
+counts 0/2/3 → 2/1/2, and the static disclaimer "This models coverage loss. It does not predict
+an outage." The engineer selector defaults to the strongest demonstrated engineer
+(`primary_engineer`, a received value) and shows name + role from graph metadata. The primary
+action carries `simulation_id` and the worst-hit capability into the candidates route. No
+prohibited panel: the person-level "silo" framing from the mockup does not exist here.
+
+**Files created.** `frontend/features/simulations/{SimulationOverlay,ImpactRow}.tsx`,
+`frontend/app/simulations/page.tsx`.
+**Files changed.** `frontend/features/systems/SystemDetailView.tsx` (simulate wiring, button
+enabled), `frontend/app/systems/[systemId]/page.tsx`.
+
+**Implements.** §C.0 and §C.3 in full; FR-014, FR-015; AC-06; §11.5; CI-32's static disclaimer.
+
+**Validation.** 26 tests + contract lock green; typecheck clean; verified in the browser — the
+canonical transition, five rows, banner, and disclaimer all render; the launcher lists all five
+systems. Mock-mode note: the fixture returns the Alex scenario for any engineer selection; the
+Sofia no-loss case is exercised in the Phase 7 live pass.
+
+**Open questions.** None new. Next unit: backup candidates.
+
+---
+
+## 2026-08-17 — Backup candidates (Person B)
+
+**What was built.** `/systems/{id}/candidates?capability=&simulation=`: Maria Gomez (HIGH
+overlap) and Jordan Lee (MEDIUM) as frosted cards with monochrome initials and roles from graph
+metadata — no photographs — demonstrated strengths as chips, per-candidate gap statements from
+the API, "Confidence in demonstrated coverage of this capability: MEDIUM" (the honest GAP-04
+wording), an evidence link opening the provenance drawer filtered by engineer, and **Generate
+transfer plan** as each card's primary action. A quiet free-choice select covers AC-09 (any other
+system engineer can be picked). The Not-considered panel lists all seven excluded factors —
+including career goals and performance history per the correction list — with the API disclaimer
+verbatim and the line "The manager chooses. Nothing here assigns anyone to anything." The plan
+route receives capability, backup, simulation id, and the primary engineer.
+
+**Files created.**
+`frontend/features/recommendations/{CandidatesView,CandidateCard,NotConsideredPanel}.tsx`,
+`frontend/app/systems/[systemId]/candidates/page.tsx`.
+
+**Implements.** §C.5 in full; AC-08, AC-09; FR-016/FR-017's display side; §11.6.
+
+**Validation.** 26 tests + contract lock green; typecheck clean; page text verified in the
+browser — both candidates with correct overlaps, gaps, confidence, and the complete
+not-considered list.
+
+**Open questions.** None new. Next unit: the mitigation plan.
+
+---
+
+## 2026-08-17 — Mitigation plan (Person B)
+
+**What was built.** `/plans/new` (generate → edit → approve) and `/plans` (the session's plan or
+a designed empty state). The mockup's inverted roles are corrected structurally: the header reads
+"Developing: Maria Gomez · Knowledge source: Alex Chen", and the task copy comes from the API,
+which already has the direction right. DRAFT status chip, target readiness PRACTICED labelled
+"(target, not achieved)", task-type labels, acceptance criteria, and linked-evidence chips per
+card. Cards are editable while DRAFT; edited tasks are submitted with the approve call (CI-12) and
+omitted when untouched. The approved state — APPROVED chip, approver, timestamp, final task list —
+renders from a unit-tested sessionStorage store because the approve response echoes no tasks and
+no read-back endpoint exists (GAP-02); it survives navigation and reload within the session.
+"Est." durations and mode chips do not exist here. Double-approval renders the VALIDATION_ERROR
+copy.
+
+**Files created.** `frontend/features/mitigation/{planStore.ts,TaskCard.tsx,PlanView.tsx}`,
+`frontend/app/plans/{new/page.tsx,page.tsx}`, `frontend/tests/planStore.test.ts`.
+
+**Implements.** §C.6 in full; AC-09, AC-10; FR-018/FR-019; §20.2's structure minus the fields the
+DTO does not carry.
+
+**Validation.** 29 tests + contract lock green; typecheck clean; the full flow exercised in the
+browser — task title edited, plan approved, APPROVED chip and approval line rendered, and the
+edited title verified inside the session store and on `/plans` after navigation.
+
+**Open questions.** None new. Next unit: capability detail, the final Phase 6 screen.
+
+---
+
+## 2026-08-17 — Capability detail, closing the screen phase (Person B)
+
+**What was built.** `/capabilities/{capability_id}`: breadcrumb into the owning system, header
+with the index (72), class chip (HIGH), exposure pill, confidence, criticality, and the reused
+Why panel; `primary_engineer` and `best_remaining_coverage` rendered as quiet labels ("strongest
+demonstrated coverage", "best remaining") rather than ranks; the engineer-by-engineer coverage
+list with monochrome ladders, freshness, dates, and per-engineer evidence entry; a
+capability-wide evidence view; and a Simulate unavailability action linking into the sandbox.
+INSUFFICIENT_EVIDENCE is a designed state — dashed container, em-dash index, and copy naming
+evidence-gathering as the next step.
+
+**Files created.** `frontend/features/systems/CapabilityDetailView.tsx`,
+`frontend/app/capabilities/[capabilityId]/page.tsx`.
+
+**Implements.** Endpoint 5's screen (UI-review missing-screen 1); FR-022's evidence-backed
+person rows within capability context; the INSUFFICIENT_EVIDENCE design (missing-screen 4).
+
+**Validation.** 29 tests + contract lock green; typecheck clean; `npm run build` clean with all
+eight routes; page text verified in the browser. The INSUFFICIENT_EVIDENCE visual can only be
+exercised against the live backend (`cap_permission_audit`) since mock mode serves the
+incident-recovery fixture for every capability id — scheduled for the Phase 7 live pass; the
+render logic is null-driven either way.
+
+**Phase status.** All nine screens of the screen phase are built, each behind its own approval:
+dashboard, system detail, evidence drawer, contextual graph, why panel, simulation sandbox,
+backup candidates, mitigation plan, capability detail. The golden path is clickable end to end on
+fixtures. Remaining for the final phase: the challenge drawer, the full state suite, the live
+integration pass, responsive polish, and the demo-script walkthrough.

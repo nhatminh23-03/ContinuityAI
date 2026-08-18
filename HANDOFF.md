@@ -589,3 +589,65 @@ workflow and public data, `19d8e54` watsonx provider, `56ca862` a cache-reportin
 I have deliberately not merged to `main`, because whether we merge or open a pull request is a joint
 call and merging is the harder one to undo. Say which you prefer and I will do it. If you would rather
 just branch your frontend work off `feature/backend-engines` and merge both at once, that works too.
+
+---
+
+## 2026-08-17 — Backend verified, decisions closed, and the entire screen phase built (Person B)
+
+**Read this first.** The stale warning above is resolved: `feature/backend-engines` was merged to
+`main` via PR #1, and all frontend work now lives on **`feature/frontend-screens`** (branched from
+`main`, 14 commits, not pushed). The dev server may already be running on :3002.
+
+### Completed
+
+- **Backend reality check.** All eleven endpoints verified live; 10/10 fixtures byte-match
+  (`scripts.verify_golden_path`); 21 payloads captured to `docs/api-samples/` with a manifest.
+- **`docs/BACKEND_GAPS.md`** — one BLOCKING item: `single_expert_dependency_count` has no
+  transport anywhere (Category C proposal for Person A); nine deferrable items; eight design
+  constraints; full AC-01…16 data-path table; zero enum drift.
+- **`docs/UI_REVIEW.md`** — all six mockups reviewed and corrected; component inventory; seven
+  missing screens; resolved design decisions (liquid-glass gradient chips, four-entry sidebar,
+  name + role on engineer rows).
+- **Frontend foundation.** Grainient WebGL background (vendored, `ogl` dep) under a liquid-glass
+  sidebar; Inter + tokens; strict Zod contract lock over all 12 root fixtures (`npm test`,
+  vitest); adapter covers all eleven endpoints with the mock/live switch.
+- **All nine screens**, mock-first, each individually approved: dashboard, system detail,
+  evidence drawer, contextual graph (fixed-coordinate layout, readiness-scaled edges, dashed
+  declared-owner edge, focus dim), why panel (70+1+1=72 arithmetic), simulation sandbox
+  (74→93 with survivors), backup candidates, mitigation plan (edit-before-approve per CI-12,
+  session store per GAP-02), capability detail. Golden path clickable end to end on fixtures.
+
+### Decisions made (Person B)
+
+- **DEC-01 values are canonical** (74/HIGH, 74→93, Identity 68, five capabilities, Maria Gomez);
+  the working brief's older 58/MODERATE set was stale.
+- **DEC-10 acknowledged — the eleventh endpoint stays**, and the frontend will build the
+  challenge drawer (types, Zod schema, and adapter function already exist).
+- Two fixtures added to jointly-owned `fixtures/` from live captures: `identity-systems.json`,
+  `challenge-attest-jordan.json`.
+
+### For Person A at the next sync
+
+1. GAP-01: add `single_expert_dependency_count` to `PlatformSummary` (Category C, yes/no needed).
+2. Wire the two new fixtures into `scripts/refresh_fixtures.py` and `fixtures/README.md`.
+3. Doc amendments: PRD §17.1 class column (DEC-07), ARCHITECTURE §29 / CONTRACT §10.2 (OPEN-09),
+   PRD §11.1 example numbers (71/52 live).
+4. R-23 key rotation is still pending and only Person B can do it.
+
+### In progress / blocked
+
+Nothing in progress; nothing blocked.
+
+### Recommended next task
+
+The final phase: challenge drawer UI (fixture and adapter ready), loading/empty/error state suite
+switching on `error.code`, the INSUFFICIENT_EVIDENCE live check (`cap_permission_audit`), flip
+`NEXT_PUBLIC_USE_MOCKS=false` for the full live golden-path pass (report divergences, do not
+absorb), responsive pass at 1280px, and the PRD §27 demo-script walkthrough.
+
+### Running it
+
+Backend: `cd backend && .venv/bin/python -m uvicorn app.main:app --reload` (:8000, auto-seeds).
+Frontend: `cd frontend && npm run dev` (mock mode by default; `.env.local` with
+`NEXT_PUBLIC_USE_MOCKS=false` for live). Tests: `npm test` (contract lock + units),
+`npm run typecheck`, `npm run build` — all green at handoff.
