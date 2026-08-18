@@ -20,6 +20,7 @@ export default async function SystemDetailPage({
       engineerParam={engineer}
       focusParam={focus}
       whyOpen={query.why === '1'}
+      simulateOpen={query.simulate === '1'}
     />
   );
 }

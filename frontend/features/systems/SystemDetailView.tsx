@@ -12,6 +12,7 @@ import { CoverageCard } from './CoverageCard';
 import { capabilitiesFromGraph, defaultCapabilityId } from './capabilities';
 import { EvidenceDrawer } from '@/features/evidence/EvidenceDrawer';
 import { SystemGraph } from '@/features/graph/SystemGraph';
+import { SimulationOverlay } from '@/features/simulations/SimulationOverlay';
 import { WhyPanel } from './WhyPanel';
 
 export function SystemDetailView({
@@ -21,6 +22,7 @@ export function SystemDetailView({
   engineerParam,
   focusParam,
   whyOpen = false,
+  simulateOpen = false,
 }: {
   systemId: string;
   capabilityParam?: string;
@@ -28,6 +30,7 @@ export function SystemDetailView({
   engineerParam?: string;
   focusParam?: string;
   whyOpen?: boolean;
+  simulateOpen?: boolean;
 }) {
   const router = useRouter();
 
@@ -43,6 +46,13 @@ export function SystemDetailView({
     queryKey: queryKeys.systemGraph(systemId, focusParam),
     queryFn: () => api.getSystemGraph(systemId, focusParam),
     enabled: Boolean(focusParam),
+  });
+  const selectedForSim =
+    capabilityParam ?? undefined; /* resolved fully below once the graph loads */
+  const simCapabilityQuery = useQuery({
+    queryKey: queryKeys.capability(selectedForSim ?? ''),
+    queryFn: () => api.getCapability(selectedForSim ?? ''),
+    enabled: simulateOpen && Boolean(selectedForSim),
   });
   const platformsQuery = useQuery({
     queryKey: queryKeys.platforms,
@@ -107,9 +117,13 @@ export function SystemDetailView({
         </div>
         <button
           type="button"
-          disabled
-          title="Sandbox arrives with the simulation screen"
-          className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white opacity-50"
+          onClick={() =>
+            router.replace(
+              `/systems/${systemId}?capability=${selectedCapabilityId ?? ''}&simulate=1`,
+              { scroll: false },
+            )
+          }
+          className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
         >
           Simulate unavailability
         </button>
@@ -179,6 +193,19 @@ export function SystemDetailView({
           />
         </div>
       </div>
+
+      {simulateOpen ? (
+        <SimulationOverlay
+          systemId={systemId}
+          defaultEngineerId={simCapabilityQuery.data?.primary_engineer?.engineer_id}
+          selectedCapabilityId={selectedCapabilityId}
+          onClose={() =>
+            router.replace(`/systems/${systemId}?capability=${selectedCapabilityId ?? ''}`, {
+              scroll: false,
+            })
+          }
+        />
+      ) : null}
 
       {whyOpen ? (
         <WhyPanel
