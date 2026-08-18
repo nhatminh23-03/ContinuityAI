@@ -33,10 +33,18 @@ export function SystemsTable({ platforms }: { platforms: PlatformSummary[] }) {
   const systems: SystemSummary[] = sortSystemsByRisk(
     results.flatMap((result) => result.data?.systems ?? []),
   );
+  const failedCount = results.filter((result) => result.isError).length;
 
   return (
     <div className="frosted-card mt-6 p-6">
       <h2 className="text-lg font-medium text-slate-900">Systems by continuity risk</h2>
+      {failedCount > 0 ? (
+        <p className="mt-2 text-xs text-slate-600">
+          {failedCount === results.length
+            ? 'The systems list could not be loaded.'
+            : 'Some systems could not be loaded; showing the rest.'}
+        </p>
+      ) : null}
       <ul className="mt-4 divide-y divide-slate-900/5">
         {systems.map((system) => (
           <li key={system.system_id}>

@@ -21,6 +21,8 @@ export default function SimulationsPage() {
     })),
   });
   const systems = systemsResults.flatMap((result) => result.data?.systems ?? []);
+  const loading =
+    platformsQuery.isPending || systemsResults.some((result) => result.isPending);
   const selected = systemId || systems[0]?.system_id || '';
 
   return (
@@ -48,11 +50,11 @@ export default function SimulationsPage() {
         </label>
         <button
           type="button"
-          disabled={!selected}
+          disabled={!selected || loading}
           onClick={() => setOpen(true)}
           className="mt-4 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
         >
-          Open sandbox
+          {loading ? 'Loading systems…' : 'Open sandbox'}
         </button>
       </div>
 

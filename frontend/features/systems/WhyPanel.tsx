@@ -147,6 +147,10 @@ export function WhyPanel({
               </div>
             ) : null}
           </div>
+        ) : capabilityId && capabilityQuery.isError ? (
+          <p className="mt-5 text-sm text-slate-600">
+            The capability breakdown could not be loaded.
+          </p>
         ) : capabilityId ? (
           <div className="mt-5 h-24 animate-pulse rounded-2xl bg-white/40" />
         ) : null}

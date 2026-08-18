@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { api, queryKeys } from '@/lib/api/endpoints';
+import { ApiError } from '@/lib/api/client';
 import { EngineerBadge } from '@/components/people';
 import { ReadinessLadder } from '@/components/people';
 import { ConfidenceLabel } from '@/components/status';
@@ -37,7 +38,12 @@ export function CoverageCard({
           ))}
         </div>
       ) : query.isError ? (
-        <p className="mt-4 text-sm text-slate-500">Coverage could not be loaded.</p>
+        <p className="mt-4 text-sm text-slate-500">
+          Coverage could not be loaded.
+          {query.error instanceof ApiError ? (
+            <span className="ml-1 text-xs">Error code: {query.error.code}</span>
+          ) : null}
+        </p>
       ) : (
         <ul className="mt-4 space-y-4">
           {query.data.engineer_coverage.map((coverage) => (

@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api, queryKeys } from '@/lib/api/endpoints';
 import { ApiError } from '@/lib/api/client';
 import { AssessmentCard } from './AssessmentCard';
 import { EvidenceCard } from './EvidenceCard';
+import { ChallengeDrawer } from '@/features/challenge/ChallengeDrawer';
 
 /**
  * The provenance drawer — every readiness claim opens into its evidence.
@@ -23,6 +24,7 @@ export function EvidenceDrawer({
   onClose: () => void;
 }) {
   const drawerRef = useRef<HTMLDivElement>(null);
+  const [challengeOpen, setChallengeOpen] = useState(false);
 
   const query = useQuery({
     queryKey: queryKeys.capabilityEvidence(capabilityId, engineerId),
@@ -145,14 +147,23 @@ export function EvidenceDrawer({
           </button>
           <button
             type="button"
-            disabled
-            title="Arrives with the challenge drawer"
-            className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white opacity-50"
+            disabled={!query.data}
+            onClick={() => setChallengeOpen(true)}
+            className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
           >
             Challenge assessment
           </button>
         </footer>
       </div>
+
+      {challengeOpen ? (
+        <ChallengeDrawer
+          capabilityId={capabilityId}
+          capabilityName={query.data?.capability.name}
+          evidenceResponse={query.data}
+          onClose={() => setChallengeOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }
