@@ -546,17 +546,14 @@ def test_a_name_recombined_from_an_attested_one_is_caught_in_any_casing(line) ->
         "Please ask Priya to confirm the result",
         "Coordinate with Stripe during the drill",
         "The settlement batching path is uncovered",
-        "Review The Settlement Batching Runbook",
     ],
 )
 def test_known_blind_spots_of_the_name_check(line) -> None:
-    """Documented, not hidden. These pass, and the module docstring says why:
+    """Documented, not hidden. These pass, and the module docstring says why: one capitalised word
+    is structurally identical to any capitalised noun, and a lower-case invention offers no signal
+    at all. Separating either needs a lexicon this module does not have.
 
-    a single capitalised word is structurally identical to any capitalised noun; a lower-case
-    invention offers no signal at all; and on a fully capitalised line capitalisation
-    distinguishes nothing, so only the recombination rule runs there.
-
-    Closing the last three needs the capability taxonomy passed into the validator, the way
+    Closing the lower-case case needs the capability taxonomy passed into the validator, the way
     `validate_extraction` receives it. Until then the prompt carries that weight, and this test
     exists so nobody reads the gate as closed-world grounding it is not.
     """
@@ -566,6 +563,33 @@ def test_known_blind_spots_of_the_name_check(line) -> None:
         KNOWN_EVIDENCE,
     )
     assert outcome.accepted, outcome.rejections
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        "Loop in Sarah Kim And Priya Raman before the drill.",
+        "Ask Priya And Marcus to review the runbook.",
+        "Contact Sarah From Payments about the drill.",
+        "Escalate to The Settlement Batching owner if needed.",
+        "Coverage of Refund Processing In Europe would drop.",
+        "Review The Settlement Batching Runbook",
+    ],
+)
+def test_a_capitalised_function_word_does_not_buy_a_run_an_exemption(line) -> None:
+    """The title exemption is bounded to two-word runs, and this is why.
+
+    Unbounded, one capitalised "And", "From" or "The" exempted the whole run, which let two
+    invented colleagues through in ordinary prose — the case the module docstring calls the most
+    damaging thing this product could print. A stripped title leaves a two-word tail ("In
+    Staging", "Update The"); an invented name needs more room than that.
+    """
+    outcome = validate_plan_draft(
+        draft([task(line, "SHADOWING", evidence=["ev_001"]), *base_tasks()[1:]]),
+        plan_context("ASSISTED"),
+        KNOWN_EVIDENCE,
+    )
+    assert not outcome.accepted
 
 
 def test_a_drill_at_assisted_is_rejected_at_a_legal_action_count() -> None:

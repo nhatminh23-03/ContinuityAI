@@ -1063,3 +1063,33 @@ so without this a gate rejecting everything is indistinguishable from a gate wor
 tests/test_golden_path.py tests/test_responsible_ai.py` → 89 passed. Full suite → 210 passed. The
 four title-cased titles from the review and the four bypasses were re-measured directly against
 the rebuilt check; all sixteen cases now behave as intended.
+
+### 2026-08-21 — Bound the title exemption to two-word runs
+
+Re-review found that the `quoted_title` exemption added in the previous entry was over-broad and
+reopened the bypass class it was meant to sit beside: any capitalised run containing one
+capitalised closed-class word was exempt at any length, so `Loop in Sarah Kim And Priya Raman
+before the drill.` — two entirely invented colleagues in ordinary prose — passed on the strength
+of one capitalised `And`. The stated rationale ("nobody capitalises 'In' mid-sentence") holds for
+a stray `In` at the tail of a stripped title; it does not hold for `And`, `From` or `The` binding
+several capitalised words together.
+
+Bounded the exemption to runs of exactly two words. Every run surviving the attested-name strip in
+a real title is two words long (`In Staging`, `Update The`), while an invented name needs more
+room. All four title-cased titles from the first review stay accepted and all five strings from
+the re-review are now caught, measured directly against the built module.
+
+`test_known_blind_spots_of_the_name_check` lost `Review The Settlement Batching Runbook`: the
+narrowing closes it inside a plan, because a task carries a prose description alongside its title
+and the description is checked. The stale assertion was inverted into
+`test_a_capitalised_function_word_does_not_buy_a_run_an_exemption`, which pins all six strings as
+rejected so the exemption cannot widen again unnoticed. The blind-spot list in the module
+docstring was rewritten to match: a bare fully capitalised line, and a two-word qualifier attached
+to an attested name (`Refund Processing In Europe` where `Refund Processing` is attested), are
+what remain.
+
+**Files changed.** `backend/app/ai/language_policy.py`,
+`backend/tests/test_narrative_validation.py`.
+
+**Validation.** `cd backend && PYTHONPATH=. .venv/bin/python -m pytest tests/test_narrative_validation.py
+tests/test_golden_path.py tests/test_responsible_ai.py` → 94 passed. Full suite → 215 passed.

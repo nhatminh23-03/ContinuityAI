@@ -27,7 +27,10 @@ looks at what capitalised multi-word runs survive, and applies two rules:
   capitalised word. "Sarah Chen" where the record holds "Alex Chen" is an invented colleague
   wearing a real surname, and it is caught whatever the capitalisation style.
 * **Unattested run** — a capitalised run containing a word from nowhere in the given facts, and
-  only on a line that is otherwise sentence-cased.
+  only on a line that is otherwise sentence-cased. A *two-word* run carrying a capitalised
+  closed-class word is exempt as the tail of a title quoted into prose ("In Staging"); the bound
+  matters, because unbounded it lets "Sarah Kim And Priya Raman" through on one capitalised
+  "And".
 
 The sentence-case condition is the load-bearing one and it is a real limitation, not a hedge. In
 "Update The Payment Gateway Runbook" every word is capitalised, so capitalisation says nothing
@@ -43,9 +46,12 @@ grounding it does not have:
   is structurally identical to any capitalised ordinary noun, and separating them needs a lexicon
   this module does not have;
 * an invented capability written in lower case — "the settlement batching path";
-* an invented capability on a fully capitalised line — "Review The Settlement Batching Runbook",
-  and likewise inside a run that capitalises a function word mid-sentence, which is title casing
-  quoted into prose and is exempt for the same reason.
+* an invention on a line where *every* word is capitalised — a bare title such as "Review The
+  Settlement Batching Runbook". A mitigation task also carries a prose description, so in a plan
+  that wording is caught there; a title standing alone is not;
+* a two-word qualifier attached to an attested name — "Refund Processing In Europe" where Refund
+  Processing is attested — because the exempted tail is exactly two words. Narrower than the
+  others, and the price of accepting title-cased output at all.
 
 Closing the second and third properly needs the capability taxonomy passed in, the way
 `validate_extraction` receives it, rather than a better guess about capitalisation. Until then the
@@ -179,12 +185,17 @@ def find_unattested_names(
             # full name was not written, so this is a different person built out of a real one.
             recombined = any(token in person_parts for token in tokens)
 
-            # A capitalised closed-class word inside the run is title casing showing through even
-            # on an otherwise lower-case line — "Execute Incident Recovery In Staging as agreed"
-            # capitalises "In" because it is quoting a title, and nobody writes "In" mid-sentence
-            # otherwise. Capitalisation says nothing about that run, so the same reasoning as the
-            # line-level test applies to it.
-            quoted_title = any(token in _FUNCTION_WORDS for token in tokens)
+            # A two-word run carrying a capitalised closed-class word is the tail of a title
+            # quoted into prose: "Execute Incident Recovery In Staging as agreed" leaves "In
+            # Staging" once the attested name is removed. Bounded to two words deliberately.
+            # Wider, it exempts "Sarah Kim And Priya Raman" and "The Settlement Batching owner",
+            # which are the inventions this check exists for — the rationale that nobody
+            # capitalises a function word mid-sentence holds for a stray "In" at the end of a
+            # stripped title, not for "And", "From" or "The" binding several capitalised words
+            # together. Every run surviving the strip in a real task title is two words long.
+            quoted_title = len(tokens) == 2 and any(
+                token in _FUNCTION_WORDS for token in tokens
+            )
 
             unattested = (
                 informative
