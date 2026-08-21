@@ -8,6 +8,7 @@ If this file fails, feature work stops until it passes (TEAM_WORKFLOW_PERSON_A_B
 
 from __future__ import annotations
 
+from app.ai.language_policy import find_forbidden_phrases, find_probability_language
 from tests.conftest import load_fixture
 
 PLATFORM = "platform_payments"
@@ -82,10 +83,15 @@ def test_simulation_is_repeatable_and_does_not_change_the_baseline(client) -> No
 
 
 def test_simulation_summary_never_predicts_an_outage(client) -> None:
-    summary = simulate(client).json()["summary"].lower()
+    """Checked against the shared `language_policy` source rather than a locally hardcoded list,
+    so this stays aligned with the runtime scan in test_responsible_ai.py. "outage will" is kept
+    as an explicit check on top: it is not itself a canonical marker, but this test previously
+    asserted against it and dropping it would weaken the assertion."""
+    summary = simulate(client).json()["summary"]
     assert summary
-    for forbidden in ("will fail", "outage will", "probability", "% chance", "chance of failure"):
-        assert forbidden not in summary
+    assert not find_probability_language(summary)
+    assert not find_forbidden_phrases(summary)
+    assert "outage will" not in summary.lower()
 
 
 def test_simulating_an_engineer_with_no_coverage_in_scope_says_so(client) -> None:
