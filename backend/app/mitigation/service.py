@@ -145,13 +145,24 @@ class MitigationPlanService:
             created_at=datetime.now(timezone.utc),
         )
         for index, task in enumerate(draft.tasks, start=1):
+            # `task.task_type` is a plain str from the provider, not yet validated against the
+            # enum. Coercing it here, before the plan is added to the session, is what keeps an
+            # invalid value from ever being committed — `_to_response` doing the coercion later
+            # was the bug: by then the row was already persisted and permanently unreadable.
+            try:
+                task_type = MitigationTaskType(task.task_type)
+            except ValueError as exc:
+                raise MitigationGenerationError(
+                    f"Plan generation produced an invalid task type '{task.task_type}'.",
+                    {"capability_id": capability.capability_id, "task_type": task.task_type},
+                ) from exc
             plan.tasks.append(
                 MitigationTask(
                     task_id=f"task_{index:03d}",
                     plan_id=plan_id,
                     title=task.title,
                     description=task.description,
-                    type=task.task_type,
+                    type=task_type.value,
                     sequence=index,
                     acceptance_criteria=task.acceptance_criteria,
                     linked_evidence_ids=task.linked_evidence_ids,

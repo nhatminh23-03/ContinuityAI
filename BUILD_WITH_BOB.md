@@ -910,3 +910,36 @@ above observed directly in the browser.
 **Open questions.** The four Person A sync items stand (GAP-01, fixture wiring, doc amendments,
 key rotation). Demo video, screenshots, and the README product narrative remain Person B's
 submission work.
+
+---
+
+## 2026-08-21 — Mitigation-plan generation: fix the post-commit enum bug
+
+**What was built/decided.** `MitigationPlanService.create` wrote `task.task_type` (an
+unvalidated `str` from the `AIProvider`) directly into the `MitigationTask` ORM row and
+committed; `MitigationTaskType` coercion happened only later, in `_to_response`, which every
+subsequent `get` also runs. `DeterministicProvider` never emits an out-of-enum value, so this
+was latent, but it becomes reachable once a language-model provider is generating task text.
+An invalid value used to persist successfully and then raise a bare `ValueError` on every read
+back (a 500 with no error envelope, since `app/core/errors.py` handles only `DomainError` and
+`RequestValidationError`), leaving the row permanently unreadable. Fixed by coercing
+`task.task_type` into `MitigationTaskType` inside the task-building loop, before
+`repository.add(plan)` is called, raising `MitigationGenerationError` (an existing
+`DomainError` subclass) on failure — matching the style of the task-count guard already in the
+same method. Nothing is added to the session before the raise, so a failing generation persists
+no row. The manager-edit path (`ApprovePlanRequest.tasks`) was left untouched; it is already
+validated at the request boundary by Pydantic.
+
+**Files changed.** `backend/app/mitigation/service.py` (the coercion, inside `create`).
+**Files created.** `backend/tests/test_mitigation_service.py`.
+
+**Implements.** Groundwork for the upcoming LLM-generated mitigation-plan text: task 1 of
+`.superpowers/sdd/superpowers-brainstorming-continuityai-merry-heron/task-1-brief.md`.
+
+**Validation.** Test-first: `test_an_invalid_provider_task_type_raises_cleanly_and_persists_nothing`
+was confirmed failing against the unfixed code (bare `ValueError` from `_to_response`, not
+`MitigationGenerationError`), then passing after the fix. Full backend suite:
+`cd backend && PYTHONPATH=. .venv/bin/python -m pytest` → 148 passed, including the existing
+golden-path mitigation create/approve/edit coverage (deterministic-provider output unchanged).
+
+**Open questions.** None for this task.
