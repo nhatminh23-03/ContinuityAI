@@ -683,24 +683,30 @@ gate exists to catch before the output is returned to a caller.
 
 **The gate's limits, so this is not one-sided.** `find_unattested_names`
 (`app/ai/language_policy.py`) is a documented heuristic, not closed-world grounding, and its module
-docstring together with `test_known_blind_spots_of_the_name_check`
-(`backend/tests/test_narrative_validation.py`) name what it cannot catch: a single-word invention
-("ask Priya to confirm" — one capitalised word is structurally identical to any capitalised ordinary
-noun), an invented capability written in lower case, and an invention on a line where every word is
-capitalised, where capitalisation carries no signal to check names against. Closing the second and
-third needs the capability taxonomy passed into the validator, the way `validate_extraction` already
-receives it — not built here. Until then, grounding is carried by the three prompt files under
-`app/ai/prompts/`, which state explicitly which names, capabilities, and evidence ids may appear;
-the gate is the net under that instruction, not a substitute for it. A manager reading a narrative
-generated under `openrouter` is protected by validated output with documented gaps, not by output
-that has been proven safe.
+docstring together with the test suite in `backend/tests/test_narrative_validation.py` — no single
+test covers all four, `test_known_blind_spots_of_the_name_check` alone parametrizes only two — name
+what it cannot catch: a single-word invention ("ask Priya to confirm" — one capitalised word is
+structurally identical to any capitalised ordinary noun), an invented capability written in lower
+case, an invention on a line where every word is capitalised, where capitalisation carries no
+signal to check names against, and a two-word qualifier attached to an attested name ("Refund
+Processing In Europe" where "Refund Processing" is attested), because the title-tail exemption is
+bounded to exactly two words. Closing the second and third needs the capability taxonomy passed
+into the validator, the way `validate_extraction` already receives it — not built here. Until then,
+grounding is carried by the three prompt files under `app/ai/prompts/`, which state explicitly
+which names, capabilities, and evidence ids may appear; the gate is the net under that instruction,
+not a substitute for it. A manager reading a narrative generated under `openrouter` is protected by
+validated output with documented gaps, not by output that has been proven safe.
 
 **Nothing about the deterministic path changes.** `AI_PROVIDER` still defaults to `deterministic`,
-`watsonx.py`'s reasoning and its code are both untouched, and extraction — the half of the pipeline
-that decides readiness, exposure, and continuity risk — is unaffected by this provider or any other:
-`OpenRouterProvider.extract_artifact_semantics` delegates straight to `DeterministicProvider`, so
-the seeded baseline (Payment Gateway 74 / HIGH, Incident Recovery 72 / HIGH, the simulation
-74 → 93, Identity Systems 68, Maria HIGH / Jordan MEDIUM) is byte-identical under every provider.
+`watsonx.py`'s reasoning and its code are both untouched, and extraction under `openrouter` is
+identical to extraction under `deterministic` — the two providers this decision actually compares —
+because `OpenRouterProvider.extract_artifact_semantics` delegates straight to
+`DeterministicProvider`. This is narrower than "every provider": `watsonx` and `cached` do change
+extraction (the README's own comparison table records 17 role disagreements against the rule-based
+result over 313 artifacts), which is exactly why `watsonx.py` treats extraction as high-stakes and
+narratives as safe to leave deterministic. Under `openrouter`, as under `deterministic`, the seeded
+baseline (Payment Gateway 74 / HIGH, Incident Recovery 72 / HIGH, the simulation 74 → 93, Identity
+Systems 68, Maria HIGH / Jordan MEDIUM) is byte-identical.
 
 **Recorded here, rather than assumed settled, because it reopens Person A's own reasoning about a
 package Person A owns.** `openrouter` is implemented, credential-gated, and off by default; it

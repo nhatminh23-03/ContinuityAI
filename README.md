@@ -112,19 +112,22 @@ provider that returns "STRONG" for a code review is corrected, not believed.
 | `cached` | Replays committed watsonx output from `data/extraction/`, so a model-derived graph seeds offline |
 | `openrouter` | The mirror image of `watsonx`: extraction stays rule-based, and a model writes the three manager-facing narratives instead — see below |
 
-Every non-default provider passes its output through a validation gate before anything reaches the
-database or the wire. `watsonx` and `cached` go through the extraction gate described above — the
-same four rejection classes, applied identically regardless of which provider produced the claim.
-`openrouter` goes through a second, narrative-specific gate for the three prose fields it generates.
-Swapping providers changes extraction quality or narrative wording and changes no conclusion path —
-readiness, exposure, continuity risk, and simulation are computed the same way under every provider,
-which is the property the interface exists to guarantee.
+`app/ingestion/pipeline.py` runs every extraction claim, from every provider including the default,
+through `validate_extraction` unconditionally — that gate is not something only the model-backed
+providers opt into. What is provider-specific is `openrouter`'s second gate, for the three prose
+fields it alone generates: no other provider writes free text that needs that check. Swapping
+providers changes extraction quality (`watsonx`, `cached`) or narrative wording (`openrouter`) and
+changes no conclusion path either way — readiness, exposure, continuity risk, and simulation are
+computed the same way under every provider, which is the property the interface exists to guarantee.
 
 ### What runs, precisely
 
 For anyone deciding whether to trust a given response: **extraction is rule-based** under every
-provider except `watsonx` — capability names and aliases are matched in the artifact text, scoped to
-its system, and the source system's participant role is mapped onto an evidence role. **The three
+provider except `watsonx` and `cached` — `cached` replays committed `watsonx` output
+(`app/ai/cache.py`: "The graph is model-derived"), so it inherits `watsonx`'s extraction rather than
+running the rule-based matcher. Under `deterministic` and `openrouter`, capability names and aliases
+are matched in the artifact text, scoped to its system, and the source system's participant role is
+mapped onto an evidence role. **The three
 narratives** — the simulation summary, a candidate's strengths and gaps, and a mitigation plan's task
 titles, descriptions, and acceptance criteria — are template-written by default and, under
 `AI_PROVIDER=openrouter`, model-written and validated before use. **Readiness, exposure, continuity
@@ -149,35 +152,61 @@ over facts the rules already decided, which changes no conclusion and is the par
 reads out in a room.
 
 **Every generation passes `app/ai/validation.py` before it can be returned**, the same discipline the
-extraction gate applies to claims. Four checks: no prohibited phrase, no likelihood or percentage
-language (a simulation reports coverage loss, not an outage forecast), no wording that states a
-person's inability rather than an absence of evidence, and no name — person or capability — outside
-what the generator was actually given. Anything rejected, and any transport failure, timeout, or
-malformed reply, falls back to the deterministic template; rejections log at WARN so a gate that is
-silently rejecting everything remains visible rather than looking identical to one that works.
+extraction gate applies to claims, but the checks are not identical across the three narratives —
+each has its own validator function, and which rule applies depends on what the text is claiming.
+No prohibited phrase and no name — person or capability — outside what the generator was actually
+given apply everywhere, in all three. Beyond that they diverge: only the simulation summary is
+checked for likelihood or percentage language (a simulation reports coverage loss, not an outage
+forecast) and only it carries a length cap; only a candidate's **gaps** are checked for wording that
+states inability rather than absence of evidence, and only its **strengths** are checked for
+overstating a capability the record holds as assisted-only or missing as independently demonstrated
+— arguably the gate's strongest responsible-AI property, because it is the one check built to catch
+exactly the overstatement this product exists to prevent, and it fires on a fact-buckets comparison
+the other checks cannot see. The mitigation plan carries a different set entirely, all structural:
+3-5 actions in total, a narrower count band keyed to the candidate's readiness, every task type a
+valid enum member, at least one acceptance criterion per task, the opening task citing evidence, and
+a recovery drill present or absent to match the readiness band. Anything any check rejects, and any
+transport failure, timeout, or malformed reply, falls back to the deterministic template; rejections
+log at WARN so a gate that is silently rejecting everything remains visible rather than looking
+identical to one that works.
 
 **Grounding is prompt-enforced, not gate-enforced, and that is worth stating without hedging.** The
 gate's name check (`find_unattested_names` in `app/ai/language_policy.py`) is a documented heuristic
-with real blind spots: a single-word invention such as "ask Priya to confirm" passes it, because one
-capitalised word is structurally identical to any capitalised ordinary noun; an invented capability
-written in lower case passes it; and a bare, fully capitalised line passes only the narrower
-recombination check, because on a title-cased line capitalisation carries no signal at all. These are
-not oversights — `test_known_blind_spots_of_the_name_check` pins them so nobody mistakes the gate for
-closed-world grounding it does not have. What actually keeps a narrative grounded is the prompt: each
-of the three prompt files under `app/ai/prompts/` states explicitly which names, capabilities, and
-evidence ids may appear, and the gate is the net under that instruction, not a replacement for it.
+with four real blind spots: a single-word invention such as "ask Priya to confirm" passes it, because
+one capitalised word is structurally identical to any capitalised ordinary noun; an invented
+capability written in lower case passes it; a bare, fully capitalised line passes only the narrower
+recombination check, because on a title-cased line capitalisation carries no signal at all; and a
+two-word qualifier attached to an attested name — "Refund Processing In Europe" where "Refund
+Processing" is attested — passes, because the title-tail exemption is bounded to exactly two words.
+These are not oversights — the module's own docstring states all four plainly, together with the
+test suite that pins each one so nobody mistakes the gate for closed-world grounding it does not
+have. What actually keeps a narrative grounded is the prompt: each of the three prompt files under
+`app/ai/prompts/` states explicitly which names, capabilities, and evidence ids may appear, and the
+gate is the net under that instruction, not a replacement for it.
 
-**Timing is sized against AC-14's 12-second budget for an AI plan or explanation operation.**
-`explain_candidate` is called once per *returned* candidate rather than once per eligible engineer —
-narration runs after the response is sliced to `limit`, which the contract caps at 3 — so three
-sequential calls at the 3.5-second default timeout come to 10.5 seconds, inside the budget. A plan is
-one call per request and gets twice the per-call ceiling.
+**Timing is sized against AC-14's 12-second budget for an AI plan or explanation operation — for two
+of the three narratives.** `explain_candidate` is called once per *returned* candidate rather than
+once per eligible engineer — narration runs after the response is sliced to `limit`, which the
+contract caps at 3 — so three sequential calls at the 3.5-second default timeout come to 10.5
+seconds, inside the budget. A plan is one call per request and gets twice the per-call ceiling. The
+third narrative does not fit that budget at all: `summarize_simulation` runs inside
+`POST /simulations` (`app/simulation/service.py`), and AC-14's figure for that endpoint is not the
+12-second "AI plan/explanation" one but the 2-second "deterministic simulation" one (`PRD.md`,
+AC-14) — a target set before this narrative call existed. A single call at the 3.5-second default
+timeout can, on its own, take longer than the endpoint's entire stated budget; nothing in this build
+reconciles the two, and a live measurement against `POST /simulations` specifically (not only the
+two 12-second operations) is worth doing before treating `openrouter` as demo-ready.
 
 **Nothing above changes a number.** `OpenRouterProvider.extract_artifact_semantics` delegates
 straight to `DeterministicProvider`, so the seeded baseline is untouched under this provider exactly
 as it is under `deterministic`: Payment Gateway 74 / HIGH, Incident Recovery 72 / HIGH, the
-simulation 74 → 93, Identity Systems 68, Maria HIGH overlap, Jordan MEDIUM. Only the wording of up to
-three narrative fields per response can move, and only after it has passed the gate above.
+simulation 74 → 93, Identity Systems 68, Maria HIGH overlap, Jordan MEDIUM. What can move is
+narrower than the DTO shape but wider than wording alone: the simulation summary and a candidate's
+strengths and gaps are wording-level changes over fixed facts, but the mitigation plan can also
+legitimately vary in task count (within the readiness-appropriate band `_task_count_band` computes),
+per-task type (any valid `MitigationTaskType`, not the deterministic template's specific sequence),
+and linked evidence (a filtered subset of what was offered, not a fixed list) — all still bounded by
+the gate above, none of it a sign the gate is failing.
 
 **The rule-based provider is the default, and its ceiling is worth stating plainly.** It finds what
 the text *names*: it resolves capabilities by matching capability names and aliases, scoped to the
@@ -450,7 +479,7 @@ Neither regeneration command is needed for normal work: both corpora are committ
 ### Checks
 
 ```bash
-cd backend && .venv/bin/python -m pytest -q                 # 131 tests, ~3 seconds
+cd backend && .venv/bin/python -m pytest -q                 # 262 tests, ~2 seconds
 cd ../frontend && npm run typecheck && npm run build
 ```
 

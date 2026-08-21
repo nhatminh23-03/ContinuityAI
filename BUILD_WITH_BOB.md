@@ -1232,6 +1232,45 @@ live API call.
 and the per-call ceiling is still arithmetic rather than measurement. The 12-second budget now has
 a real bound behind it, which is what makes measuring it meaningful.
 
+### 2026-08-21 — Make the responsible-AI phrase check real at runtime
+
+Backfilled entry — written after the fact, from `git show dfb8dae`, because this commit landed
+without one at the time. The commit is two test files only, fully inspectable, so writing the
+entry retroactively carries no real risk of misattributing a decision; noted here rather than
+silently left missing, which is what the previous version of this log did.
+
+`test_no_prohibited_phrase_appears_in_generated_text` (`backend/tests/test_responsible_ai.py`)
+AST-scans `.py` string literals under `app/` for `FORBIDDEN_PHRASES`, which is exactly why it
+could not have caught anything a configured model provider writes at request time: prose a model
+returns exists nowhere as a source-code literal. With `OpenRouterProvider` landed two commits
+earlier, that blind spot stopped being theoretical.
+
+Two changes close it. First, `FORBIDDEN_PHRASES` in `test_responsible_ai.py` — previously eight
+strings duplicated by hand — is now imported from `app.ai.language_policy`, the module the
+narrative gate itself reads from, so the static scan and the gate can no longer drift onto two
+different lists; `test_golden_path.py`'s separate `test_simulation_summary_never_predicts_an_outage`
+had its own local outage-language tuple and was moved onto `find_probability_language` and
+`find_forbidden_phrases` from the same module for the same reason, keeping `"outage will"` as an
+explicit extra check since it is not itself a canonical marker but the test previously asserted
+against it. Second, and the actual fix: a new
+`test_no_prohibited_phrase_appears_in_narrative_endpoint_responses` POSTs the three endpoints that
+return model-generated prose — `/simulations`, `/recommendations/backup-candidates`,
+`/mitigation-plans` — and scans every narrative field in the live response (`summary`; each
+candidate's `strengths` and `gaps`; each task's `title`, `description`, and
+`acceptance_criteria`) against `find_forbidden_phrases`. Tests run under the default
+`deterministic` provider, so today this asserts the template output is clean — that is the point:
+the same assertions cover whatever a configured model provider writes without the test needing to
+change when one is.
+
+**Files changed.** `backend/tests/test_responsible_ai.py`, `backend/tests/test_golden_path.py`.
+
+**Validation.** `cd backend && PYTHONPATH=. .venv/bin/python -m pytest -q` → 262 passed at the time
+of this backfill (re-run for this entry; the commit's own contemporaneous count was not recorded).
+
+**Open questions.** None beyond what the OpenRouter provider entries already carry. This entry
+exists to close the log gap identified in review of the following documentation task, not because
+new work was done here.
+
 ### 2026-08-21 — Documentation for the OpenRouter narrative provider: fixture policy, README, decision log, environment template
 
 Four pieces, no application code. `fixtures/README.md` gets a fixture-capture policy section:
@@ -1283,3 +1322,73 @@ as more than implemented-and-available; tracked as OPEN-10. Two pre-existing ite
 alone as out of scope for this pass: the commit that made the responsible-AI phrase check run at
 runtime has no `BUILD_WITH_BOB.md` entry of its own, and the Checks section of `README.md` still
 reads "131 tests" against a suite that is now 262.
+
+### 2026-08-21 — Review fixes on the OpenRouter documentation: seven accuracy corrections
+
+A review of the previous entry's four documentation files found five factual errors, both declined
+cleanup items reconsidered and required, and four cheap accuracy minors — all fixed, no application
+code touched.
+
+**`cached` was miscategorised as rule-based extraction.** `README.md` said extraction is rule-based
+"under every provider except `watsonx`," which is false for `cached`: `app/ai/cache.py`'s own
+docstring states "the graph is model-derived," and it replays committed `watsonx` output rather
+than running the rule-based matcher. Fixed to "except `watsonx` and `cached`," with the reasoning
+spelled out rather than just the exception list.
+
+**DEC-15 claimed a stronger invariant than the code delivers.** "Unaffected by this provider or
+any other" and "byte-identical under every provider" is true of `openrouter` against
+`deterministic` — the comparison DEC-15 is actually making — but not of `watsonx` or `cached`,
+which do change extraction; the README's own comparison table records 17 role disagreements over
+313 artifacts. Narrowed to the claim the evidence supports.
+
+**"Only the wording... can move" understated the mitigation plan's legitimate variance**, in
+sections written specifically so a maintainer would not chase the difference as a bug. A plan can
+also vary in task count (within the readiness-band `_task_count_band` permits — Maria is
+`ASSISTED`, which allows 3 or 4, and the fixture has 4, so a 3-task generation re-indexes every
+task diff below it), task type (a model choice, only enum-checked), and linked evidence (a filtered
+subset, not a fixed list). `README.md` and `fixtures/README.md` both now say so.
+
+**The "four checks" description of the validation gate was wrong in both directions.**
+`find_probability_language` runs only inside `validate_simulation_summary`; `find_inability_language`
+runs only over a candidate narrative's gaps — so, as written, the description implied a plan
+claiming "80% chance" would be caught by a rule that never runs over plan text. It also omitted the
+independence-overstatement check (`validation.py:334-343`, arguably the gate's strongest
+responsible-AI property, since it is the one built to catch exactly the assisted-read-as-independent
+failure this product exists to avoid) and every plan-specific structural check (task count, the
+readiness-keyed band, task-type validity, per-task acceptance criteria, the opening citation, the
+drill rule). Rewritten to describe which check runs over which narrative, rather than one list of
+four applied uniformly.
+
+**The timing section never mentioned `summarize_simulation`'s actual endpoint budget.**
+`POST /simulations` is where the simulation narrative call happens, and AC-14's figure for that
+endpoint is the 2-second "deterministic simulation" target, not the 12-second "AI plan/explanation"
+one the section discussed — a 3.5-second default timeout can alone exceed it. Added, along with a
+matching caveat to `fixtures/README.md`'s live-pass invitation: `verify_golden_path.py` applies an
+800ms budget to every endpoint whose label does not contain `"simulations"`, so a live `openrouter`
+run will print `AC-14 breaches` for `POST /mitigation-plans` and
+`POST /recommendations/backup-candidates` by design, not as a regression.
+
+**Two declined cleanup items were reconsidered and fixed.** `README.md`'s Checks block read "131
+tests, ~3 seconds" against a suite now measuring 262 passed, ~2 seconds — corrected, since leaving
+a known-false number in a file being edited specifically for accuracy does not fit "smallest
+change." And the missing `BUILD_WITH_BOB.md` entry for `dfb8dae` (the runtime responsible-AI scan)
+is backfilled above — the commit is two test files, fully inspectable, so the misattribution risk
+originally cited did not hold up.
+
+**Four minors.** `README.md` no longer credits one narrow test with covering blind spots the
+module docstring documents more broadly (only two of the docstring's four are in that test's own
+parametrize list) — both `README.md` and DEC-15 now cite "the module docstring together with the
+test suite" and list all four blind spots, including the two-word-qualifier-on-an-attested-name
+case that was previously dropped from both. `README.md`'s claim that "every non-default provider"
+passes validation is corrected: `app/ingestion/pipeline.py` calls `validate_extraction`
+unconditionally, for every provider including the default. `fixtures/README.md`'s "never with
+`watsonx` or `openrouter` set" now also names `cached`.
+
+**Files changed.** `README.md`, `docs/DECISIONS.md`, `fixtures/README.md`, `BUILD_WITH_BOB.md`
+(the backfilled entry above and this one). No file under `backend/app/` or `frontend/` touched.
+
+**Validation.** `cd backend && PYTHONPATH=. .venv/bin/python -m pytest -q` → 262 passed. No seed or
+fixture-refresh script run; no network call made; `backend/.env` never read.
+
+**Open questions.** None outstanding from this review round. DEC-15 (OPEN-10) still needs Person
+A's acknowledgement; that has not changed.

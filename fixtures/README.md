@@ -57,7 +57,8 @@ mitigation-plan.json
 
 Fixtures are the rule-based baseline, on purpose and permanently. Whoever runs
 `scripts/refresh_fixtures.py` runs it with `AI_PROVIDER` unset (or explicitly `deterministic`,
-which is the default in `backend/.env.example`) — never with `watsonx` or `openrouter` set.
+which is the default in `backend/.env.example`) — never with `watsonx`, `cached`, or `openrouter`
+set.
 
 **Why.** `AI_PROVIDER=openrouter` (`backend/app/ai/openrouter.py`) writes model-generated prose for
 three narrative fields — the simulation summary, a candidate's strengths and gaps, and the
@@ -88,18 +89,40 @@ the fixtures or the script:
 - `verify_golden_path.py` exits 0 whether or not differences are found — that is its documented
   design ("Exit code is 0 even when differences exist: some are expected and deliberate"), and
   differences are printed for a human to triage, not treated as failures.
-- Every difference under `openrouter` will be confined to the same handful of narrative fields, and
-  every other field — risk index, readiness, exposure, evidence, graph — will still read identical
-  to the fixture, because extraction and every deterministic rule downstream of it are unaffected by
-  the provider switch.
+- Every difference under `openrouter` will be confined to the three narrative-bearing responses —
+  `alex-simulation.json`, `backup-candidates.json`, `mitigation-plan.json` — and every other field,
+  in every other fixture, will still read identical, because extraction and every deterministic rule
+  downstream of it are unaffected by the provider switch.
 - A model-written narrative that differs from the frozen template text is not a contract violation;
   it is validated prose (`backend/app/ai/validation.py`) that says the same thing a different way, or
-  it has already fallen back to the deterministic template because validation rejected it. Either
-  way the shape is unchanged — only the wording of up to three fields per response can move.
+  it has already fallen back to the deterministic template because validation rejected it. The field
+  *shapes* never change. But **do not expect the variance to be wording-only** — read literally, that
+  claim would itself send a maintainer chasing the wrong thing. The mitigation plan in particular can
+  legitimately vary in ways that reorder or resize the JSON, not just reword it: the **task count**
+  moves inside the readiness-appropriate band (`_task_count_band` in `app/ai/validation.py` — Maria
+  is `ASSISTED`, which permits 3 or 4 tasks, and the committed fixture happens to have 4, so a
+  3-task plan under `openrouter` re-indexes every `task_NNN` id and every array-position diff below
+  it); each task's **`type`** is a model choice, checked only for enum validity
+  (`validation.py:410-417`) and not pinned to the deterministic template's specific sequence, so a
+  diff like `type: 'KNOWLEDGE_REVIEW' -> 'SHADOWING'` is exactly what the gate allows through; and
+  **`linked_evidence_ids`** is a filtered subset of the evidence actually offered, not a fixed list,
+  so its contents can differ per task while every id that survives is still a real, resolvable
+  citation. None of this is a validation failure or a fixture bug — it is the gate doing its job on
+  a plan that is legitimately different prose over the same facts.
+- The same run's **latency** will not resemble the deterministic baseline either, and
+  `verify_golden_path.py` will very likely print `AC-14 breaches` for it — expectedly, not as a
+  regression. Its per-endpoint budget is 800 ms for everything except a label containing
+  `"simulations"`, which gets 2000 ms; it has no separate budget for `POST /mitigation-plans` or
+  `POST /recommendations/backup-candidates`, so a live model call on either — the very thing being
+  exercised — reads as a breach of an 800 ms budget the deterministic template only ever met because
+  it does no I/O. See `README.md` for the actual budget these two operations are sized against
+  (AC-14's 12-second "AI plan/explanation operations" figure, which `verify_golden_path.py` does not
+  encode) and for the one endpoint, `POST /simulations`, where the two budgets are not obviously
+  compatible even on paper.
 
-A future reader seeing those diffs under `openrouter` should not treat them as a fixture that needs
-regenerating, and should not treat them as a bug in `refresh_fixtures.py` or `verify_golden_path.py`.
-They are the expected effect of pointing `verify_golden_path` at a provider that writes prose
-instead of one that recites a template — and `verify_golden_path` is deliberately still runnable
-that way, so a live pass under `openrouter` remains useful for confirming grounding and latency
-(see `README.md`), even though `refresh_fixtures.py --check` is never run under it.
+A future reader seeing those diffs, or those breach lines, under `openrouter` should not treat them
+as a fixture that needs regenerating, and should not treat them as a bug in `refresh_fixtures.py` or
+`verify_golden_path.py`. They are the expected effect of pointing `verify_golden_path` at a provider
+that writes prose instead of one that recites a template — and `verify_golden_path` is deliberately
+still runnable that way, so a live pass under `openrouter` remains useful for confirming grounding
+and for measuring real latency, even though `refresh_fixtures.py --check` is never run under it.
