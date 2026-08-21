@@ -18,10 +18,14 @@ Failure policy differs by method, deliberately:
   strengths, and plan text are prose over facts the rules already decided, so a timeout should
   degrade the wording rather than break the demo (ARCHITECTURE.md section 85).
 
+Of the three narratives only `summarize_simulation` spends a model call; `explain_candidate` and
+`generate_mitigation_plan` return the deterministic text and say in their own bodies why.
+
 Every response is validated by `app/ai/validation.py` before anything reaches the database — the same
 gate the deterministic provider passes through. An invented capability, a claim against someone who
 is not a recorded participant, or a cross-system attribution is rejected regardless of which provider
-produced it.
+produced it, and the one model-written sentence goes through `validate_simulation_summary` before it
+is returned or persisted.
 """
 
 from __future__ import annotations
@@ -47,6 +51,7 @@ from app.ai.schemas import (
     PlanDraft,
     SimulationSummaryContext,
 )
+from app.ai.validation import validate_simulation_summary
 from app.core.config import settings
 from app.core.errors import AIExtractionError
 from app.evidence.strength import strength_for_role
@@ -350,11 +355,17 @@ class WatsonxProvider:
             f"Risk class moves from {context.risk_class_before} to {context.risk_class_after}."
         )
         try:
-            sentence = self._chat(system, user, NARRATIVE_MAX_TOKENS).strip().strip('"')
-            return sentence or self._fallback.summarize_simulation(context)
+            sentence = self._chat(system, user, NARRATIVE_MAX_TOKENS).strip().strip('"').strip()
+            # The same gate `OpenRouterProvider.summarize_simulation` applies, for the same
+            # reason: this value is returned by `POST /simulations` *and* persisted into
+            # `result_json`, so an ungated sentence would outlive the request that produced it.
+            # An empty reply is a rejection here rather than a separate branch — the gate already
+            # treats it as one.
+            if validate_simulation_summary(sentence, context).accepted:
+                return sentence
         except AIExtractionError:
             logger.warning("watsonx summary failed; using the deterministic template")
-            return self._fallback.summarize_simulation(context)
+        return self._fallback.summarize_simulation(context)
 
     def explain_candidate(self, context: CandidateNarrativeContext) -> CandidateNarrative:
         # The structured content — which capabilities are demonstrated, assisted, or missing — is

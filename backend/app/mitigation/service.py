@@ -25,6 +25,7 @@ from sqlalchemy.orm import Session
 
 from app.ai.provider import AIProvider, get_provider
 from app.ai.schemas import PlanContext
+from app.ai.validation import MAX_PLAN_TASKS, MIN_PLAN_TASKS
 from app.core.errors import MitigationGenerationError, NotFoundError, ValidationError
 from app.evidence.strength import is_adequate
 from app.models import MitigationPlan, MitigationTask
@@ -55,8 +56,15 @@ from app.schemas.mitigation import MitigationTask as MitigationTaskDTO
 
 # AC-10 requires 3 to 5 actions. A generator that returns 2 or 9 has misunderstood the job, and
 # silently trimming would hide that.
-MIN_TASKS = 3
-MAX_TASKS = 5
+#
+# Taken from the narrative gate rather than restated as literals. The gate needs the same two
+# numbers to reject a model-written plan (`app/ai/validation.py`), and as two independent
+# literals the pair could be changed on one side only — after which the gate would reject every
+# plan forever, silently, because a rejection falls back to the template and looks like success.
+# `app/ai` must not import from `app/mitigation`, and this module already depends on `app.ai`, so
+# the shared definition lives there and the dependency runs this way round.
+MIN_TASKS = MIN_PLAN_TASKS
+MAX_TASKS = MAX_PLAN_TASKS
 MAX_REFERENCE_EVIDENCE = 2
 
 

@@ -144,8 +144,11 @@ in `backend/.env`.
 
 `OpenRouterProvider` (`backend/app/ai/openrouter.py`) exists for the opposite reason `watsonx` does.
 `watsonx` spends a model call on extraction, where a wrong answer changes the knowledge graph and
-every downstream number while still looking plausible — so its narratives stay deterministic on
-purpose (`watsonx.py:360-372` explains why in each method). `openrouter` spends its model calls the
+every downstream number while still looking plausible — so two of its three narratives stay
+deterministic on purpose (`explain_candidate` and `generate_mitigation_plan` in `watsonx.py` each
+say why in their own body). The third, `summarize_simulation`, is model-written there as well, and
+passes the same `validate_simulation_summary` gate before it is returned or written to
+`result_json`. `openrouter` spends its model calls the
 other way: extraction delegates to `DeterministicProvider` in one line, and the model writes only the
 simulation sentence, a candidate's strengths and gaps, and the mitigation plan's task text — prose
 over facts the rules already decided, which changes no conclusion and is the part a manager actually
@@ -162,7 +165,11 @@ states inability rather than absence of evidence, and only its **strengths** are
 overstating a capability the record holds as assisted-only or missing as independently demonstrated
 — arguably the gate's strongest responsible-AI property, because it is the one check built to catch
 exactly the overstatement this product exists to prevent, and it fires on a fact-buckets comparison
-the other checks cannot see. The mitigation plan carries a different set entirely, all structural:
+the other checks cannot see. That check is lexical, though, and the limit belongs next to the claim:
+it pairs the independence wording with an unproven capability only when the strength contains that
+capability's **name**, so "has independently handled that recovery work, unaided" carries the same
+overstatement past it. See the fifth blind spot below. The mitigation plan carries a different set
+entirely, all structural:
 3-5 actions in total, a narrower count band keyed to the candidate's readiness, every task type a
 valid enum member, at least one acceptance criterion per task, the opening task citing evidence, and
 a recovery drill present or absent to match the readiness band. Anything any check rejects, and any
@@ -178,8 +185,14 @@ capability written in lower case passes it; a bare, fully capitalised line passe
 recombination check, because on a title-cased line capitalisation carries no signal at all; and a
 two-word qualifier attached to an attested name — "Refund Processing In Europe" where "Refund
 Processing" is attested — passes, because the title-tail exemption is bounded to exactly two words.
-These are not oversights — the module's own docstring states all four plainly, together with the
-test suite that pins each one so nobody mistakes the gate for closed-world grounding it does not
+A fifth belongs to a different check: the independence rule above is lexical, so an oblique
+reference to an assisted-only capability — "has independently handled that recovery work, unaided",
+where the capability is never named — passes, and closing it needs a lexicon the module does not
+have. These are not oversights — the docstrings of `find_unattested_names` and
+`validate_candidate_narrative` state all five plainly, and `backend/tests/test_narrative_validation.py`
+pins them, though no single test covers them all: `test_known_blind_spots_of_the_name_check`
+parametrizes two of the name check's four, and `test_known_blind_spot_of_the_independence_check`
+covers the fifth. Nobody should mistake the gate for closed-world grounding it does not
 have. What actually keeps a narrative grounded is the prompt: each of the three prompt files under
 `app/ai/prompts/` states explicitly which names, capabilities, and evidence ids may appear, and the
 gate is the net under that instruction, not a replacement for it.

@@ -35,7 +35,7 @@ if str(REPO_ROOT / "backend") not in sys.path:
 
 from sqlalchemy.orm import Session  # noqa: E402
 
-from app.ai.provider import get_provider  # noqa: E402
+from app.ai.provider import extraction_provenance, get_provider  # noqa: E402
 from app.ai.schemas import TaxonomyCapability  # noqa: E402
 from app.core.config import settings  # noqa: E402
 from app.db.session import create_all, drop_all, session_scope  # noqa: E402
@@ -236,7 +236,11 @@ def seed(verbose: bool = True) -> SeedReport:
 
     if verbose:
         print(report.render())
-        print(f"  provider         {provider.name}")
+        # What produced the graph, not what AI_PROVIDER is set to. Under `openrouter` those are
+        # different things — that provider extracts rule-based and spends its model calls on the
+        # narratives — and this line is the record of where the evidence in the database came
+        # from. Extraction provenance is the one thing here that must not be quietly wrong.
+        print(f"  extraction       {extraction_provenance(provider)}")
         print(f"  database         {settings.database_url}")
     return report
 

@@ -229,6 +229,34 @@ def test_a_strength_overstating_assisted_or_missing_work_is_rejected(strength) -
     assert any("assisted or absent" in r for r in outcome.rejections), outcome.rejections
 
 
+@pytest.mark.parametrize(
+    "strength",
+    [
+        "Maria Gomez has independently handled that recovery work end to end, unaided.",
+        "Maria Gomez has run the same kind of work solo before.",
+    ],
+)
+def test_known_blind_spot_of_the_independence_check(strength) -> None:
+    """The fifth documented blind spot, and the one that does not belong to the name check.
+
+    The rule above pairs an independence marker with an unproven capability *name*, so it fires
+    only where the strength lexically contains that name. Referring to the same capability
+    obliquely — "that recovery work", "the same kind of work" — carries the identical
+    overstatement past it, because deciding that a pronoun phrase means Incident Recovery needs a
+    lexicon this module does not have, exactly as with the lower-case invention the name check
+    cannot see.
+
+    Documented here rather than patched: HARD RULE 2 of `prompts/candidate_narrative_system.txt`
+    is what keeps assisted work from being written up as demonstrated, and this gate is the net
+    under that instruction, not a replacement for it.
+    """
+    outcome = validate_candidate_narrative(
+        CandidateNarrative(strengths=[strength], gaps=list(GOOD_NARRATIVE.gaps)),
+        candidate_context(),
+    )
+    assert outcome.accepted, outcome.rejections
+
+
 def test_the_same_wording_is_accepted_for_a_capability_the_record_demonstrates() -> None:
     """The pair that proves the rule reads the bucket rather than the word."""
     outcome = validate_candidate_narrative(

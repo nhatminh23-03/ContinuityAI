@@ -1392,3 +1392,96 @@ fixture-refresh script run; no network call made; `backend/.env` never read.
 
 **Open questions.** None outstanding from this review round. DEC-15 (OPEN-10) still needs Person
 A's acknowledgement; that has not changed.
+
+### 2026-08-21 — Whole-branch review fixes: the narrative gate becomes system-wide
+
+Six items from the final whole-branch review of the OpenRouter narrative work, applied in one pass.
+The verdict was merge with no critical findings; these are the items worth closing before it lands.
+
+**The gate now covers every model-written narrative, not only this branch's.** `watsonx.py`'s
+`summarize_simulation` is the one narrative that provider has a model write, and it returned the
+sentence verbatim: `strip()`, `strip('"')`, return. That value is the response body of
+`POST /simulations` and is also written into `result_json` (`app/simulation/service.py`), so an
+ungated sentence outlived the request that produced it. The file is untouched by this branch and the
+hole predates it, but the branch built the gate that closes it and the README now claims the gate
+protects narrative output — so the claim had to become true rather than be softened.
+`validate_simulation_summary` is applied exactly as `openrouter.py` applies it, with the
+deterministic template on rejection. An empty reply is now a rejection by the gate rather than a
+separate branch, since the gate already treats it as one.
+
+**Two documentation claims about watsonx were inaccurate and are corrected.** `README.md` said its
+"narratives stay deterministic on purpose" and cited a line range that excluded the model-written
+one; it now says two of the three are deterministic, names those two methods instead of citing line
+numbers that shift, and states that the third is model-written *and* gated. `docs/DECISIONS.md`
+(DEC-15) said the fallback is "the exact deterministic text `watsonx.py` always returns", which was
+never true of the simulation summary; it now points at the template in `app/ai/deterministic.py`
+and distinguishes the two narratives watsonx returns deterministically from the one it falls back
+to.
+
+**A fifth blind spot is disclosed rather than patched.** The independence check in
+`validate_candidate_narrative` — the check both `README.md` and DEC-15 call arguably the gate's
+strongest responsible-AI property — pairs independence wording with an unproven capability only
+where the strength *lexically contains that capability's name*. Verified with Incident Recovery
+assisted-only: "has independently demonstrated Incident Recovery" is rejected, and "has
+independently handled that recovery work end to end, unaided" is accepted. That second sentence is
+the assisted-presented-as-demonstrated failure the product exists to prevent. Resolving an oblique
+reference to a capability needs a lexicon the module does not have, and HARD RULE 2 of
+`prompts/candidate_narrative_system.txt` already addresses it, so the fix is honesty rather than
+heuristics: one paragraph in the `validate_candidate_narrative` docstring, a sentence next to the
+claim in `README.md` and a fifth entry in its blind-spot list, a paragraph in DEC-15's "the gate's
+limits" section, and `test_known_blind_spot_of_the_independence_check` pinning both wordings so it
+is discoverable next to the four name-check ones rather than buried.
+
+**The demo output no longer states the wrong extraction provenance.** `scripts/seed_demo.py`
+printed `provider openrouter` while the graph had been built by string matching — the exact
+misdescription `CacheBuildRefusedError` refuses to write to disk, printed instead. `provider.py`
+gains `extraction_provenance()`, `OpenRouterProvider` gains an `extraction_provider_name` class
+attribute naming the deterministic provider, and the script prints `extraction <name>`. The
+attribute is optional: a provider that does its own extraction needs none, because its `name` is
+already the honest answer.
+
+**AC-10's 3-5 band has one definition again.** `MIN_TASKS`/`MAX_TASKS` in
+`app/mitigation/service.py` and `MIN_PLAN_TASKS`/`MAX_PLAN_TASKS` in `app/ai/validation.py` were
+independent literals, and changing one would make the gate reject every plan forever — silently,
+because a rejection falls back to the template and looks like success. A comment was the fallback
+option; an import was available and is stronger. `app/ai` must not depend on `app/mitigation`, and
+`app/mitigation/service.py` already imports from `app.ai`, so the definition stays in the gate and
+the service imports it under its existing local names. No call site changed.
+
+**AC-14's timeout arithmetic is now true rather than nominal.** `httpx.Client(timeout=3.5)` sets
+connect, read, write and pool to 3.5 seconds *each*, so a call that spends 3.4 connecting and 3.4
+reading was inside every configured limit and outside the 3 x 3.5 = 10.5 the 12-second budget was
+sized against. httpx has no total-request setting, so `_call_budget()` splits one budget across the
+four phases, which run in sequence. Connect gets the second-largest share because a provider is
+constructed per request and every call therefore pays a TLS handshake inside its own budget; read
+gets the largest because that is where the model generates. The default stays 3.5 seconds and the
+plan's 2x multiplier now multiplies a real ceiling.
+
+**Requirements.** AC-10 (the task band), AC-14 (the timing budget), AC-09 via the unchanged
+readiness bands, PRD section 22 and DOMAIN_MODEL.md section 10.2 (the narrative gate),
+ARCHITECTURE.md section 22 (validate before persist — the reason I-1 mattered at all, since the
+summary is persisted).
+
+**Files changed.** `backend/app/ai/watsonx.py`, `backend/app/ai/openrouter.py`,
+`backend/app/ai/provider.py`, `backend/app/ai/validation.py`, `backend/app/mitigation/service.py`,
+`backend/scripts/seed_demo.py`, `backend/tests/test_watsonx_provider.py`,
+`backend/tests/test_openrouter_provider.py`, `backend/tests/test_narrative_validation.py`,
+`README.md`, `docs/DECISIONS.md`, `BUILD_WITH_BOB.md`. Nothing under `frontend/`.
+
+**Validation.** `cd backend && PYTHONPATH=. .venv/bin/python -m pytest -q` → 269 passed, up from
+262. Both behaviour changes were written test-first and confirmed non-vacuous: the poisoned-summary
+test and the two timeout tests each failed against the unmodified source before the fix. The
+poisoned summary is paired with a grounded one that must still be returned verbatim, so a validator
+that rejected everything could not pass the pair. Frozen demo numbers re-read from
+`backend/continuity.db` read-only, without reseeding: Payment Gateway 74/HIGH, Incident Recovery
+72/HIGH, Identity's highest system 68; the 74 → 93 simulation and Maria HIGH / Jordan MEDIUM stay
+pinned by `test_continuity_engine.py` and `test_golden_path.py`. `AI_PROVIDER` still defaults to
+`deterministic`. No seed or fixture-refresh script run, no network call made, `backend/.env` never
+read.
+
+**Open questions.** Two carried forward, neither introduced here. The `POST /simulations` timing
+conflict stands — AC-14 gives that endpoint 2 seconds as a deterministic simulation, and a single
+narrative call at the 3.5-second default can exceed it on its own; making the per-call bound real
+sharpens that number without resolving the conflict. And closing the lower-case and title-cased
+name-check blind spots still needs the capability taxonomy passed into the validator the way
+`validate_extraction` receives it. DEC-15 (OPEN-10) still awaits Person A's acknowledgement.

@@ -82,6 +82,20 @@ PLAN_MAX_TOKENS = 1600
 # can therefore spend more of AC-14's 12-second budget without putting it at risk.
 PLAN_TIMEOUT_MULTIPLIER = 2.0
 
+# How one per-call budget is divided across httpx's four timeout phases. They must sum to 1.
+#
+# `httpx.Client(timeout=3.5)` does not mean "this call takes at most 3.5 seconds": it gives
+# connect, write, read and pool 3.5 seconds *each*, so a call that spends 3.4 connecting and 3.4
+# reading is inside every configured limit and outside the arithmetic AC-14 is sized against
+# (3 x 3.5 = 10.5 inside 12). httpx has no total-request setting, so the total is built by
+# splitting one budget across the phases that run in sequence.
+#
+# Connect carries the second-largest share because it is a real fixed cost here rather than a
+# formality: a provider is constructed per request, so each request opens a fresh connection and
+# pays a TLS handshake inside its own budget. Read carries the largest because that is where the
+# model actually generates.
+TIMEOUT_PHASE_SHARES = {"pool": 0.05, "connect": 0.25, "write": 0.05, "read": 0.65}
+
 # Retry-After is honoured but bounded. A narrative call sits inside a request budget with a
 # deterministic template behind it, so a gateway asking for a minute is asking for longer than the
 # wording is worth.
@@ -92,6 +106,19 @@ BACKOFF_BASE_SECONDS = 1.0
 CACHE_BUILDER_SCRIPT = "extract_with_provider"
 
 _JSON_BLOCK = re.compile(r"\{.*\}", re.DOTALL)
+
+
+def _call_budget(total_seconds: float) -> httpx.Timeout:
+    """One per-call budget, split so that `total_seconds` is the ceiling for the whole call.
+
+    See `TIMEOUT_PHASE_SHARES` for why this is not simply `httpx.Timeout(total_seconds)`.
+    """
+    return httpx.Timeout(
+        connect=total_seconds * TIMEOUT_PHASE_SHARES["connect"],
+        write=total_seconds * TIMEOUT_PHASE_SHARES["write"],
+        read=total_seconds * TIMEOUT_PHASE_SHARES["read"],
+        pool=total_seconds * TIMEOUT_PHASE_SHARES["pool"],
+    )
 
 
 class CacheBuildRefusedError(AIExtractionError):
@@ -107,6 +134,13 @@ class CacheBuildRefusedError(AIExtractionError):
 
 class OpenRouterProvider:
     name = "openrouter"
+
+    # What actually built the graph, which is not what `name` says. Extraction here delegates to
+    # the deterministic provider, so anything reporting extraction provenance — the seeding
+    # script's summary, a cache file name — must read this rather than `name`, or it states a
+    # model produced evidence that string matching produced. `CacheBuildRefusedError` above is
+    # the same rule enforced at the point where the mistake would be written to disk.
+    extraction_provider_name = DeterministicProvider.name
 
     def __init__(self) -> None:
         # All three, not only the key. `openrouter_base_url` and `openrouter_model` have defaults,
@@ -129,7 +163,7 @@ class OpenRouterProvider:
         self._simulation_prompt = SIMULATION_PROMPT_FILE.read_text()
         self._candidate_prompt = CANDIDATE_PROMPT_FILE.read_text()
         self._plan_prompt = PLAN_PROMPT_FILE.read_text()
-        self._client = httpx.Client(timeout=settings.openrouter_timeout_seconds)
+        self._client = httpx.Client(timeout=_call_budget(settings.openrouter_timeout_seconds))
 
     @staticmethod
     def _refuse_to_build_an_extraction_cache() -> None:
@@ -155,8 +189,10 @@ class OpenRouterProvider:
         """One OpenAI-compatible chat call, with a bounded number of attempts.
 
         `timeout` overrides the configured per-call ceiling for the one narrative that can afford
-        more of the budget; everything else takes the default.
+        more of the budget; everything else takes the default. Either way the number is a total
+        for the call, not a limit per connection phase — see `TIMEOUT_PHASE_SHARES`.
         """
+        per_call = _call_budget(timeout or settings.openrouter_timeout_seconds)
         url = f"{settings.openrouter_base_url.rstrip('/')}{CHAT_PATH}"
         body = {
             "model": settings.openrouter_model,
@@ -182,7 +218,7 @@ class OpenRouterProvider:
                     url,
                     json=body,
                     headers=headers,
-                    timeout=timeout or settings.openrouter_timeout_seconds,
+                    timeout=per_call,
                 )
             except httpx.HTTPError as exc:
                 last_error = f"transport error: {exc}"

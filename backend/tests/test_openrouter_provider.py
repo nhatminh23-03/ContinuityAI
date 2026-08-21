@@ -246,6 +246,22 @@ def test_the_provider_refuses_to_build_an_extraction_cache(monkeypatch) -> None:
         OpenRouterProvider()
 
 
+def test_extraction_provenance_names_what_built_the_graph_not_the_configured_provider(
+    provider,
+) -> None:
+    """The printed counterpart of the refusal above.
+
+    `scripts/seed_demo.py` reports where the evidence in the database came from, and under this
+    provider that is the rule-based extractor, not a model. Reporting `name` there would state the
+    wrong provenance in the demo output — quietly, and in the one place a reader would trust it.
+    """
+    from app.ai.provider import extraction_provenance
+
+    assert provider.name == "openrouter"
+    assert extraction_provenance(provider) == RULES.name == "deterministic"
+    assert extraction_provenance(RULES) == "deterministic"
+
+
 # ---------------------------------------------------------------------------------------
 # The simulation sentence
 # ---------------------------------------------------------------------------------------
@@ -529,6 +545,49 @@ def test_a_rate_limited_call_is_retried_and_then_gives_up(provider, monkeypatch)
     assert len(client.calls) == 2, "one retry, then the deterministic template takes over"
 
 
+def test_the_per_call_timeout_is_a_total_and_not_a_ceiling_per_phase(provider) -> None:
+    """The AC-14 arithmetic is only true if the configured number bounds the call.
+
+    `httpx.Client(timeout=3.5)` gives connect, write, read and pool 3.5 seconds *each*, so a call
+    that spends 3.4 connecting and 3.4 reading is inside every one of those and outside the
+    budget three of them were multiplied into. Splitting one budget across the four phases makes
+    the documented number the ceiling rather than a nominal figure.
+    """
+    import httpx
+
+    client = FakeClient(content("a sentence"))
+    provider._client = client
+    provider._chat("system", "user", 100)
+
+    timeout = client.calls[0]["timeout"]
+    assert isinstance(timeout, httpx.Timeout)
+    total = timeout.connect + timeout.write + timeout.read + timeout.pool
+    assert total == pytest.approx(settings.openrouter_timeout_seconds)
+    # Every phase has to carry some of it; a zero share is a phase that times out instantly.
+    assert min(timeout.connect, timeout.write, timeout.read, timeout.pool) > 0
+
+
+def test_the_plan_gets_twice_the_budget_and_it_is_still_a_total(provider) -> None:
+    """The one narrative that is a single call per request may spend more of AC-14's 12 seconds,
+    but the multiplier has to apply to a real ceiling for that to mean anything."""
+    import httpx
+
+    from app.ai.openrouter import PLAN_TIMEOUT_MULTIPLIER
+
+    client = FakeClient(content("a sentence"))
+    provider._client = client
+    provider._chat(
+        "system", "user", 100, timeout=settings.openrouter_timeout_seconds * PLAN_TIMEOUT_MULTIPLIER
+    )
+
+    timeout = client.calls[0]["timeout"]
+    total = timeout.connect + timeout.write + timeout.read + timeout.pool
+    assert total == pytest.approx(
+        settings.openrouter_timeout_seconds * PLAN_TIMEOUT_MULTIPLIER
+    )
+    assert isinstance(timeout, httpx.Timeout)
+
+
 def test_the_call_stays_inside_the_operation_budget() -> None:
     """AC-14 gives an AI plan or explanation 12 seconds.
 
@@ -537,6 +596,9 @@ def test_the_call_stays_inside_the_operation_budget() -> None:
     by that. Read from the field rather than written as a literal: a hardcoded 3 here asserts an
     assumption about the caller instead of the caller's actual bound, which is how the earlier
     version of this test passed while the service was making four calls.
+
+    The multiplication is only meaningful because the per-call figure is a total rather than a
+    per-phase ceiling — see `test_the_per_call_timeout_is_a_total_and_not_a_ceiling_per_phase`.
     """
     from app.schemas.recommendation import BackupCandidateRequest
 

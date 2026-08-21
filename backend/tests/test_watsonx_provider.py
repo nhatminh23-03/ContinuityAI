@@ -193,6 +193,64 @@ def test_no_model_call_is_made_when_there_is_nothing_to_attribute(provider) -> N
 
 
 # ---------------------------------------------------------------------------------------
+# The one model-written narrative, and the gate over it
+# ---------------------------------------------------------------------------------------
+
+
+def sim_context() -> "SimulationSummaryContext":
+    from app.ai.schemas import SimulationSummaryContext
+
+    return SimulationSummaryContext(
+        engineer_name="Alex Chen",
+        scope_name="Payment Gateway",
+        critical_gap_capabilities=["Incident Recovery"],
+        degraded_capabilities=[],
+        preserved_capabilities=["Retry Logic"],
+        risk_class_before="HIGH",
+        risk_class_after="CRITICAL",
+    )
+
+
+def test_a_grounded_summary_is_returned(provider) -> None:
+    """The gate is a filter, not a blanket refusal.
+
+    Paired with the rejection test below on purpose: a validator that rejected everything would
+    still pass that one, because both outcomes look like the deterministic template.
+    """
+    grounded = (
+        "With Alex Chen unavailable, Incident Recovery in Payment Gateway would have no adequate "
+        "demonstrated coverage, while Retry Logic keeps it."
+    )
+    reply(provider, f'"{grounded}"')
+    assert provider.summarize_simulation(sim_context()) == grounded
+
+
+def test_a_poisoned_summary_is_rejected_and_the_template_is_returned(provider) -> None:
+    """`summarize_simulation` is the one watsonx narrative a model writes, so it is the one place
+    where model prose could reach `POST /simulations` — and `result_json`, which is persisted —
+    without a rule having read it first.
+
+    The sentence below states a likelihood twice, predicts a failure, uses two phrases from
+    `prohibited_phrases.txt`, and names someone the simulation never mentioned. None of it may
+    survive: the answer is the deterministic template, byte for byte.
+    """
+    from app.ai.deterministic import DeterministicProvider
+
+    poisoned = (
+        "Alex Chen is a critical employee, so there is a 92% chance of failure and Payment "
+        "Gateway will fail without him; ask Priya Raman to cover the settlement work."
+    )
+    context = sim_context()
+    reply(provider, poisoned)
+
+    summary = provider.summarize_simulation(context)
+
+    assert summary == DeterministicProvider().summarize_simulation(context)
+    assert "Priya Raman" not in summary
+    assert "%" not in summary
+
+
+# ---------------------------------------------------------------------------------------
 # Failure behaviour
 # ---------------------------------------------------------------------------------------
 

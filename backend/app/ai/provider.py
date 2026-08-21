@@ -69,6 +69,20 @@ class AIProvider(Protocol):
     def generate_mitigation_plan(self, context: PlanContext) -> PlanDraft: ...
 
 
+def extraction_provenance(provider: AIProvider) -> str:
+    """What actually produced the extraction, which is not always `provider.name`.
+
+    `OpenRouterProvider` delegates extraction to the deterministic provider and spends its model
+    calls on the narratives instead, so reporting its `name` as the origin of a knowledge graph
+    would describe rule-based output as model output — the mistake `CacheBuildRefusedError`
+    refuses to write to disk, and the same mistake when it is only printed.
+
+    Optional by design: a provider that does its own extraction needs no attribute, because its
+    name is already the honest answer.
+    """
+    return str(getattr(provider, "extraction_provider_name", provider.name))
+
+
 def get_provider(name: str | None = None) -> AIProvider:
     """Resolve the configured provider.
 

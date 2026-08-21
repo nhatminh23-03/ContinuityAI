@@ -143,10 +143,15 @@ def validate_extraction(
 # exists to catch a model that starts writing an essay, not to trim a well-formed sentence.
 MAX_SUMMARY_CHARS = 500
 
-# AC-10 requires 3 to 5 actions. Checked here as well as in `MitigationPlanService.create`
-# (MIN_TASKS/MAX_TASKS) on purpose: the service raises MitigationGenerationError, which is the
-# right answer for a broken generator but the wrong one for a model that simply wrote six
-# actions. Rejecting here means the template is used instead of the request failing.
+# AC-10 requires 3 to 5 actions. Checked here as well as in `MitigationPlanService.create` on
+# purpose: the service raises MitigationGenerationError, which is the right answer for a broken
+# generator but the wrong one for a model that simply wrote six actions. Rejecting here means the
+# template is used instead of the request failing.
+#
+# The two checks share these definitions — `app/mitigation/service.py` imports them as
+# MIN_TASKS/MAX_TASKS — so the band cannot be widened in one place and left narrow in the other.
+# The direction is forced: `app/ai` must not depend on `app/mitigation`, and the gate needs the
+# band whether or not a plan service is involved.
 MIN_PLAN_TASKS = 3
 MAX_PLAN_TASKS = 5
 
@@ -289,6 +294,14 @@ def validate_candidate_narrative(
     passes it even where the record holds that capability as assisted-only or absent. Overstating
     assisted participation as demonstrated is the failure this product exists to avoid, and this
     is the only place with the buckets still in hand, so it is checked here.
+
+    The check is lexical, and that is its documented blind spot: it pairs an independence marker
+    with an unproven capability only where the strength *contains that capability's name*, so an
+    oblique reference — "has independently handled that recovery work, unaided" — carries the same
+    overstatement past it, for the same reason the name check cannot see a lower-case invention.
+    Resolving a pronoun phrase to a capability needs a lexicon this module does not have; HARD
+    RULE 2 of `prompts/candidate_narrative_system.txt` is what addresses it, and
+    `test_known_blind_spot_of_the_independence_check` pins it so it stays visible.
     """
     outcome = NarrativeOutcome()
 

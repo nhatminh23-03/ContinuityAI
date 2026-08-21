@@ -676,8 +676,12 @@ writes reaches a manager unchecked. Every narrative is drafted by the model and 
 applies to claims, extended to prose: no prohibited phrase, no likelihood or percentage language, no
 wording that states a person's inability rather than an absence of evidence, and no capability or
 person named outside what the generator was actually given. Anything the gate rejects, and anything
-that fails in transport, parsing, or shape, falls back to the exact deterministic text `watsonx.py`
-always returns. The model never gets the last word — the rules do, on every single generation — so
+that fails in transport, parsing, or shape, falls back to the deterministic template in
+`app/ai/deterministic.py`. That is the exact text `watsonx.py` returns for the candidate narrative
+and for the plan; its third narrative, `summarize_simulation`, is model-written there too, so the
+same template is what it falls back to when `validate_simulation_summary` — the identical gate —
+rejects a sentence. The model never gets the last word — the rules do, on every
+single generation — so
 the two passages' worry (a rephrasing that drifts, an invented step) is precisely the failure the
 gate exists to catch before the output is returned to a caller.
 
@@ -691,7 +695,16 @@ case, an invention on a line where every word is capitalised, where capitalisati
 signal to check names against, and a two-word qualifier attached to an attested name ("Refund
 Processing In Europe" where "Refund Processing" is attested), because the title-tail exemption is
 bounded to exactly two words. Closing the second and third needs the capability taxonomy passed
-into the validator, the way `validate_extraction` already receives it — not built here. Until then,
+into the validator, the way `validate_extraction` already receives it — not built here.
+
+A fifth blind spot belongs to the independence check in `validate_candidate_narrative` rather than
+to the name check, and is recorded here for the same reason: that check pairs independence wording
+with an unproven capability only where the strength lexically contains the capability's name, so
+"has independently handled that recovery work, unaided" — the assisted-presented-as-demonstrated
+failure, with the capability never named — is accepted. Resolving an oblique reference to a
+capability needs a lexicon the module does not have; HARD RULE 2 of
+`app/ai/prompts/candidate_narrative_system.txt` addresses it, and
+`test_known_blind_spot_of_the_independence_check` pins it. Until then,
 grounding is carried by the three prompt files under `app/ai/prompts/`, which state explicitly
 which names, capabilities, and evidence ids may appear; the gate is the net under that instruction,
 not a substitute for it. A manager reading a narrative generated under `openrouter` is protected by
