@@ -1231,3 +1231,55 @@ live API call.
 **Open questions.** Unchanged from the previous entry: none of this has run against the live API,
 and the per-call ceiling is still arithmetic rather than measurement. The 12-second budget now has
 a real bound behind it, which is what makes measuring it meaningful.
+
+### 2026-08-21 — Documentation for the OpenRouter narrative provider: fixture policy, README, decision log, environment template
+
+Four pieces, no application code. `fixtures/README.md` gets a fixture-capture policy section:
+fixtures are always captured under `AI_PROVIDER=deterministic`, on the strength that
+`OpenRouterProvider.extract_artifact_semantics` delegates to `DeterministicProvider` so every
+non-narrative field is unaffected by which of the two produced the fixture, while its three
+narrative fields are not byte-reproducible even at temperature 0. Neither `refresh_fixtures.py` nor
+`verify_golden_path.py` needed a code change: both already read `AI_PROVIDER` from the environment
+and default to `deterministic`, so `--check` keeps passing exactly as before, and the section states
+plainly that narrative-field differences reported by `verify_golden_path` under
+`AI_PROVIDER=openrouter` are expected — its exit code is 0 by design regardless — and not something
+to chase as drift.
+
+`README.md`'s AI-provider section gets a fourth provider row, a "What runs, precisely" paragraph
+stating the split in one place (rule-based extraction; the three narratives template-written by
+default and model-written-and-validated under `openrouter`; readiness, exposure, risk, and
+simulation always deterministic, guaranteed by the `AIProvider` interface shape rather than by
+configuration), and a full subsection on `OpenRouterProvider` — what it does, that the validation
+gate stands between every generation and the caller, and an explicit statement that grounding is
+prompt-enforced rather than gate-enforced, naming the gate's documented blind spots (a single-word
+invention, a lower-case invented capability, a fully capitalised line) so the claim is not
+overstated. The existing watsonx measured-comparison material is untouched.
+
+`docs/DECISIONS.md` gets DEC-15, the Category C entry the addition requires. It records that the
+provider reopens two decisions `watsonx.py` documents and quotes them directly — lines 360-362 on
+`explain_candidate` ("a rephrasing that drifts is worse than a plain one") and 366-371 on
+`generate_mitigation_plan` ("invented steps or an invented tool would be a real cost... Left
+deterministic on purpose") — states the counter-argument (the validation gate is what the model
+drafts against before anything reaches a caller) without hiding the gate's own limits, and marks
+itself as needing Person A's acknowledgement rather than Person B's, since it reopens Person A's
+reasoning in a file Person A owns.
+
+`backend/.env.example` gets the three operator-facing OpenRouter variables — `OPENROUTER_API_KEY`,
+`OPENROUTER_BASE_URL`, `OPENROUTER_MODEL` — with no real values, matching the pattern the watsonx
+block already sets and restoring the completeness `RECOMMENDATIONS.md` R-23 recorded as remediated.
+`openrouter_timeout_seconds` and `openrouter_max_retries` are left out of the file, the same way
+`watsonx_timeout_seconds` and `watsonx_max_retries` are: both have working defaults and neither
+carries an operator-facing caveat the way `WATSONX_REQUESTS_PER_SECOND`'s plan-limit note does.
+
+**Files changed.** `fixtures/README.md`, `README.md`, `docs/DECISIONS.md`, `backend/.env.example`.
+No file under `backend/app/` or `frontend/` touched.
+
+**Validation.** `cd backend && PYTHONPATH=. .venv/bin/python -m pytest -q` → 262 passed, unchanged
+from before this entry, since nothing here touches application code. No seed or fixture-refresh
+script run; no network call made; `backend/.env` never read.
+
+**Open questions.** DEC-15 needs Person A's walkthrough before `AI_PROVIDER=openrouter` is treated
+as more than implemented-and-available; tracked as OPEN-10. Two pre-existing items noticed but left
+alone as out of scope for this pass: the commit that made the responsible-AI phrase check run at
+runtime has no `BUILD_WITH_BOB.md` entry of its own, and the Checks section of `README.md` still
+reads "131 tests" against a suite that is now 262.

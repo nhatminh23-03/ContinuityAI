@@ -631,3 +631,87 @@ MEDIUM.
 | OPEN-09 | `ARCHITECTURE.md` section 29 and `API_CONTRACT.md` section 10.2 still carry the superseded reason-code spelling and extraction shape (DEC-05, DEC-06). Amend for self-consistency | Both | Next contract touch |
 
 OPEN-01 is closed by DEC-10. OPEN-08 is closed by DEC-14. OPEN-06 was closed by the previous build.
+
+---
+
+## Implementation decision — the OpenRouter narrative provider
+
+Made on **2026-08-21**. One decision, and it needs **Person A's** acknowledgement rather than
+Person B's, because it reopens reasoning Person A recorded and decided against, in code Person A
+owns.
+
+### DEC-15 — A second narrative path is added behind a validation gate, reopening `watsonx.py`'s deterministic-narrative decision
+
+**Date:** 2026-08-21 · **Category:** C · **Needs Person A's acknowledgement**
+
+`backend/app/ai/openrouter.py` adds `OpenRouterProvider`, a second model-backed `AIProvider`
+implementation, selected by `AI_PROVIDER=openrouter`. It is the mirror image of `WatsonxProvider`:
+extraction delegates to `DeterministicProvider` in one line and stays rule-based, while a model
+writes the three manager-facing narratives — the simulation summary, a candidate's strengths and
+gaps, and the mitigation plan's task titles, descriptions, and acceptance criteria.
+
+**This overrides a decision Person A already made and documented, not an open question.**
+`watsonx.py:360-362`, on `explain_candidate`:
+
+> The structured content — which capabilities are demonstrated, assisted, or missing — is decided
+> by the rules. A model here would only rephrase it, and a rephrasing that drifts is worse than a
+> plain one, so the deterministic phrasing stands.
+
+and `watsonx.py:366-371`, on `generate_mitigation_plan`:
+
+> The deterministic plan is already gap-targeted and validated for 3-5 actions. A model could write
+> warmer prose, but the plan is the artifact a manager approves and then someone executes — invented
+> steps or an invented tool would be a real cost, and the structure is what carries the value. Left
+> deterministic on purpose.
+
+Both are reasoned engineering positions recorded at the time the code was written, not defaults left
+unconsidered, and this decision does not treat them as wrong. It argues that the objection they
+raise is answerable rather than fatal to letting a model write these three fields.
+
+**The counter-argument, stated honestly.** The risk both passages name is real: a model that
+rephrases can drift, and an invented step or an invented tool in a plan a manager approves and
+someone then executes is a real cost. What is different under `openrouter` is that nothing a model
+writes reaches a manager unchecked. Every narrative is drafted by the model and then validated by
+`app/ai/validation.py` before it can be returned — the same discipline `validate_extraction` already
+applies to claims, extended to prose: no prohibited phrase, no likelihood or percentage language, no
+wording that states a person's inability rather than an absence of evidence, and no capability or
+person named outside what the generator was actually given. Anything the gate rejects, and anything
+that fails in transport, parsing, or shape, falls back to the exact deterministic text `watsonx.py`
+always returns. The model never gets the last word — the rules do, on every single generation — so
+the two passages' worry (a rephrasing that drifts, an invented step) is precisely the failure the
+gate exists to catch before the output is returned to a caller.
+
+**The gate's limits, so this is not one-sided.** `find_unattested_names`
+(`app/ai/language_policy.py`) is a documented heuristic, not closed-world grounding, and its module
+docstring together with `test_known_blind_spots_of_the_name_check`
+(`backend/tests/test_narrative_validation.py`) name what it cannot catch: a single-word invention
+("ask Priya to confirm" — one capitalised word is structurally identical to any capitalised ordinary
+noun), an invented capability written in lower case, and an invention on a line where every word is
+capitalised, where capitalisation carries no signal to check names against. Closing the second and
+third needs the capability taxonomy passed into the validator, the way `validate_extraction` already
+receives it — not built here. Until then, grounding is carried by the three prompt files under
+`app/ai/prompts/`, which state explicitly which names, capabilities, and evidence ids may appear;
+the gate is the net under that instruction, not a substitute for it. A manager reading a narrative
+generated under `openrouter` is protected by validated output with documented gaps, not by output
+that has been proven safe.
+
+**Nothing about the deterministic path changes.** `AI_PROVIDER` still defaults to `deterministic`,
+`watsonx.py`'s reasoning and its code are both untouched, and extraction — the half of the pipeline
+that decides readiness, exposure, and continuity risk — is unaffected by this provider or any other:
+`OpenRouterProvider.extract_artifact_semantics` delegates straight to `DeterministicProvider`, so
+the seeded baseline (Payment Gateway 74 / HIGH, Incident Recovery 72 / HIGH, the simulation
+74 → 93, Identity Systems 68, Maria HIGH / Jordan MEDIUM) is byte-identical under every provider.
+
+**Recorded here, rather than assumed settled, because it reopens Person A's own reasoning about a
+package Person A owns.** `openrouter` is implemented, credential-gated, and off by default; it
+should not be treated as anything more than available until Person A has seen this entry.
+
+**Documents affected:** none of the frozen specifications — the change is additive and sits behind
+a default that stays off. `README.md` (AI-provider section), `fixtures/README.md` (fixture
+capture policy), `backend/.env.example` (three new operator-facing variables, no values).
+
+### Open items after this build
+
+| ID | Item | Owner | Resolve by |
+|---|---|---|---|
+| OPEN-10 | DEC-15 (OpenRouter narrative provider) needs Person A's acknowledgement | Person A | Next sync |

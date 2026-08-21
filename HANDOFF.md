@@ -686,3 +686,77 @@ the Person A sync items: GAP-01 (`single_expert_dependency_count`, the one block
 `identity-systems.json` + `challenge-attest-jordan.json` into `refresh_fixtures.py` and the
 fixtures README, doc amendments (PRD §17.1 class column, ARCHITECTURE §29 / CONTRACT §10.2, PRD
 §11.1 example numbers), and the R-23 key rotation (Person B only).
+
+---
+
+## 2026-08-21 — OpenRouter narrative provider: implementation and documentation (five-task plan)
+
+### Completed
+
+A five-task plan (`.superpowers/sdd/superpowers-brainstorming-continuityai-merry-heron/`) added a
+second model-backed `AIProvider`, the mirror image of the existing `watsonx` one: extraction stays
+rule-based (`OpenRouterProvider.extract_artifact_semantics` delegates to `DeterministicProvider`)
+and a model writes the three manager-facing narratives instead — the simulation summary, a
+candidate's strengths and gaps, and the mitigation plan's task text. In order:
+
+1. Fixed a pre-existing latent bug found while preparing for model-backed narratives:
+   `MitigationPlanService.create` persisted `task.task_type` before validating it against
+   `MitigationTaskType`, so an invalid value (never emitted by the deterministic provider, but
+   reachable from a model) would commit and then 500 on every subsequent read.
+2. Added the validation gate (`backend/app/ai/validation.py`, `language_policy.py`,
+   `prohibited_phrases.txt`): every narrative a provider generates is checked for prohibited
+   phrases, probability/likelihood language, inability language, and unattested names before it
+   can reach a caller; anything rejected falls back to the deterministic template and logs at
+   WARN. The name check is a documented heuristic with known blind spots (single-word inventions,
+   lower-case invented capabilities, fully capitalised lines) — pinned by
+   `test_known_blind_spots_of_the_name_check` so nobody mistakes it for closed-world grounding.
+3. Added `OpenRouterProvider` (`backend/app/ai/openrouter.py`) and its three prompt files, wired
+   through `app/ai/provider.py` and `app/core/config.py`
+   (`openrouter_api_key/base_url/model/timeout_seconds/max_retries`). A follow-up review fix moved
+   candidate narration to run only over returned candidates (bounded by the contract's `limit`
+   cap of 3) rather than every eligible engineer, which is what makes the AC-14 12-second budget
+   arithmetic (3 × 3.5s = 10.5s) actually hold.
+4. Made the responsible-AI phrase check scan the three narrative endpoints' live responses at
+   runtime, not just source-code string literals — the static scan could not have caught anything
+   a configured model provider writes.
+5. Documentation, this task: `fixtures/README.md` (fixture-capture policy: always
+   `AI_PROVIDER=deterministic`, and why narrative-field diffs under `openrouter` in
+   `verify_golden_path` are expected, not drift), `README.md` (AI-provider section extended with
+   the fourth provider, a precise "what runs" statement, and an honest account of the gate's
+   blind spots), `docs/DECISIONS.md` (DEC-15), `backend/.env.example` (the three OpenRouter
+   variables, no values).
+
+`AI_PROVIDER` still defaults to `deterministic` throughout — nothing above is switched on. Full
+backend suite: 262 passed (`cd backend && PYTHONPATH=. .venv/bin/python -m pytest -q`).
+
+### Decisions made
+
+**DEC-15** (`docs/DECISIONS.md`), Category C, **needs Person A's acknowledgement**: the OpenRouter
+provider reopens two decisions `watsonx.py:360-362` and `:366-371` document (keeping
+`explain_candidate` and `generate_mitigation_plan` deterministic on purpose) and argues the
+validation gate answers the objection, while stating the gate's blind spots honestly rather than
+claiming closed-world grounding.
+
+### Files changed across the five-task plan
+
+`backend/app/mitigation/service.py`, `backend/app/ai/{validation,language_policy,openrouter,provider}.py`,
+`backend/app/ai/prompts/{simulation_summary_system,candidate_narrative_system,mitigation_plan_system}.txt`,
+`backend/app/ai/prohibited_phrases.txt`, `backend/app/core/config.py`,
+`backend/app/recommendation/service.py`, `backend/tests/test_{mitigation_service,narrative_validation,openrouter_provider,recommendation_service,responsible_ai,golden_path}.py`,
+`fixtures/README.md`, `README.md`, `docs/DECISIONS.md`, `backend/.env.example`, `BUILD_WITH_BOB.md`.
+
+### In progress / blocked
+
+Nothing in progress. Blocked on Person A: DEC-15 acknowledgement (OPEN-10), and this task's report
+notes two pre-existing gaps that are Person A's or a joint call, not fixed here per the
+documentation-only scope of task 5 — see "Open questions" in this session's `BUILD_WITH_BOB.md`
+entry (a missing build-log entry for the responsible-AI runtime-scan commit, and `README.md`'s
+Checks section still stating "131 tests" against a suite that is now 262).
+
+### Recommended next task
+
+Walk Person A through DEC-15. Separately: a live pass with a real OpenRouter key
+(`AI_PROVIDER=openrouter`), confirming narrative prose is grounded and measuring actual latency
+against AC-14 for `POST /mitigation-plans` and `POST /recommendations/backup-candidates` — the
+budget arithmetic in this build is sized correctly but has not yet been measured against a live
+model.

@@ -103,17 +103,81 @@ classes:
 Evidence strength is derived from the evidence role rather than trusted from the model, so a
 provider that returns "STRONG" for a code review is corrected, not believed.
 
-### Two providers, one interface
+### Providers, one interface
 
 | `AI_PROVIDER` | What it does |
 |---|---|
-| `deterministic` | Offline rule-based extraction. No credential, fully repeatable. **The shipped default.** |
-| `watsonx` | IBM watsonx.ai (`ibm/granite-4-h-small`) reads each artifact and returns structured claims |
+| `deterministic` | Offline rule-based extraction, deterministic template narratives. No credential, fully repeatable. **The shipped default.** |
+| `watsonx` | IBM watsonx.ai (`ibm/granite-4-h-small`) reads each artifact and returns structured claims. Narratives stay deterministic — see below |
 | `cached` | Replays committed watsonx output from `data/extraction/`, so a model-derived graph seeds offline |
+| `openrouter` | The mirror image of `watsonx`: extraction stays rule-based, and a model writes the three manager-facing narratives instead — see below |
 
-Both real providers pass through the same validation gate and feed the same deterministic engine.
-Swapping them changes extraction quality and changes no conclusion path — which is the property the
-interface exists to guarantee.
+Every non-default provider passes its output through a validation gate before anything reaches the
+database or the wire. `watsonx` and `cached` go through the extraction gate described above — the
+same four rejection classes, applied identically regardless of which provider produced the claim.
+`openrouter` goes through a second, narrative-specific gate for the three prose fields it generates.
+Swapping providers changes extraction quality or narrative wording and changes no conclusion path —
+readiness, exposure, continuity risk, and simulation are computed the same way under every provider,
+which is the property the interface exists to guarantee.
+
+### What runs, precisely
+
+For anyone deciding whether to trust a given response: **extraction is rule-based** under every
+provider except `watsonx` — capability names and aliases are matched in the artifact text, scoped to
+its system, and the source system's participant role is mapped onto an evidence role. **The three
+narratives** — the simulation summary, a candidate's strengths and gaps, and a mitigation plan's task
+titles, descriptions, and acceptance criteria — are template-written by default and, under
+`AI_PROVIDER=openrouter`, model-written and validated before use. **Readiness, exposure, continuity
+risk, and simulation are always deterministic rules and are never model-decided**, under any
+provider: no `AIProvider` method exists through which a model could return one of those values (see
+"Where the boundary sits, and why", above), so this is a property of the interface shape rather than
+of provider configuration.
+
+`AI_PROVIDER` still defaults to `deterministic`. Nothing above is switched on by default; it
+describes what runs when an operator explicitly configures a model provider and supplies credentials
+in `backend/.env`.
+
+### A second provider: rule-based extraction, model-written narratives
+
+`OpenRouterProvider` (`backend/app/ai/openrouter.py`) exists for the opposite reason `watsonx` does.
+`watsonx` spends a model call on extraction, where a wrong answer changes the knowledge graph and
+every downstream number while still looking plausible — so its narratives stay deterministic on
+purpose (`watsonx.py:360-372` explains why in each method). `openrouter` spends its model calls the
+other way: extraction delegates to `DeterministicProvider` in one line, and the model writes only the
+simulation sentence, a candidate's strengths and gaps, and the mitigation plan's task text — prose
+over facts the rules already decided, which changes no conclusion and is the part a manager actually
+reads out in a room.
+
+**Every generation passes `app/ai/validation.py` before it can be returned**, the same discipline the
+extraction gate applies to claims. Four checks: no prohibited phrase, no likelihood or percentage
+language (a simulation reports coverage loss, not an outage forecast), no wording that states a
+person's inability rather than an absence of evidence, and no name — person or capability — outside
+what the generator was actually given. Anything rejected, and any transport failure, timeout, or
+malformed reply, falls back to the deterministic template; rejections log at WARN so a gate that is
+silently rejecting everything remains visible rather than looking identical to one that works.
+
+**Grounding is prompt-enforced, not gate-enforced, and that is worth stating without hedging.** The
+gate's name check (`find_unattested_names` in `app/ai/language_policy.py`) is a documented heuristic
+with real blind spots: a single-word invention such as "ask Priya to confirm" passes it, because one
+capitalised word is structurally identical to any capitalised ordinary noun; an invented capability
+written in lower case passes it; and a bare, fully capitalised line passes only the narrower
+recombination check, because on a title-cased line capitalisation carries no signal at all. These are
+not oversights — `test_known_blind_spots_of_the_name_check` pins them so nobody mistakes the gate for
+closed-world grounding it does not have. What actually keeps a narrative grounded is the prompt: each
+of the three prompt files under `app/ai/prompts/` states explicitly which names, capabilities, and
+evidence ids may appear, and the gate is the net under that instruction, not a replacement for it.
+
+**Timing is sized against AC-14's 12-second budget for an AI plan or explanation operation.**
+`explain_candidate` is called once per *returned* candidate rather than once per eligible engineer —
+narration runs after the response is sliced to `limit`, which the contract caps at 3 — so three
+sequential calls at the 3.5-second default timeout come to 10.5 seconds, inside the budget. A plan is
+one call per request and gets twice the per-call ceiling.
+
+**Nothing above changes a number.** `OpenRouterProvider.extract_artifact_semantics` delegates
+straight to `DeterministicProvider`, so the seeded baseline is untouched under this provider exactly
+as it is under `deterministic`: Payment Gateway 74 / HIGH, Incident Recovery 72 / HIGH, the
+simulation 74 → 93, Identity Systems 68, Maria HIGH overlap, Jordan MEDIUM. Only the wording of up to
+three narrative fields per response can move, and only after it has passed the gate above.
 
 **The rule-based provider is the default, and its ceiling is worth stating plainly.** It finds what
 the text *names*: it resolves capabilities by matching capability names and aliases, scoped to the
@@ -379,7 +443,7 @@ Neither regeneration command is needed for normal work: both corpora are committ
 |---|---|---|
 | `DATABASE_URL` | `sqlite:///backend/continuity.db` | Demo database |
 | `AUTO_SEED` | `true` | Seed automatically when the database is empty |
-| `AI_PROVIDER` | `deterministic` | Extraction provider. Only the offline provider ships |
+| `AI_PROVIDER` | `deterministic` | `deterministic`, `watsonx`, `cached`, or `openrouter`. The offline provider ships as the default; the model-backed providers are implemented and credential-gated, and shipping with `deterministic` means nothing is switched on until an operator opts in |
 | `API_TOKEN` | *(empty)* | When set, `/api/v1` requires `Authorization: Bearer <token>`. Empty leaves the API open, which is the local default |
 | `REFERENCE_DATE` | `2026-08-15` | The clock freshness is judged against, so a seeded demo cannot age into different classifications |
 
