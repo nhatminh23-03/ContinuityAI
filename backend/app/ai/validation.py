@@ -25,6 +25,8 @@ caller that receives a rejection uses the deterministic template instead.
 
 from __future__ import annotations
 
+import logging
+
 from app.ai.language_policy import (
     find_forbidden_phrases,
     find_inability_language,
@@ -45,6 +47,8 @@ from app.ai.schemas import (
 )
 from app.evidence.strength import strength_for_role
 from app.schemas.enums import MitigationTaskType, ReadinessLevel
+
+logger = logging.getLogger(__name__)
 
 
 class ValidationOutcome:
@@ -179,6 +183,22 @@ class PlanValidationOutcome(NarrativeOutcome):
         self.draft: PlanDraft | None = None
 
 
+def _report(outcome: NarrativeOutcome, subject: str) -> NarrativeOutcome:
+    """Log what the gate did, and return the outcome so callers can `return _report(...)`.
+
+    A rejection is silent by construction: the caller falls back to the deterministic template and
+    the response looks completely normal, which means a gate that is rejecting *everything* — a
+    wording rule that is too strict, a prompt that stopped naming the right facts — is
+    indistinguishable from a gate that is working. WARN is what makes the difference visible.
+    Corrections are logged too: dropping a citation is quiet data loss otherwise.
+    """
+    if outcome.rejections:
+        logger.warning("%s rejected: %s", subject, "; ".join(outcome.rejections))
+    if outcome.corrections:
+        logger.info("%s corrected: %s", subject, "; ".join(outcome.corrections))
+    return outcome
+
+
 def requires_recovery_drill(readiness: str | ReadinessLevel) -> bool:
     """Whether a candidate at this readiness must be given an unaided drill.
 
@@ -218,7 +238,7 @@ def validate_simulation_summary(
 
     if text is None or not text.strip():
         outcome.rejections.append("simulation summary is empty")
-        return outcome
+        return _report(outcome, "simulation summary")
 
     if len(text) > MAX_SUMMARY_CHARS:
         outcome.rejections.append(
@@ -241,12 +261,12 @@ def validate_simulation_summary(
         *context.degraded_capabilities,
         *context.preserved_capabilities,
     ]
-    for name in find_unattested_names(text, attested):
+    for name in find_unattested_names(text, attested, people=[context.engineer_name]):
         outcome.rejections.append(
             f"simulation summary names '{name}', which is not among the simulated facts"
         )
 
-    return outcome
+    return _report(outcome, "simulation summary")
 
 
 def validate_candidate_narrative(
@@ -283,7 +303,7 @@ def validate_candidate_narrative(
     for line in [*strengths, *gaps]:
         for phrase in find_forbidden_phrases(line):
             outcome.rejections.append(f"candidate narrative uses prohibited wording {phrase!r}")
-        for name in find_unattested_names(line, attested):
+        for name in find_unattested_names(line, attested, people=[context.candidate_name]):
             outcome.rejections.append(
                 f"candidate narrative names '{name}', which is neither the candidate nor a "
                 f"capability the evidence covers"
@@ -297,7 +317,7 @@ def validate_candidate_narrative(
                 f"gap {gap!r} states inability ({marker!r}); a gap is absence of evidence"
             )
 
-    return outcome
+    return _report(outcome, "candidate narrative")
 
 
 def validate_plan_draft(
@@ -322,6 +342,7 @@ def validate_plan_draft(
         # Without a readiness there is no candidate-specificity rule to apply, and a plan that
         # cited an unknown one was not built from this candidate's coverage.
         outcome.rejections.append(f"unknown candidate readiness '{context.candidate_readiness}'")
+        _report(outcome, "mitigation plan")
         return outcome
 
     if not MIN_PLAN_TASKS <= len(draft.tasks) <= MAX_PLAN_TASKS:
@@ -372,7 +393,8 @@ def validate_plan_draft(
         text = "\n".join([task.title, task.description, *task.acceptance_criteria])
         for phrase in find_forbidden_phrases(text):
             outcome.rejections.append(f"action {position} uses prohibited wording {phrase!r}")
-        for name in find_unattested_names(text, attested):
+        people = [context.source_engineer_name, context.candidate_name]
+        for name in find_unattested_names(text, attested, people=people):
             outcome.rejections.append(
                 f"action {position} names '{name}', which is neither the source engineer, the "
                 f"candidate, nor anything the plan context supplied"
@@ -404,4 +426,5 @@ def validate_plan_draft(
 
     if outcome.accepted:
         outcome.draft = draft.model_copy(update={"tasks": tasks})
+    _report(outcome, "mitigation plan")
     return outcome

@@ -10,6 +10,8 @@ everything is as useless as one that accepts everything, and only the pair prove
 
 from __future__ import annotations
 
+import logging
+
 import pytest
 
 from app.ai.deterministic import DeterministicProvider
@@ -205,12 +207,26 @@ def test_a_narrative_with_no_gaps_is_rejected() -> None:
 def test_a_capability_outside_the_graph_facts_is_rejected() -> None:
     outcome = validate_candidate_narrative(
         CandidateNarrative(
-            strengths=["Demonstrated Settlement Batching"], gaps=list(GOOD_NARRATIVE.gaps)
+            strengths=["Has demonstrated Settlement Batching end to end"],
+            gaps=list(GOOD_NARRATIVE.gaps),
         ),
         candidate_context(),
     )
     assert not outcome.accepted
     assert any("Settlement Batching" in r for r in outcome.rejections)
+
+
+def test_a_capability_the_context_names_differently_is_rejected() -> None:
+    """The likeliest invention is a near miss, not a wholesale fabrication: the model paraphrases
+    Incident Recovery into Incident Response and the sentence still reads correctly."""
+    outcome = validate_candidate_narrative(
+        CandidateNarrative(
+            strengths=["Assisted with Incident Response during the outage"],
+            gaps=list(GOOD_NARRATIVE.gaps),
+        ),
+        candidate_context(),
+    )
+    assert not outcome.accepted
 
 
 def test_another_person_named_in_a_narrative_is_rejected() -> None:
@@ -476,3 +492,126 @@ def test_validation_reports_rather_than_raises() -> None:
     outcome = validate_plan_draft(nonsense, plan_context("NONE"), set())
     assert not outcome.accepted
     assert outcome.rejections
+
+
+# ---------------------------------------------------------------------------------------
+# The name check: what it accepts, what it catches, and what it cannot see
+#
+# A gate that rejects everything is indistinguishable from a gate that works, because both
+# produce the deterministic template. The first test here is the one that catches that.
+# ---------------------------------------------------------------------------------------
+
+TITLE_CASED_TASKS = [
+    "Review Incident Recovery Architecture",
+    "Shadow Alex Chen During Incident Recovery",
+    "Execute Incident Recovery In Staging",
+    "Update The Payment Gateway Runbook",
+]
+
+
+def test_ordinary_title_cased_output_is_accepted() -> None:
+    """Title case is a formatting choice, not a semantic property. A model that capitalises its
+    task titles must not have every plan silently replaced by the template."""
+    tasks = [
+        task(title, task_type, evidence=["ev_001"] if index == 0 else None)
+        for index, (title, task_type) in enumerate(
+            zip(TITLE_CASED_TASKS, ["KNOWLEDGE_REVIEW", "SHADOWING", "PRACTICE", "DOCUMENTATION"])
+        )
+    ]
+    outcome = validate_plan_draft(draft(tasks), plan_context("ASSISTED"), KNOWN_EVIDENCE)
+    assert outcome.accepted, outcome.rejections
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        "Sarah Chen would carry Incident Recovery.",
+        "Shadow Sarah Chen During Incident Recovery",
+    ],
+)
+def test_a_name_recombined_from_an_attested_one_is_caught_in_any_casing(line) -> None:
+    """The sharpest failure: an invented colleague wearing a real surname. Caught whether the
+    line is written as prose or as a title, because the full attested name is never present."""
+    outcome = validate_plan_draft(
+        draft([task(line, "SHADOWING", evidence=["ev_001"]), *base_tasks()[1:]]),
+        plan_context("ASSISTED"),
+        KNOWN_EVIDENCE,
+    )
+    assert not outcome.accepted
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        "Please ask Priya to confirm the result",
+        "Coordinate with Stripe during the drill",
+        "The settlement batching path is uncovered",
+        "Review The Settlement Batching Runbook",
+    ],
+)
+def test_known_blind_spots_of_the_name_check(line) -> None:
+    """Documented, not hidden. These pass, and the module docstring says why:
+
+    a single capitalised word is structurally identical to any capitalised noun; a lower-case
+    invention offers no signal at all; and on a fully capitalised line capitalisation
+    distinguishes nothing, so only the recombination rule runs there.
+
+    Closing the last three needs the capability taxonomy passed into the validator, the way
+    `validate_extraction` receives it. Until then the prompt carries that weight, and this test
+    exists so nobody reads the gate as closed-world grounding it is not.
+    """
+    outcome = validate_plan_draft(
+        draft([task(line, "SHADOWING", evidence=["ev_001"]), *base_tasks()[1:]]),
+        plan_context("ASSISTED"),
+        KNOWN_EVIDENCE,
+    )
+    assert outcome.accepted, outcome.rejections
+
+
+def test_a_drill_at_assisted_is_rejected_at_a_legal_action_count() -> None:
+    """The rejection that keeps test_golden_path.py:213 ("RECOVERY_DRILL" not in maria_types)
+    passing once a model writes the plan. Four actions is inside the ASSISTED band, so the count
+    rule cannot catch this shape and only the drill rule can."""
+    tasks = base_tasks()
+    tasks[2] = task("Run an unaided Incident Recovery drill", "RECOVERY_DRILL")
+    outcome = validate_plan_draft(draft(tasks), plan_context("ASSISTED"), KNOWN_EVIDENCE)
+
+    assert len(tasks) == 4, "inside the ASSISTED band, so the count rule is not what rejects this"
+    assert not outcome.accepted
+    assert any("RECOVERY_DRILL" in r for r in outcome.rejections)
+
+
+# ---------------------------------------------------------------------------------------
+# Visibility
+# ---------------------------------------------------------------------------------------
+
+
+def test_a_rejection_is_logged_at_warning(caplog) -> None:
+    """Rejections are silent by construction — the caller falls back to the template and the
+    response looks normal. Without this the gate could reject every generation for a week."""
+    with caplog.at_level(logging.WARNING, logger="app.ai.validation"):
+        validate_simulation_summary("Alex Chen is irreplaceable.", sim_context())
+    assert [r for r in caplog.records if r.levelno == logging.WARNING]
+    assert "irreplaceable" in caplog.text
+
+
+def test_every_validator_logs_its_rejections(caplog) -> None:
+    with caplog.at_level(logging.WARNING, logger="app.ai.validation"):
+        validate_candidate_narrative(CandidateNarrative(strengths=[], gaps=[]), candidate_context())
+        validate_plan_draft(PlanDraft(target_readiness="", tasks=[]), plan_context("NONE"), set())
+    subjects = {record.getMessage().split(" rejected")[0] for record in caplog.records}
+    assert subjects == {"candidate narrative", "mitigation plan"}
+
+
+def test_a_dropped_evidence_id_is_logged(caplog) -> None:
+    """Quiet data loss otherwise: the plan is accepted and a citation has vanished."""
+    tasks = base_tasks()
+    tasks[0] = task(
+        "Review the Incident Recovery runbook",
+        "KNOWLEDGE_REVIEW",
+        evidence=["ev_001", "ev_invented"],
+    )
+    with caplog.at_level(logging.INFO, logger="app.ai.validation"):
+        outcome = validate_plan_draft(draft(tasks), plan_context("ASSISTED"), KNOWN_EVIDENCE)
+    assert outcome.accepted, outcome.rejections
+    assert "ev_invented" in caplog.text

@@ -1017,3 +1017,49 @@ template and the validator ever disagree. Full backend suite → 198 passed, inc
 ("Payment Recovery" from "Payment Gateway" and "Incident Recovery"). Tightening that needs the
 capability taxonomy passed into the validator, which the brief's signatures do not carry; worth
 revisiting if the prompt work shows the model actually doing it.
+
+### 2026-08-21 — Review fixes on the narrative gate
+
+Three findings from review of the entry above, all fixed.
+
+**The name check rejected ordinary title-cased output.** The word-level rule ("every word of a
+capitalised run must be an attested word or a function word") rejected `Review Incident Recovery
+Architecture`, `Execute Incident Recovery In Staging` and every other title-cased task title,
+because `Architecture`, `Staging`, `In` and `The` are not names and not function words. Sentence
+case passed and title case failed — a formatting coin-flip, and one that would have templated
+almost every well-formed plan while looking exactly like a gate that works. Rebuilt on a different
+basis: strip every attested name from the line first, then judge what survives. Two rules now
+apply — a surviving fragment of an attested *person's* name next to another capitalised word is a
+recombination (`Sarah Chen` where the record holds `Alex Chen`) and is caught in any casing; an
+unattested capitalised run is caught only where capitalisation carries information, meaning a line
+that is otherwise lower-case and a run that does not capitalise a function word. `people` was
+added as a third parameter of `find_unattested_names` so the person rule knows which attested
+names are individuals.
+
+**The check had bypasses.** The recombination rule closes the sharpest one — an invented forename
+on a real surname, which the previous "skip the first word of a line-initial run" step made
+invisible in every plan field. Three remain and are now stated in the module docstring, in a test
+(`test_known_blind_spots_of_the_name_check`) and in the task report rather than left for someone
+to discover: a single-word invention (`ask Priya`, `with Stripe`), a lower-case invented
+capability, and an invented capability on a fully capitalised line. Closing the last two needs the
+capability taxonomy passed into the validator the way `validate_extraction` receives it; until
+then the prompt carries that weight and the gate is a net under it, not a substitute.
+
+**The `ASSISTED`+ drill rejection had no effective test.** Deleting it still left the suite green:
+the only test covering it used five tasks, which the readiness band (3-4) already rejects. Added
+`test_a_drill_at_assisted_is_rejected_at_a_legal_action_count` — four tasks, one of them a
+`RECOVERY_DRILL`, which is the exact shape that would break `test_golden_path.py:213`. Both that
+rule and the recombination rule were mutation-checked: removing either now fails a test.
+
+**Rejections are logged.** `_report` logs every rejection at WARN with its reasons and every
+correction at INFO, from all three validators including their early returns. A rejected generation
+is silent by construction — the caller falls back to the template and the response looks normal —
+so without this a gate rejecting everything is indistinguishable from a gate working.
+
+**Files changed.** `backend/app/ai/language_policy.py`, `backend/app/ai/validation.py`,
+`backend/tests/test_narrative_validation.py`.
+
+**Validation.** `cd backend && PYTHONPATH=. .venv/bin/python -m pytest tests/test_narrative_validation.py
+tests/test_golden_path.py tests/test_responsible_ai.py` → 89 passed. Full suite → 210 passed. The
+four title-cased titles from the review and the four bypasses were re-measured directly against
+the rebuilt check; all sixteen cases now behave as intended.

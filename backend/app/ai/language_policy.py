@@ -19,11 +19,42 @@ Four rules, each with the failure it prevents:
    generator is an invention, and inventing a name attached to a person is the most damaging
    failure this product could have.
 
-The name check is a heuristic and is deliberately biased. It reads multi-word capitalised runs as
-proper names and requires every word of such a run to come from the given facts or to be an
-ordinary function word. It therefore over-reports rather than under-reports: a false positive
-costs the model-written sentence and falls back to the deterministic template, while a false
-negative puts an invented claim in front of a manager.
+`find_unattested_names` is the only rule here that is a heuristic rather than a lookup, so be
+precise about what it does and does not do. It removes every attested name from the line, then
+looks at what capitalised multi-word runs survive, and applies two rules:
+
+* **Recombination** — a surviving fragment of an attested *person's* name sitting next to another
+  capitalised word. "Sarah Chen" where the record holds "Alex Chen" is an invented colleague
+  wearing a real surname, and it is caught whatever the capitalisation style.
+* **Unattested run** — a capitalised run containing a word from nowhere in the given facts, and
+  only on a line that is otherwise sentence-cased.
+
+The sentence-case condition is the load-bearing one and it is a real limitation, not a hedge. In
+"Update The Payment Gateway Runbook" every word is capitalised, so capitalisation says nothing
+about which words are names: "Runbook" and "The" look exactly like "Priya" would. Applying the
+rule there rejects almost every well-formed title, and a gate that rejects everything is
+indistinguishable from a gate that works, because both produce the deterministic template. So on
+a fully capitalised line only the recombination rule runs.
+
+What this check therefore **cannot** catch, stated plainly so that no caller assumes closed-world
+grounding it does not have:
+
+* a single-word invention — "ask Priya to confirm", "coordinate with Stripe". One capitalised word
+  is structurally identical to any capitalised ordinary noun, and separating them needs a lexicon
+  this module does not have;
+* an invented capability written in lower case — "the settlement batching path";
+* an invented capability on a fully capitalised line — "Review The Settlement Batching Runbook",
+  and likewise inside a run that capitalises a function word mid-sentence, which is title casing
+  quoted into prose and is exempt for the same reason.
+
+Closing the second and third properly needs the capability taxonomy passed in, the way
+`validate_extraction` receives it, rather than a better guess about capitalisation. Until then the
+prompt, not this module, is what keeps invented capabilities out; this is a net under the prompt
+and not a substitute for it.
+
+Where the check does fire it over-reports rather than under-reports: a false positive costs the
+model-written sentence and falls back to the deterministic template, while a false negative puts
+an invented claim in front of a manager.
 """
 
 from __future__ import annotations
@@ -66,17 +97,18 @@ INABILITY_MARKERS: tuple[str, ...] = (
 _PROPER_NAME = re.compile(r"[A-Z][a-z][\w'’-]*(?:[ \t]+[A-Z][a-z][\w'’-]*)+")
 _WORD = re.compile(r"[\w'’-]+")
 
-# Closed-class English words. A capitalised run can start with one of these purely because it
-# starts a sentence ("Without Alex Chen, ..."), and no proper name is made of them.
+# Closed-class English words. They carry no facts, so a run made only of them is never a name.
+# Kept small on purpose: it is a guard against artefacts like "In The", not the mechanism the
+# check relies on — that is the attested-name strip below.
 _FUNCTION_WORDS = frozenset(
     {
         "a", "after", "all", "also", "an", "and", "another", "any", "as", "at", "because",
         "before", "both", "but", "by", "each", "either", "every", "for", "from", "her", "his",
         "however", "if", "in", "into", "its", "neither", "no", "none", "nor", "not", "of", "on",
         "once", "one", "only", "or", "our", "out", "over", "per", "since", "so", "some", "still",
-        "than", "that", "the", "their", "them", "then", "there", "these", "they", "this", "those",
-        "to", "two", "under", "until", "up", "when", "where", "which", "while", "who", "will",
-        "with", "within", "without", "yet",
+        "during", "than", "that", "the", "their", "them", "then", "there", "these", "they",
+        "this", "those", "to", "two", "under", "until", "up", "when", "where", "which", "while",
+        "who", "will", "with", "within", "without", "yet",
     }
 )
 
@@ -107,44 +139,76 @@ def find_inability_language(text: str) -> list[str]:
     return _found(text, INABILITY_MARKERS)
 
 
-def find_unattested_names(text: str, attested: Iterable[str]) -> list[str]:
-    """Proper names in `text` that were not among the facts the generator was given.
+def find_unattested_names(
+    text: str, attested: Iterable[str], people: Iterable[str] = ()
+) -> list[str]:
+    """Proper names in `text` that the facts handed to the generator do not account for.
 
-    `attested` is every name the caller supplied to the generator — capabilities, systems,
-    components, evidence references, and the people the context actually names. A run is accepted
-    when every one of its words appears in one of those names, which tolerates rephrasing
-    ("the Payment Gateway recovery path") while still catching a name that arrived from nowhere.
+    `attested` is every name the caller supplied — capabilities, systems, components, evidence
+    references, and the people the context names. `people` is the subset of those that are
+    individuals; their name fragments get the stricter rule, because an invented colleague is the
+    most damaging thing this product could print.
 
-    The first word of a run that opens a sentence or a line is skipped: it may be capitalised by
-    position rather than because it is part of a name, which is the difference between "Shadow
-    Incident Recovery" as a task title and "Sarah Kim" as an invented colleague. Callers that
-    assemble several fields into one string should join them with newlines so each field keeps
-    its own opening position.
+    Read the module docstring before relying on this: it catches recombined person names and
+    unattested capitalised runs in sentence-cased prose, and it deliberately does not fire on a
+    fully capitalised line, where capitalisation distinguishes nothing.
     """
-    vocabulary = {
-        _normalise(word)
-        for name in attested
-        if name
-        for word in _WORD.findall(str(name))
+    names = sorted(
+        {str(name).strip() for name in attested if str(name).strip()}, key=len, reverse=True
+    )
+    vocabulary = {_normalise(word) for name in names for word in _WORD.findall(name)}
+    person_parts = {
+        _normalise(word) for name in people if name for word in _WORD.findall(str(name))
     }
     vocabulary.discard("")
-    unattested: list[str] = []
-    for match in _PROPER_NAME.finditer(text):
-        run = match.group(0)
-        words = run.split()
-        if _opens_a_sentence(text, match.start()):
-            words = words[1:]
-        tokens = [_normalise(word) for word in words]
-        unknown = [
-            token
-            for token in tokens
-            if token and token not in vocabulary and token not in _FUNCTION_WORDS
-        ]
-        if unknown and run not in unattested:
-            unattested.append(run)
-    return unattested
+    person_parts.discard("")
+
+    flagged: list[str] = []
+    for line in text.splitlines():
+        # Removing the attested names first is what makes the rest meaningful: "Shadow Alex Chen
+        # During Incident Recovery" becomes "Shadow \x00 During \x00", and what survives is only
+        # the wording the facts do not account for. The sentinel is a non-space character so the
+        # words either side of a removed name do not become adjacent and read as one run.
+        residue = _strip_attested(line, names)
+        informative = _is_sentence_cased(line)
+        for match in _PROPER_NAME.finditer(residue):
+            run = match.group(0)
+            tokens = [_normalise(word) for word in run.split()]
+
+            # A surviving piece of a person's name, adjacent to another capitalised word: the
+            # full name was not written, so this is a different person built out of a real one.
+            recombined = any(token in person_parts for token in tokens)
+
+            # A capitalised closed-class word inside the run is title casing showing through even
+            # on an otherwise lower-case line — "Execute Incident Recovery In Staging as agreed"
+            # capitalises "In" because it is quoting a title, and nobody writes "In" mid-sentence
+            # otherwise. Capitalisation says nothing about that run, so the same reasoning as the
+            # line-level test applies to it.
+            quoted_title = any(token in _FUNCTION_WORDS for token in tokens)
+
+            unattested = (
+                informative
+                and not quoted_title
+                and any(token and token not in vocabulary for token in tokens)
+            )
+
+            if (recombined or unattested) and run not in flagged:
+                flagged.append(run)
+    return flagged
 
 
-def _opens_a_sentence(text: str, position: int) -> bool:
-    head = text[:position].rstrip(" \t")
-    return not head or head[-1] in ".:;!?\n"
+def _strip_attested(line: str, names: list[str]) -> str:
+    """Blank out every attested name, longest first so overlapping names cannot half-match."""
+    for name in names:
+        line = re.sub(rf"(?<!\w){re.escape(name)}(?!\w)", "\x00", line, flags=re.IGNORECASE)
+    return line
+
+
+def _is_sentence_cased(line: str) -> bool:
+    """Whether capitalisation carries information on this line.
+
+    A line with at least one lower-case word is being written as prose, so a capitalised word on
+    it is a deliberate signal. A line where every word is capitalised is a title, and on a title
+    the signal is gone — see the module docstring.
+    """
+    return any(word[:1].islower() for word in _WORD.findall(line))
