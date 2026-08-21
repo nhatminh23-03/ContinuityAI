@@ -89,6 +89,11 @@ def get_provider(name: str | None = None) -> AIProvider:
         from app.ai.watsonx import WatsonxProvider
 
         return WatsonxProvider()
+    if requested in {"openrouter", "openrouter.ai"}:
+        # The mirror image of watsonx: rule-based extraction, model-written narratives.
+        from app.ai.openrouter import OpenRouterProvider
+
+        return OpenRouterProvider()
     if requested == "cached":
         # Extraction replayed from a committed cache: model-derived evidence, offline seeding.
         from app.ai.cache import CachedProvider

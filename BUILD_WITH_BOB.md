@@ -1093,3 +1093,70 @@ what remain.
 
 **Validation.** `cd backend && PYTHONPATH=. .venv/bin/python -m pytest tests/test_narrative_validation.py
 tests/test_golden_path.py tests/test_responsible_ai.py` → 94 passed. Full suite → 215 passed.
+
+### 2026-08-21 — Add the OpenRouter provider: model-written narratives behind the gate
+
+The mirror image of `WatsonxProvider`. That one lets a model do extraction and keeps the narratives
+deterministic; `OpenRouterProvider` does the opposite — extraction delegates to
+`DeterministicProvider` in one line, and a model writes only the three manager-facing narratives.
+The split follows from where the damage is. Every risk number in the product is computed from the
+extracted graph, so a model reading an artifact differently changes readiness, exposure and
+continuity risk while every number still looks plausible. The narratives change no conclusion and
+are the part a manager reads out in a room, so that is where the model calls are spent.
+
+**Every generation passes the gate before it is returned.** Each narrative method builds a context
+message, calls the model, parses, validates through `app/ai/validation.py`, and returns the result
+only if the outcome is accepted. Any failure at all — transport, timeout, output that is not JSON,
+a field the model omitted, a rejection by the gate — logs at WARN and returns
+`self._fallback.<same method>(context)`. `generate_mitigation_plan` returns `outcome.draft`, the
+filtered draft, never the one that was passed in: the gate drops citations that do not resolve, and
+an unresolvable evidence id in front of a manager is a citation to nothing. `target_readiness` is
+copied from the context and never taken from the model.
+
+**Grounding is prompt-enforced, and that is a deliberate division of labour.** The gate's
+`find_unattested_names` is a documented heuristic with known blind spots — a single-word invention
+and a lower-case invented capability both pass it, which
+`test_known_blind_spots_of_the_name_check` pins on purpose. So the three prompt files carry the
+grounding rule explicitly: use only the capability names, engineer names and evidence ids in the
+message, name no colleague who is not listed, invent nothing. The prompts live in
+`app/ai/prompts/*.txt` rather than in code, which also lets them name prohibited wording *in order
+to forbid it* without tripping the `.py` literal scan in `tests/test_responsible_ai.py` — the same
+workaround `watsonx.py:333-335` documents. The plan prompt takes its action count from
+`validation._task_count_band` rather than restating it, so a prompt cannot ask for a count the gate
+would reject; a mismatch there would fall back on every call, silently.
+
+**Timeouts are sized to AC-14.** `openrouter_timeout_seconds` defaults to 3.5 because
+`explain_candidate` is issued once per candidate and up to three run sequentially
+(`app/recommendation/service.py`), so 3 × 3.5 = 10.5s stays inside the 12-second budget for an AI
+plan or explanation operation. Deliberately not batched: batching would change the `AIProvider`
+protocol for one provider's convenience. `openrouter_max_retries` defaults to 0 for the same
+reason — a second call spends the rest of the budget to buy a wording that the template already
+provides — and the retry/backoff loop honours a higher value where latency is not budgeted, with
+`Retry-After` capped at 2s. A plan is one call per request rather than one of three, so it gets
+twice the per-call ceiling.
+
+**The cache guard is a refusal, not a note.** `scripts/extract_with_provider.py` names its output
+after the provider, so `--provider openrouter` would write an `openrouter_cache.json` full of
+string-matched output, and a later provider comparison would compare the deterministic provider
+against itself without knowing it. The provider raises `CacheBuildRefusedError` from its
+constructor when the entry script is the cache builder, which stops the run before the first
+artifact instead of printing 640 identical per-artifact failures and still writing the file.
+Verified by running the script: it aborts at `get_provider`, and `data/extraction/` is untouched.
+
+**Files changed.** `backend/app/ai/openrouter.py` (new), `backend/app/ai/prompts/`
+`simulation_summary_system.txt`, `candidate_narrative_system.txt`, `mitigation_plan_system.txt`
+(new), `backend/app/ai/provider.py` (registration), `backend/app/core/config.py`
+(`openrouter_api_key`, `openrouter_base_url`, `openrouter_model`, `openrouter_timeout_seconds`,
+`openrouter_max_retries`), `backend/tests/test_openrouter_provider.py` (new).
+
+**Validation.** `cd backend && PYTHONPATH=. .venv/bin/python -m pytest tests/test_openrouter_provider.py`
+→ 31 passed. Full suite → 246 passed, up from 215 with none lost. No test touches the network:
+`_chat` is stubbed the way `tests/test_watsonx_provider.py` stubs it, and the four transport tests
+replace the httpx client instead. Each of the three narratives is covered four ways — a good reply
+accepted, a reply the gate rejects, a malformed or fenced reply, and a transport failure — each
+asserting the deterministic template is what comes back.
+
+**Open questions.** Nothing here has been run against the live API yet; the timeout figures are
+budget arithmetic, not measurements, and a real pass may show 3.5s is tight for a candidate
+explanation. Whether narrative generation should be enabled for the demo at all is a separate call:
+`AI_PROVIDER` still defaults to `deterministic`, so this changes nothing until it is set.

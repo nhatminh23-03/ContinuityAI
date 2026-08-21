@@ -21,7 +21,8 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     database_url: str = f"sqlite:///{REPO_ROOT / 'backend' / 'continuity.db'}"
 
-    # Extraction provider: `deterministic` (offline, reproducible) or `watsonx` (IBM watsonx.ai).
+    # Provider: `deterministic` (offline, reproducible), `cached` (replayed model extraction),
+    # `watsonx` (IBM watsonx.ai) or `openrouter` (model-written narratives, rule-based extraction).
     ai_provider: str = "deterministic"
     ai_model: str = ""
     ai_api_key: str = ""
@@ -38,6 +39,23 @@ class Settings(BaseSettings):
     # Hard service ceiling per instance — 2/s on the plan this was developed against. Exceeding it
     # returns 429 for the whole burst, so the client paces itself rather than discovering the limit.
     watsonx_requests_per_second: float = 2.0
+
+    # OpenRouter, an OpenAI-compatible gateway. Used the other way round from watsonx: extraction
+    # stays deterministic and the model writes only the three manager-facing narratives, each of
+    # which passes app/ai/validation.py before it can be returned. Credentials live in
+    # backend/.env, which is gitignored.
+    openrouter_api_key: str = ""
+    openrouter_base_url: str = "https://openrouter.ai/api/v1"
+    openrouter_model: str = "anthropic/claude-sonnet-5"
+    # AC-14 allows 12 seconds for an AI plan or explanation operation. `explain_candidate` is
+    # issued once per candidate and up to three run sequentially (app/recommendation/service.py),
+    # so the per-call ceiling is a third of the budget. A slower answer than that is worth less
+    # than the deterministic template it falls back to.
+    openrouter_timeout_seconds: float = 3.5
+    # One attempt by default, for the same reason: a second call costs the rest of the budget and
+    # buys a wording, while the template is already sitting there. Raise it where latency is not
+    # budgeted.
+    openrouter_max_retries: int = 0
 
     # Shared contract fixtures, jointly owned. Contract decision CI-14.
     fixtures_path: Path = REPO_ROOT / "fixtures"
