@@ -115,7 +115,7 @@ class BackupCandidateService:
         for row in system_coverage:
             by_engineer.setdefault(row.engineer_id, {})[row.capability_id] = row
 
-        scored: list[tuple[int, BackupCandidate]] = []
+        scored: list[tuple[int, BackupCandidate, CandidateNarrativeContext]] = []
         for engineer_id, coverage_by_capability in by_engineer.items():
             if engineer_id in excluded or engineer_id not in engineers:
                 continue
@@ -129,23 +129,29 @@ class BackupCandidateService:
             )
             if score <= 0:
                 continue
-            scored.append(
-                (
-                    score,
-                    self._candidate(
-                        engineer_id,
-                        engineers[engineer_id].name,
-                        score,
-                        coverage_by_capability,
-                        capability,
-                        capabilities,
-                        system_evidence,
-                    ),
-                )
+            candidate, narrative_context = self._candidate(
+                engineer_id,
+                engineers[engineer_id].name,
+                score,
+                coverage_by_capability,
+                capability,
+                capabilities,
+                system_evidence,
             )
+            scored.append((score, candidate, narrative_context))
 
         scored.sort(key=lambda item: (-item[0], item[1].engineer_id))
-        candidates = [candidate for _, candidate in scored[: request.limit]]
+
+        # Narration happens here, after the slice, rather than inside the scoring loop above. The
+        # loop runs once per *eligible engineer* — four of them for cap_retry_logic on the seeded
+        # dataset, and bounded by nothing except how many engineers happen to qualify — so a
+        # model-backed provider was being paid for narratives on candidates that were then
+        # discarded, and enough of them to put AC-14's 12-second budget out of reach. Deferring
+        # bounds the provider calls at `limit`, which the contract caps at 3.
+        candidates = [
+            self._narrate(candidate, narrative_context)
+            for _, candidate, narrative_context in scored[: request.limit]
+        ]
 
         # `message` is omitted rather than sent as null when candidates exist: the contract only
         # documents it for the empty case, and an explicit null would show up as a contract diff.
@@ -244,7 +250,13 @@ class BackupCandidateService:
         capability,
         capabilities: dict,
         system_evidence: list,
-    ) -> BackupCandidate:
+    ) -> tuple[BackupCandidate, CandidateNarrativeContext]:
+        """The candidate's structured half, plus the facts a provider may narrate.
+
+        The two are returned separately because narration is deferred to `_narrate`, which runs
+        only for the candidates that survive the `limit` slice. Everything here is computed for
+        every eligible engineer, because the score decides who survives.
+        """
         target_row = coverage_by_capability.get(capability.capability_id)
         target_readiness = (
             ReadinessLevel(target_row.readiness) if target_row is not None else ReadinessLevel.NONE
@@ -271,15 +283,13 @@ class BackupCandidateService:
             elif other.component_id == capability.component_id:
                 missing.append(other.name)
 
-        narrative = self.provider.explain_candidate(
-            CandidateNarrativeContext(
-                capability_name=capability.name,
-                candidate_name=engineer_name,
-                technical_overlap=self._band(score).value,
-                demonstrated_capabilities=demonstrated[:MAX_STRENGTHS],
-                assisted_capabilities=assisted[:MAX_STRENGTHS],
-                missing_capabilities=missing[:MAX_GAPS],
-            )
+        narrative_context = CandidateNarrativeContext(
+            capability_name=capability.name,
+            candidate_name=engineer_name,
+            technical_overlap=self._band(score).value,
+            demonstrated_capabilities=demonstrated[:MAX_STRENGTHS],
+            assisted_capabilities=assisted[:MAX_STRENGTHS],
+            missing_capabilities=missing[:MAX_GAPS],
         )
 
         supporting = [
@@ -299,14 +309,36 @@ class BackupCandidateService:
             else EvidenceConfidence.LOW
         )
 
-        return BackupCandidate(
-            engineer_id=engineer_id,
-            name=engineer_name,
-            technical_overlap=self._band(score),
-            strengths=narrative.strengths[:MAX_STRENGTHS],
-            gaps=narrative.gaps[:MAX_GAPS],
-            evidence_confidence=confidence,
-            supporting_evidence_ids=supporting,
+        return (
+            BackupCandidate(
+                engineer_id=engineer_id,
+                name=engineer_name,
+                technical_overlap=self._band(score),
+                # Filled by `_narrate` for the candidates that are actually returned.
+                strengths=[],
+                gaps=[],
+                evidence_confidence=confidence,
+                supporting_evidence_ids=supporting,
+            ),
+            narrative_context,
+        )
+
+    def _narrate(
+        self, candidate: BackupCandidate, context: CandidateNarrativeContext
+    ) -> BackupCandidate:
+        """Ask the provider for this candidate's strengths and gaps.
+
+        The one place a provider is called on this path, and it is called once per returned
+        candidate. Whatever the provider is, the facts it narrates were decided above by the
+        rules; a provider that fails or wanders returns the deterministic template instead, so
+        the structured half of the candidate is unaffected either way.
+        """
+        narrative = self.provider.explain_candidate(context)
+        return candidate.model_copy(
+            update={
+                "strengths": narrative.strengths[:MAX_STRENGTHS],
+                "gaps": narrative.gaps[:MAX_GAPS],
+            }
         )
 
     @staticmethod

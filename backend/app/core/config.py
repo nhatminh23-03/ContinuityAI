@@ -48,9 +48,11 @@ class Settings(BaseSettings):
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
     openrouter_model: str = "anthropic/claude-sonnet-5"
     # AC-14 allows 12 seconds for an AI plan or explanation operation. `explain_candidate` is
-    # issued once per candidate and up to three run sequentially (app/recommendation/service.py),
-    # so the per-call ceiling is a third of the budget. A slower answer than that is worth less
-    # than the deterministic template it falls back to.
+    # issued once per *returned* candidate — app/recommendation/service.py narrates after the
+    # `limit` slice — and the contract caps `limit` at 3, so three sequential calls is the bound
+    # and the per-call ceiling is a third of the budget. Narrating inside the scoring loop instead
+    # made that bound the number of eligible engineers, which is four on the seeded data and
+    # capped by nothing. A slower answer is worth less than the template it falls back to.
     openrouter_timeout_seconds: float = 3.5
     # One attempt by default, for the same reason: a second call costs the rest of the budget and
     # buys a wording, while the template is already sitting there. Raise it where latency is not

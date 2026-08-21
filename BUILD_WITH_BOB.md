@@ -1125,10 +1125,11 @@ workaround `watsonx.py:333-335` documents. The plan prompt takes its action coun
 `validation._task_count_band` rather than restating it, so a prompt cannot ask for a count the gate
 would reject; a mismatch there would fall back on every call, silently.
 
-**Timeouts are sized to AC-14.** `openrouter_timeout_seconds` defaults to 3.5 because
-`explain_candidate` is issued once per candidate and up to three run sequentially
-(`app/recommendation/service.py`), so 3 × 3.5 = 10.5s stays inside the 12-second budget for an AI
-plan or explanation operation. Deliberately not batched: batching would change the `AIProvider`
+**Timeouts are sized to AC-14.** `openrouter_timeout_seconds` defaults to 3.5 so that three
+sequential calls come to 10.5s, inside the 12-second budget for an AI plan or explanation
+operation. *Corrected the same day: the "three sequential calls" premise was false when this was
+written — `explain_candidate` ran once per eligible engineer, four of them on the seeded data. See
+the entry below, which moved narration after the `limit` slice and made the bound real.* Deliberately not batched: batching would change the `AIProvider`
 protocol for one provider's convenience. `openrouter_max_retries` defaults to 0 for the same
 reason — a second call spends the rest of the budget to buy a wording that the template already
 provides — and the retry/backoff loop honours a higher value where latency is not budgeted, with
@@ -1160,3 +1161,73 @@ asserting the deterministic template is what comes back.
 budget arithmetic, not measurements, and a real pass may show 3.5s is tight for a candidate
 explanation. Whether narrative generation should be enabled for the demo at all is a separate call:
 `AI_PROVIDER` still defaults to `deterministic`, so this changes nothing until it is set.
+
+### 2026-08-21 — Review fixes: bound the narrative calls, catch the overstatement, fail loudly
+
+Four fixes from the review of the OpenRouter provider. The core property held under attack — eight
+mutations produced no route by which model output reaches a caller unvalidated — so these are about
+the budget the provider sits inside and about three ways it could degrade silently.
+
+**The AC-14 budget was unenforceable, and the timeout was sized against a false premise.**
+`explain_candidate` was called from `_candidate(...)` inside the scoring loop, which runs once per
+*eligible engineer*, not once per returned candidate: the `scored[: request.limit]` slice happens
+afterwards. Measured across all 25 capabilities on the seeded dataset, the worst case was
+`cap_retry_logic` at 4 calls for 3 returned candidates — 14s against a 12-second budget, bounded by
+nothing except how many engineers happen to qualify.
+
+Fixed at the source rather than by shrinking the timeout. `_candidate` now returns the structured
+candidate together with the `CandidateNarrativeContext`, and `_narrate` runs over the sliced list,
+so the provider is called once per candidate that is actually returned and the bound is `limit`,
+which the contract caps at 3. That stops paying for prose on candidates about to be discarded,
+which is worth doing whatever the provider is. Measured again after the change: 3 calls for 3
+returned, worst case across every capability.
+
+The DTO is unchanged for the candidates that are returned. `tests/test_recommendation_service.py`
+pins all three properties — narratives written equals candidates returned, in the returned order,
+across every capability; a `limit` of 1 buys one call; and the endpoint payload still equals
+`fixtures/backup-candidates.json` field for field. Mutation-checked by stashing the service change
+and re-running: two of the three fail against the old code.
+
+`test_the_call_stays_inside_the_operation_budget` asserted `timeout * 3 <= 12` with a hardcoded 3,
+so it asserted an assumption about the caller rather than the caller's bound and could never have
+caught this. It now reads the `le` constraint off `BackupCandidateRequest.limit`.
+
+**The product's stated core failure mode was passing the gate.** `validate_candidate_narrative`
+flattens the demonstrated, assisted and missing lists into one `attested` list before handing them
+to `find_unattested_names`, which loses the bucket — so with Incident Recovery assisted-only in the
+context, `Demonstrated Incident Recovery independently` was accepted and returned to a manager. The
+name check cannot see this by construction: the capability *is* attested.
+
+Added the bucket-aware rule to `validate_candidate_narrative`, which is the only place that still
+has the lists apart, in the report-don't-raise style of the module. A strength naming a capability
+the record holds as assisted-only or missing, alongside wording that claims independent execution,
+is rejected. The marker vocabulary went to `language_policy.py` as `find_independence_language`,
+beside `find_inability_language` and `find_probability_language`, because that module owns what
+words mean here while validation owns which facts they may be applied to. Six tests: five rejected
+phrasings, the same wording accepted for a demonstrated capability, and assisted participation
+still stateable as assisted. The deterministic gap line — "No qualifying independent evidence for
+X" — is unaffected: the rule reads strengths only, and `test_the_deterministic_narrative_passes_its
+_own_gate` covers it.
+
+**Two silent-degradation holes closed.** `_clean` coerced anything to `str`, so a strengths entry
+returned as an object became the literal text `{'capability': 'Provider Failover', 'note': ...}` in
+front of a manager and passed the gate as one unremarkable line; it now keeps text entries only,
+which empties the list and routes to the template. `_plan_task` had the same shape via
+`str(entry["title"])` and now takes the fields as they came. And the constructor validated only the
+API key, so an empty `OPENROUTER_BASE_URL` or `OPENROUTER_MODEL` in `.env` — which silently beats
+the default — constructed fine and then degraded to templates forever behind one WARN line. All
+three are now checked, naming each missing value, matching `watsonx.py:86-95`.
+
+**Files changed.** `backend/app/recommendation/service.py`, `backend/app/ai/validation.py`,
+`backend/app/ai/language_policy.py`, `backend/app/ai/openrouter.py`, `backend/app/core/config.py`,
+`backend/tests/test_recommendation_service.py` (new), `backend/tests/test_narrative_validation.py`,
+`backend/tests/test_openrouter_provider.py`.
+
+**Validation.** `cd backend && PYTHONPATH=. .venv/bin/python -m pytest` → 261 passed, from 246,
+with no test removed and one rewritten. `tests/test_golden_path.py tests/test_api_contract.py` →
+33 passed, run explicitly because the recommendation service changed. No network, no seeding, no
+live API call.
+
+**Open questions.** Unchanged from the previous entry: none of this has run against the live API,
+and the per-call ceiling is still arithmetic rather than measurement. The 12-second budget now has
+a real bound behind it, which is what makes measuring it meaningful.

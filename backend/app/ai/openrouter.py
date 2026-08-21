@@ -109,10 +109,19 @@ class OpenRouterProvider:
     name = "openrouter"
 
     def __init__(self) -> None:
-        if not settings.openrouter_api_key:
+        # All three, not only the key. `openrouter_base_url` and `openrouter_model` have defaults,
+        # but an empty override in .env silently beats the default, and the symptom would be every
+        # narrative degrading to the template forever behind a single WARN line — the exact silent
+        # failure this provider is built to avoid. Missing configuration fails at construction.
+        missing = [
+            field
+            for field in ("openrouter_api_key", "openrouter_base_url", "openrouter_model")
+            if not getattr(settings, field)
+        ]
+        if missing:
             raise ValueError(
-                "AI_PROVIDER=openrouter requires OPENROUTER_API_KEY in backend/.env. "
-                "Never commit real credentials."
+                f"AI_PROVIDER=openrouter requires {', '.join(m.upper() for m in missing)} in "
+                f"backend/.env. Never commit real credentials."
             )
         self._refuse_to_build_an_extraction_cache()
         self.model_id = settings.openrouter_model
@@ -345,20 +354,32 @@ class OpenRouterProvider:
 
     @staticmethod
     def _plan_task(entry: dict) -> PlanTaskDraft:
-        """Field by field, so a missing one is a failure here rather than a surprise downstream."""
+        """Field by field, so a missing one is a failure here rather than a surprise downstream.
+
+        Deliberately no `str()` coercion: a model that returns an object where a title was asked
+        for has not answered the question, and coercing it would print a Python repr into a plan a
+        manager approves. Letting the attribute error escape routes it to the template instead.
+        """
         return PlanTaskDraft(
-            title=str(entry["title"]).strip(),
-            description=str(entry["description"]).strip(),
-            task_type=str(entry["task_type"]).strip().upper(),
+            title=entry["title"].strip(),
+            description=entry["description"].strip(),
+            task_type=entry["task_type"].strip().upper(),
             acceptance_criteria=OpenRouterProvider._clean(entry.get("acceptance_criteria")),
             linked_evidence_ids=OpenRouterProvider._clean(entry.get("linked_evidence_ids")),
         )
 
     @staticmethod
     def _clean(values: object) -> list[str]:
+        """Text entries only.
+
+        Same reason as above: `str()` on a dict the model invented — `{"capability": "...",
+        "note": "..."}` where a line of prose was asked for — yields a repr that reads as garbage
+        to a manager and passes the gate as one long unremarkable string. Dropping non-text
+        entries empties the list, the gate rejects it for being empty, and the template is used.
+        """
         if not isinstance(values, list):
             return []
-        return [str(v).strip() for v in values if str(v).strip()]
+        return [value.strip() for value in values if isinstance(value, str) and value.strip()]
 
     @staticmethod
     def _lines(names: list[str]) -> str:

@@ -33,6 +33,9 @@ from app.schemas.enums import EvidenceSourceType
 
 RULES = DeterministicProvider()
 
+# AC-14: an AI plan or explanation operation answers within 12 seconds.
+AI_OPERATION_BUDGET_SECONDS = 12
+
 # ---------------------------------------------------------------------------------------
 # Fixtures and helpers
 # ---------------------------------------------------------------------------------------
@@ -168,6 +171,23 @@ def test_a_missing_credential_fails_at_construction(monkeypatch) -> None:
     from app.ai.openrouter import OpenRouterProvider
 
     with pytest.raises(ValueError, match="OPENROUTER_API_KEY"):
+        OpenRouterProvider()
+
+
+@pytest.mark.parametrize(
+    ("field", "named"),
+    [("openrouter_base_url", "OPENROUTER_BASE_URL"), ("openrouter_model", "OPENROUTER_MODEL")],
+)
+def test_an_empty_setting_that_has_a_default_still_fails_at_construction(
+    monkeypatch, field, named
+) -> None:
+    """An empty value in .env beats the default silently, and the only symptom would be every
+    narrative degrading to the template behind one WARN line."""
+    monkeypatch.setattr(settings, "openrouter_api_key", "test-key")
+    monkeypatch.setattr(settings, field, "")
+    from app.ai.openrouter import OpenRouterProvider
+
+    with pytest.raises(ValueError, match=named):
         OpenRouterProvider()
 
 
@@ -310,6 +330,33 @@ def test_a_candidate_narrative_naming_an_invented_colleague_falls_back(provider)
     assert provider.explain_candidate(context) == RULES.explain_candidate(context)
 
 
+def test_strengths_returned_as_objects_fall_back_rather_than_printing_a_repr(provider) -> None:
+    """Coercing whatever came back into a string would put `{'capability': ...}` in front of a
+    manager, and it would sail through the gate as one unremarkable line."""
+    reply(
+        provider,
+        """{"strengths": [{"capability": "Provider Failover", "note": "totally made up"}],
+        "gaps": ["No qualifying evidence for Ledger Reconciliation"]}""",
+    )
+    context = candidate_context()
+    narrative = provider.explain_candidate(context)
+
+    assert narrative == RULES.explain_candidate(context)
+    assert not any("capability" in s and "{" in s for s in narrative.strengths)
+
+
+def test_an_overstated_strength_falls_back(provider) -> None:
+    """Incident Recovery is assisted-only in this context, so a strength claiming it was
+    demonstrated independently is the overstatement the whole product is built to avoid."""
+    reply(
+        provider,
+        """{"strengths": ["Demonstrated Incident Recovery independently"],
+        "gaps": ["No qualifying evidence for Ledger Reconciliation"]}""",
+    )
+    context = candidate_context()
+    assert provider.explain_candidate(context) == RULES.explain_candidate(context)
+
+
 def test_a_candidate_reply_that_is_not_json_falls_back(provider) -> None:
     reply(provider, "Maria looks like a strong choice to me.")
     context = candidate_context()
@@ -401,6 +448,15 @@ def test_a_plan_missing_required_task_fields_falls_back(provider) -> None:
     assert provider.generate_mitigation_plan(context) == RULES.generate_mitigation_plan(context)
 
 
+def test_a_plan_field_returned_as_an_object_falls_back(provider) -> None:
+    """The same coercion hole as the candidate strengths, on the artifact a manager approves."""
+    tasks = good_plan_tasks()
+    tasks[0]["title"] = {"text": "Review the runbook"}
+    reply(provider, plan_payload(tasks))
+    context = plan_context()
+    assert provider.generate_mitigation_plan(context) == RULES.generate_mitigation_plan(context)
+
+
 def test_a_transport_failure_on_the_plan_falls_back(provider) -> None:
     fail(provider)
     context = plan_context()
@@ -473,10 +529,21 @@ def test_a_rate_limited_call_is_retried_and_then_gives_up(provider, monkeypatch)
     assert len(client.calls) == 2, "one retry, then the deterministic template takes over"
 
 
-def test_the_call_stays_inside_the_operation_budget(provider) -> None:
-    """AC-14 gives an AI plan or explanation 12 seconds. `explain_candidate` is issued once per
-    candidate, up to three sequentially, so the per-call ceiling has to be a third of that."""
-    assert settings.openrouter_timeout_seconds * 3 <= 12
+def test_the_call_stays_inside_the_operation_budget() -> None:
+    """AC-14 gives an AI plan or explanation 12 seconds.
+
+    `explain_candidate` is issued once per returned candidate, so the number of sequential calls
+    is bounded by the contract's cap on `limit` and the per-call ceiling has to divide the budget
+    by that. Read from the field rather than written as a literal: a hardcoded 3 here asserts an
+    assumption about the caller instead of the caller's actual bound, which is how the earlier
+    version of this test passed while the service was making four calls.
+    """
+    from app.schemas.recommendation import BackupCandidateRequest
+
+    constraints = BackupCandidateRequest.model_fields["limit"].metadata
+    max_candidates = next(c.le for c in constraints if hasattr(c, "le"))
+
+    assert settings.openrouter_timeout_seconds * max_candidates <= AI_OPERATION_BUDGET_SECONDS
 
 
 # ---------------------------------------------------------------------------------------

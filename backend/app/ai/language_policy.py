@@ -96,6 +96,24 @@ INABILITY_MARKERS: tuple[str, ...] = (
     "not capable of",
 )
 
+# Wording that claims work was done alone. Harmless on a capability the record shows independent
+# evidence for, and the central overstatement everywhere else: "assisted" and "demonstrated" are
+# kept apart throughout the model (app/ai/schemas.py, DOMAIN_MODEL.md section 10.2) because
+# collapsing them is exactly how a coverage gap disappears from view. Which capability a line is
+# talking about is not knowable here, so the caller pairs these markers with its own buckets.
+INDEPENDENCE_MARKERS: tuple[str, ...] = (
+    "demonstrated",
+    "demonstrates",
+    "demonstrating",
+    "independent",
+    "unaided",
+    "without support",
+    "without assistance",
+    "on their own",
+    "single-handed",
+    "solo",
+)
+
 # Two or more adjacent capitalised words. Each word must start upper case and continue lower
 # case, so screaming-case contract values (HIGH, CRITICAL_GAP, INC-2481) are not proper names.
 # The separator is spaces only: a run must not reach across a line break, or the last word of one
@@ -143,6 +161,15 @@ def find_probability_language(text: str) -> list[str]:
 def find_inability_language(text: str) -> list[str]:
     """Wording that describes a person's limits instead of the state of the evidence."""
     return _found(text, INABILITY_MARKERS)
+
+
+def find_independence_language(text: str) -> list[str]:
+    """Wording that claims the work was demonstrated or performed alone.
+
+    Only meaningful against a capability: the caller decides which capability the line is about
+    and whether the record supports a claim that strong.
+    """
+    return _found(text, INDEPENDENCE_MARKERS)
 
 
 def find_unattested_names(

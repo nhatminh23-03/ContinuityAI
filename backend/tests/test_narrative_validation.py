@@ -204,6 +204,54 @@ def test_a_narrative_with_no_gaps_is_rejected() -> None:
     assert not outcome.accepted
 
 
+@pytest.mark.parametrize(
+    "strength",
+    [
+        "Demonstrated Incident Recovery independently",
+        "Has demonstrated Incident Recovery end to end",
+        "Handled Incident Recovery unaided during the last outage",
+        "Ran Ledger Reconciliation on their own",
+        "Solo Ledger Reconciliation work in the last quarter",
+    ],
+)
+def test_a_strength_overstating_assisted_or_missing_work_is_rejected(strength) -> None:
+    """The failure mode the product exists to avoid, and the one the name check cannot see.
+
+    Both capabilities are attested, so the flattened list `find_unattested_names` receives has no
+    objection: only the buckets know that Incident Recovery is assisted-only here and that Ledger
+    Reconciliation is absent from the record entirely.
+    """
+    outcome = validate_candidate_narrative(
+        CandidateNarrative(strengths=[strength], gaps=list(GOOD_NARRATIVE.gaps)),
+        candidate_context(),
+    )
+    assert not outcome.accepted
+    assert any("assisted or absent" in r for r in outcome.rejections), outcome.rejections
+
+
+def test_the_same_wording_is_accepted_for_a_capability_the_record_demonstrates() -> None:
+    """The pair that proves the rule reads the bucket rather than the word."""
+    outcome = validate_candidate_narrative(
+        CandidateNarrative(
+            strengths=["Demonstrated Queue Draining independently"],
+            gaps=list(GOOD_NARRATIVE.gaps),
+        ),
+        candidate_context(),
+    )
+    assert outcome.accepted, outcome.rejections
+
+
+def test_assisted_participation_may_still_be_stated_as_assisted() -> None:
+    outcome = validate_candidate_narrative(
+        CandidateNarrative(
+            strengths=["Assisted Incident Recovery alongside the incident lead"],
+            gaps=list(GOOD_NARRATIVE.gaps),
+        ),
+        candidate_context(),
+    )
+    assert outcome.accepted, outcome.rejections
+
+
 def test_a_capability_outside_the_graph_facts_is_rejected() -> None:
     outcome = validate_candidate_narrative(
         CandidateNarrative(

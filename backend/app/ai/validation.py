@@ -30,6 +30,7 @@ import logging
 from app.ai.language_policy import (
     find_forbidden_phrases,
     find_inability_language,
+    find_independence_language,
     find_probability_language,
     find_unattested_names,
 )
@@ -281,6 +282,13 @@ def validate_candidate_narrative(
     FR-017 limits the content to evidence-backed graph facts, so every capability named has to
     come from the demonstrated, assisted, or missing lists, and the only person who may appear is
     the candidate.
+
+    Which of those three lists a capability came from matters as much as whether it appears in
+    them at all. `find_unattested_names` cannot see the difference — it is given one flattened
+    list of attested names — so a strength claiming a capability was demonstrated independently
+    passes it even where the record holds that capability as assisted-only or absent. Overstating
+    assisted participation as demonstrated is the failure this product exists to avoid, and this
+    is the only place with the buckets still in hand, so it is checked here.
     """
     outcome = NarrativeOutcome()
 
@@ -308,6 +316,31 @@ def validate_candidate_narrative(
                 f"candidate narrative names '{name}', which is neither the candidate nor a "
                 f"capability the evidence covers"
             )
+
+    # Capabilities the record does not support an independent claim for. The target capability
+    # legitimately appears in both the assisted and the missing list, hence the de-duplication,
+    # and a capability that is also demonstrated is not in question at all.
+    demonstrated = {
+        name.strip().lower() for name in context.demonstrated_capabilities if name.strip()
+    }
+    unproven: list[str] = []
+    seen: set[str] = set()
+    for name in [*context.assisted_capabilities, *context.missing_capabilities]:
+        key = name.strip().lower()
+        if key and key not in demonstrated and key not in seen:
+            seen.add(key)
+            unproven.append(name.strip())
+
+    for strength in strengths:
+        lowered = strength.lower()
+        for name in unproven:
+            if name.lower() not in lowered:
+                continue
+            for marker in find_independence_language(strength):
+                outcome.rejections.append(
+                    f"strength {strength!r} claims {marker!r} for '{name}', which the record "
+                    f"holds as assisted or absent"
+                )
 
     for gap in gaps:
         # PRD section 22.3. The gap is that the record holds no qualifying evidence, which is a
