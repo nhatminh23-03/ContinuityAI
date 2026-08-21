@@ -943,3 +943,77 @@ was confirmed failing against the unfixed code (bare `ValueError` from `_to_resp
 golden-path mitigation create/approve/edit coverage (deterministic-provider output unchanged).
 
 **Open questions.** None for this task.
+
+---
+
+## 2026-08-21 — The language policy and the narrative validation gate
+
+**What was built/decided.** The safety gate that model-written manager-facing prose has to pass.
+Nothing calls it yet; it exists so that the next step — letting a language model write the
+simulation sentence, the candidate strengths and gaps, and the mitigation plan — is defensible
+rather than hopeful. Every check reports; none of them raises, so a caller that gets a rejection
+falls back to the deterministic template and the request still succeeds.
+
+`app/ai/language_policy.py` holds the wording rules: the canonical prohibited-phrase list, the
+probability markers (`%`, "probability", "chance of", "will fail") that would turn a coverage
+statement into an outage forecast, the inability markers that would turn absence of evidence into
+a claim about a person (PRD 22.3), and an unattested-name check. The phrase list previously
+existed only in `tests/test_responsible_ai.py`, where it was applied to source-code string
+literals and never to runtime output; it is now enforceable at runtime with contents unchanged, so
+the test can import it in a later task without altering behaviour.
+
+Two decisions worth recording:
+
+* The phrase list lives in `app/ai/prohibited_phrases.txt` rather than as literals in the module.
+  `test_responsible_ai.py::test_no_prohibited_phrase_appears_in_generated_text` scans string
+  constants under `app/ai` for exactly these phrases, so a module that spelled them out would be
+  flagged by the rule it exists to enforce — the same reason that test already excludes
+  `app/ai/prompts/`. Holding them as data avoids needing an exception in a check that is most
+  useful when it is blunt.
+* The unattested-name check is a heuristic and is biased on purpose. It reads multi-word
+  capitalised runs as proper names, skips a run's first word where it opens a sentence or line
+  (it may be capitalised by position — "Shadow Incident Recovery" is a task title), and requires
+  every remaining word to come from the facts the generator was given or to be a closed-class
+  function word. It over-reports rather than under-reports: a false positive costs the generated
+  wording, a false negative puts an invented capability or an invented colleague in front of a
+  manager.
+
+`app/ai/validation.py` gains the three validators beside `validate_extraction`, sharing its shape:
+`validate_simulation_summary`, `validate_candidate_narrative`, `validate_plan_draft`. Unknown
+`linked_evidence_ids` are dropped with a correction logged rather than rejecting the plan,
+mirroring how `validate_extraction` corrects an evidence strength instead of discarding the claim.
+The task-count rule (AC-10, 3-5 actions) is checked here as well as in `MitigationPlanService`
+because the service raises `MitigationGenerationError` — right for a broken generator, wrong for a
+model that simply wrote six actions, which should quietly fall back mid-demo.
+
+AC-09 (the plan is specific to the chosen candidate) was previously an implicit property of the
+template in `deterministic.py`: a candidate at `NONE`/`EXPOSED` gets an extra `RECOVERY_DRILL`
+task, one who has already assisted does not, and `test_golden_path.py:208-218` asserts the
+comparison between two generated plans. A validator only ever sees one plan, so the rule is
+encoded as readiness bands whose ranges do not overlap: the `NONE`/`EXPOSED` band takes exactly
+five actions and must include a `RECOVERY_DRILL`; `ASSISTED` and above take three or four and must
+not. Any two plans that pass therefore satisfy the comparison. `requires_recovery_drill` is the
+single definition of the readiness half of that rule and `DeterministicProvider` now branches on
+it, so the template and the gate cannot drift apart silently.
+
+**Files created.** `backend/app/ai/language_policy.py`,
+`backend/app/ai/prohibited_phrases.txt`, `backend/tests/test_narrative_validation.py`.
+**Files changed.** `backend/app/ai/validation.py` (the three validators, the outcome types, the
+shared AC-09 predicate), `backend/app/ai/deterministic.py` (the drill branch now calls
+`requires_recovery_drill`).
+
+**Implements.** Task 2 of
+`.superpowers/sdd/superpowers-brainstorming-continuityai-merry-heron/task-2-brief.md`: PRD 22.3
+wording rules, FR-017 evidence-backed narrative content, AC-09 and AC-10 on the plan.
+
+**Validation.** Test-first, one test per rejection path with its accepting case beside it:
+`cd backend && PYTHONPATH=. .venv/bin/python -m pytest tests/test_narrative_validation.py` → 50
+passed. Two of those tests run the deterministic provider's own summary, narrative, and plan
+(across all five readiness levels) back through the gate, which is what fails first if the
+template and the validator ever disagree. Full backend suite → 198 passed, including
+`test_responsible_ai.py` and the golden-path AC-09/AC-10 assertions, unchanged.
+
+**Open questions.** The unattested-name heuristic accepts a recombination of given words
+("Payment Recovery" from "Payment Gateway" and "Incident Recovery"). Tightening that needs the
+capability taxonomy passed into the validator, which the brief's signatures do not carry; worth
+revisiting if the prompt work shows the model actually doing it.

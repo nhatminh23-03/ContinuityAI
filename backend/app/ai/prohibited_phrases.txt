@@ -1,0 +1,17 @@
+# Wording that must never reach a manager, whatever produced it.
+#
+# Held as data rather than as string literals in language_policy.py on purpose: the
+# responsible-AI check in tests/test_responsible_ai.py scans string constants in app/ai for
+# exactly these phrases, and a module that spelled them out would be flagged by the rule it
+# exists to enforce. Same reasoning as the prompts/ exclusion noted in that test.
+#
+# One phrase per line, lower case, matched as a substring of lower-cased output.
+# DOMAIN_MODEL.md section 10.2, PRD section 22.
+best employee
+cannot recover
+chance of failure
+probability of outage
+irreplaceable
+critical employee
+weak engineer
+low-value engineer
