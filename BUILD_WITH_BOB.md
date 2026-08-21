@@ -1485,3 +1485,37 @@ narrative call at the 3.5-second default can exceed it on its own; making the pe
 sharpens that number without resolving the conflict. And closing the lower-case and title-cased
 name-check blind spots still needs the capability taxonomy passed into the validator the way
 `validate_extraction` receives it. DEC-15 (OPEN-10) still awaits Person A's acknowledgement.
+
+## 2026-08-21 — Three documentation corrections from final re-review
+
+Three factual inaccuracies caught by a final re-review, fixed with no code, test, or behaviour
+change.
+
+1. DEC-15 in `docs/DECISIONS.md` claimed "`watsonx.py`'s reasoning and its code are both
+   untouched." Commit `a11aea7` had already changed both — the module docstring's reasoning and
+   `summarize_simulation`'s code — to apply the `validate_simulation_summary` gate, and that entry
+   was never updated to say so. The clause now states what is true: `AI_PROVIDER` still defaults to
+   `deterministic`, `explain_candidate` and `generate_mitigation_plan` still delegate to the
+   deterministic templates for the reasons stated in their own bodies, and `summarize_simulation` is
+   model-written and passes the gate.
+2. `README.md` attributed all five documented name/independence-check blind spots to "the
+   docstrings of `find_unattested_names` and `validate_candidate_narrative`." The four name-check
+   blind spots live in `app/ai/language_policy.py`'s module docstring; `find_unattested_names`'s own
+   docstring only points there. The fifth (independence) blind spot is correctly in
+   `validate_candidate_narrative`'s own docstring. Reworded to attribute each correctly.
+3. `backend/app/ai/openrouter.py`'s per-call timeout split (`TIMEOUT_PHASE_SHARES`) was described,
+   in `_call_budget`'s docstring, as making `total_seconds` "the ceiling for the whole call" with no
+   qualification. httpx's `read` timeout bounds the gap between socket reads, not the whole response
+   body, so a pathological slow trickle could still run past it even though the total holds for
+   ordinary replies — now stated in the docstring. Separately, the split narrows per-phase headroom
+   (connect 3.5s → 0.875s, read 3.5s → 2.275s at the 3.5s default), which was true but unstated: on a
+   slow network the provider now falls back to the deterministic template more often than before —
+   safe and WARN-logged, but a real trade. Added as a clause in `README.md`'s timing paragraph.
+
+**Files changed.** `docs/DECISIONS.md`, `README.md`, `backend/app/ai/openrouter.py` (docstring
+only).
+
+**Validation.** `cd backend && PYTHONPATH=. .venv/bin/python -m pytest -q` → 269 passed, unchanged.
+No seed or fixture-refresh script run, no network call made, `backend/.env` never read.
+
+**Open questions.** None introduced. DEC-15 (OPEN-10) still awaits Person A's acknowledgement.

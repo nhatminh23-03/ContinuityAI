@@ -112,6 +112,11 @@ def _call_budget(total_seconds: float) -> httpx.Timeout:
     """One per-call budget, split so that `total_seconds` is the ceiling for the whole call.
 
     See `TIMEOUT_PHASE_SHARES` for why this is not simply `httpx.Timeout(total_seconds)`.
+
+    One qualification on "ceiling": httpx's `read` timeout bounds the gap between socket reads,
+    not the whole response body. For an ordinary, non-streaming reply that is a real total, but a
+    pathological slow trickle — the far end dribbling bytes just inside each read window — could
+    still keep resetting that clock and run past `total_seconds` overall.
     """
     return httpx.Timeout(
         connect=total_seconds * TIMEOUT_PHASE_SHARES["connect"],

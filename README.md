@@ -188,9 +188,11 @@ Processing" is attested — passes, because the title-tail exemption is bounded 
 A fifth belongs to a different check: the independence rule above is lexical, so an oblique
 reference to an assisted-only capability — "has independently handled that recovery work, unaided",
 where the capability is never named — passes, and closing it needs a lexicon the module does not
-have. These are not oversights — the docstrings of `find_unattested_names` and
-`validate_candidate_narrative` state all five plainly, and `backend/tests/test_narrative_validation.py`
-pins them, though no single test covers them all: `test_known_blind_spots_of_the_name_check`
+have. These are not oversights — the four name-check blind spots are stated plainly in
+`app/ai/language_policy.py`'s module docstring (`find_unattested_names`'s own docstring only
+points there), the fifth is stated in `validate_candidate_narrative`'s own docstring, and
+`backend/tests/test_narrative_validation.py` pins them, though no single test covers them all:
+`test_known_blind_spots_of_the_name_check`
 parametrizes two of the name check's four, and `test_known_blind_spot_of_the_independence_check`
 covers the fifth. Nobody should mistake the gate for closed-world grounding it does not
 have. What actually keeps a narrative grounded is the prompt: each of the three prompt files under
@@ -201,7 +203,12 @@ gate is the net under that instruction, not a replacement for it.
 of the three narratives.** `explain_candidate` is called once per *returned* candidate rather than
 once per eligible engineer — narration runs after the response is sliced to `limit`, which the
 contract caps at 3 — so three sequential calls at the 3.5-second default timeout come to 10.5
-seconds, inside the budget. A plan is one call per request and gets twice the per-call ceiling. The
+seconds, inside the budget. That total is bought by narrowing each phase's own headroom: splitting
+the 3.5-second default across `TIMEOUT_PHASE_SHARES` leaves connect 0.875s and read 2.275s, each
+down from the full 3.5s an unsplit `httpx.Timeout` would have given it, so on a slow network this
+provider now falls back to the deterministic template more often than the wider, unbounded-total
+budget used to — safe, and WARN-logged, but a real trade against the old headroom. A plan is one
+call per request and gets twice the per-call ceiling. The
 third narrative does not fit that budget at all: `summarize_simulation` runs inside
 `POST /simulations` (`app/simulation/service.py`), and AC-14's figure for that endpoint is not the
 12-second "AI plan/explanation" one but the 2-second "deterministic simulation" one (`PRD.md`,

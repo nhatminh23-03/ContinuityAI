@@ -711,8 +711,11 @@ not a substitute for it. A manager reading a narrative generated under `openrout
 validated output with documented gaps, not by output that has been proven safe.
 
 **Nothing about the deterministic path changes.** `AI_PROVIDER` still defaults to `deterministic`,
-`watsonx.py`'s reasoning and its code are both untouched, and extraction under `openrouter` is
-identical to extraction under `deterministic` — the two providers this decision actually compares —
+`watsonx.py`'s `explain_candidate` and `generate_mitigation_plan` still delegate to the
+deterministic templates for the reasons stated in their own bodies, its `summarize_simulation` is
+model-written and now passes the same `validate_simulation_summary` gate described above, and
+extraction under `openrouter` is identical to extraction under `deterministic` — the two providers
+this decision actually compares —
 because `OpenRouterProvider.extract_artifact_semantics` delegates straight to
 `DeterministicProvider`. This is narrower than "every provider": `watsonx` and `cached` do change
 extraction (the README's own comparison table records 17 role disagreements against the rule-based
