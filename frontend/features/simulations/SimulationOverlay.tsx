@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import type { SimulationResponse, SimulationState } from '@/types/api';
@@ -106,11 +106,11 @@ export function SimulationOverlay({
 
   return (
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Simulation sandbox">
-      <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 bg-slate-900/40" />
+      <button type="button" aria-label="Close" onClick={onClose} className="motion-fade absolute inset-0 bg-slate-900/40" />
       <div
         ref={panelRef}
         tabIndex={-1}
-        className="glass-panel absolute left-1/2 top-1/2 flex max-h-[90vh] w-[720px] max-w-[calc(100vw-32px)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-3xl outline-none"
+        className="glass-panel motion-modal absolute left-1/2 top-1/2 flex max-h-[90vh] w-[720px] max-w-[calc(100vw-32px)] -translate-x-1/2 -translate-y-1/2 flex-col rounded-3xl outline-none"
       >
         <header className="border-b border-slate-900/5 px-6 py-4">
           <div className="flex items-center justify-between gap-3">
@@ -150,8 +150,8 @@ export function SimulationOverlay({
           {mutation.isPending || (!result && !mutation.isError) ? (
             <div className="space-y-4">
               <div className="text-sm text-slate-600">Running coverage simulation…</div>
-              <div className="h-28 animate-pulse rounded-2xl bg-white/40" />
-              <div className="h-40 animate-pulse rounded-2xl bg-white/40" />
+              <div className="h-28 skeleton rounded-2xl" />
+              <div className="h-40 skeleton rounded-2xl" />
             </div>
           ) : mutation.isError ? (
             <div className="text-sm text-slate-600">
@@ -162,7 +162,13 @@ export function SimulationOverlay({
             </div>
           ) : result ? (
             <>
-              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+              {/* A wider beat than the list default: current, then arrow, then
+                  simulated. The sequence is the causal claim the panel makes,
+                  so it is worth reading as three steps rather than one. */}
+              <div
+                className="motion-stagger grid grid-cols-[1fr_auto_1fr] items-center gap-3"
+                style={{ '--stagger': '110ms' } as CSSProperties}
+              >
                 <StateBlock label="Current" state={result.before} />
                 <span aria-hidden className="text-2xl text-slate-400">
                   →
@@ -178,7 +184,7 @@ export function SimulationOverlay({
               ) : null}
 
               {result.capability_impacts.length > 0 ? (
-                <ul className="mt-4 divide-y divide-slate-900/5">
+                <ul className="motion-stagger mt-4 divide-y divide-slate-900/5">
                   {result.capability_impacts.map((impact) => (
                     <ImpactRow key={impact.capability_id} impact={impact} />
                   ))}
@@ -212,7 +218,7 @@ export function SimulationOverlay({
                 `/systems/${systemId}/candidates?simulation=${result.simulation_id}&capability=${candidateCapabilityId}`,
               )
             }
-            className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+            className="motion-press rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
           >
             Find backup candidates
           </button>

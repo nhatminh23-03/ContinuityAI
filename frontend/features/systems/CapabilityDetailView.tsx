@@ -36,8 +36,8 @@ export function CapabilityDetailView({ capabilityId }: { capabilityId: string })
   if (capabilityQuery.isPending) {
     return (
       <div className="mx-auto max-w-4xl space-y-6 py-6">
-        <div className="frosted-card h-32 animate-pulse" />
-        <div className="frosted-card h-60 animate-pulse" />
+        <div className="frosted-card h-32 skeleton" />
+        <div className="frosted-card h-60 skeleton" />
       </div>
     );
   }
@@ -83,7 +83,7 @@ export function CapabilityDetailView({ capabilityId }: { capabilityId: string })
         </div>
         <Link
           href={`/systems/${capability.system_id}?capability=${capability.capability_id}&simulate=1`}
-          className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
+          className="motion-press rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
         >
           Simulate unavailability
         </Link>

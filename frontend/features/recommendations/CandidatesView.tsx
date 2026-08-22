@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api, queryKeys } from '@/lib/api/endpoints';
 import { ApiError } from '@/lib/api/client';
 import { EvidenceDrawer } from '@/features/evidence/EvidenceDrawer';
+import { FlowSteps, goldenPathSteps } from '@/components/FlowSteps';
 import { CandidateCard } from './CandidateCard';
 import { NotConsideredPanel } from './NotConsideredPanel';
 
@@ -61,6 +62,9 @@ export function CandidatesView({
 
   const goToPlan = (backupEngineerId: string) => {
     const params = new URLSearchParams({ capability: capabilityId, backup: backupEngineerId });
+    // The plan screen needs the system to offer a way back into the flow; it
+    // cannot derive one from a capability id alone.
+    params.set('system', systemId);
     if (simulationId) params.set('simulation', simulationId);
     if (primaryEngineerId) params.set('primary', primaryEngineerId);
     router.push(`/plans/new?${params.toString()}`);
@@ -85,7 +89,12 @@ export function CandidatesView({
           {capabilityQuery.data?.name ?? capabilityId}
         </span>
       </nav>
-      <h1 className="mt-2 text-3xl font-medium tracking-tight text-slate-900">
+      <div className="mt-3">
+        <FlowSteps
+          steps={goldenPathSteps({ stage: 'candidates', systemId, capabilityId, simulationId })}
+        />
+      </div>
+      <h1 className="mt-4 text-3xl font-medium tracking-tight text-slate-900">
         Backup candidates for {capabilityQuery.data?.name ?? '…'}
       </h1>
       <p className="mt-1 max-w-2xl text-[15px] text-slate-600">
@@ -94,8 +103,8 @@ export function CandidatesView({
 
       {candidatesQuery.isPending ? (
         <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div className="frosted-card h-72 animate-pulse" />
-          <div className="frosted-card h-72 animate-pulse" />
+          <div className="frosted-card h-72 skeleton" />
+          <div className="frosted-card h-72 skeleton" />
         </div>
       ) : candidatesQuery.isError ? (
         <div className="frosted-card mt-8 p-6 text-sm text-slate-600">
@@ -114,7 +123,7 @@ export function CandidatesView({
                 'No technically adjacent candidates were found for this capability.'}
             </div>
           ) : (
-            <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="motion-stagger mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
               {candidatesQuery.data.candidates.map((candidate) => (
                 <CandidateCard
                   key={candidate.engineer_id}

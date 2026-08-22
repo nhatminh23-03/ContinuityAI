@@ -2,11 +2,15 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, queryKeys } from '@/lib/api/endpoints';
-import { PlatformCard } from '@/features/dashboard/PlatformCard';
 import { SystemsTable } from '@/features/dashboard/SystemsTable';
 import { ApiError } from '@/lib/api/client';
 
-export default function DashboardPage() {
+/**
+ * The sidebar's Systems destination: every system across every platform,
+ * ordered by risk. The dashboard answers "how are we doing?" with platform
+ * cards on top; this page answers "which system do I open?" and nothing else.
+ */
+export default function SystemsPage() {
   const queryClient = useQueryClient();
   const platformsQuery = useQuery({
     queryKey: queryKeys.platforms,
@@ -15,20 +19,21 @@ export default function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-5xl py-6">
-      <h1 className="text-4xl font-medium tracking-tight text-slate-900">Knowledge Resilience</h1>
+      <h1 className="text-4xl font-medium tracking-tight text-slate-900">Systems</h1>
       <p className="mt-2 text-[15px] text-slate-600">
-        Where does critical capability depend on one person?
+        Every system across all platforms, highest continuity risk first.
       </p>
 
       {platformsQuery.isPending ? (
-        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div className="frosted-card h-48 skeleton" />
-          <div className="frosted-card h-48 skeleton" />
+        <div className="frosted-card mt-8 space-y-3 p-6">
+          {[0, 1, 2].map((row) => (
+            <div key={row} className="h-12 skeleton rounded-xl" />
+          ))}
         </div>
       ) : platformsQuery.isError ? (
         <div className="frosted-card mt-8 p-6">
           <div className="text-sm font-medium text-slate-900">
-            The platform overview could not be loaded.
+            The systems list could not be loaded.
           </div>
           <div className="mt-1 text-xs text-slate-500">
             {platformsQuery.error instanceof ApiError
@@ -44,14 +49,7 @@ export default function DashboardPage() {
           </button>
         </div>
       ) : (
-        <>
-          <div className="motion-stagger mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-            {platformsQuery.data.platforms.map((platform) => (
-              <PlatformCard key={platform.platform_id} platform={platform} />
-            ))}
-          </div>
-          <SystemsTable platforms={platformsQuery.data.platforms} />
-        </>
+        <SystemsTable platforms={platformsQuery.data.platforms} />
       )}
     </div>
   );

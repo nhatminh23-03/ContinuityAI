@@ -34,7 +34,7 @@ export function CoverageCard({
       {query.isPending ? (
         <div className="mt-4 space-y-3">
           {[0, 1, 2].map((row) => (
-            <div key={row} className="h-10 animate-pulse rounded-xl bg-slate-200/50" />
+            <div key={row} className="h-10 skeleton rounded-xl" />
           ))}
         </div>
       ) : query.isError ? (
@@ -45,7 +45,7 @@ export function CoverageCard({
           ) : null}
         </p>
       ) : (
-        <ul className="mt-4 space-y-4">
+        <ul className="motion-stagger mt-4 space-y-4">
           {query.data.engineer_coverage.map((coverage) => (
             <li
               key={coverage.engineer_id}

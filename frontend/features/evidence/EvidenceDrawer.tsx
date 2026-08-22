@@ -50,12 +50,12 @@ export function EvidenceDrawer({
         type="button"
         aria-label="Close evidence drawer"
         onClick={onClose}
-        className="absolute inset-0 bg-slate-900/40"
+        className="motion-fade absolute inset-0 bg-slate-900/40"
       />
       <div
         ref={drawerRef}
         tabIndex={-1}
-        className="glass-panel absolute inset-y-3 right-3 flex w-[520px] max-w-[calc(100vw-24px)] flex-col rounded-3xl outline-none"
+        className="glass-panel motion-drawer absolute inset-y-3 right-3 flex w-[520px] max-w-[calc(100vw-24px)] flex-col rounded-3xl outline-none"
       >
         <header className="flex items-center gap-3 border-b border-slate-900/5 px-6 py-4">
           <div className="min-w-0">
@@ -81,8 +81,8 @@ export function EvidenceDrawer({
         <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-4">
           {query.isPending ? (
             <>
-              <div className="frosted-card h-32 animate-pulse" />
-              <div className="frosted-card h-40 animate-pulse" />
+              <div className="frosted-card h-32 skeleton" />
+              <div className="frosted-card h-40 skeleton" />
             </>
           ) : query.isError ? (
             <div className="frosted-card p-4 text-sm text-slate-600">
@@ -109,7 +109,7 @@ export function EvidenceDrawer({
               {query.data.missing_evidence.length > 0 ? (
                 <>
                   <h3 className="pt-1 text-sm font-semibold text-slate-900">Missing evidence</h3>
-                  <ul className="space-y-2">
+                  <ul className="motion-stagger space-y-2">
                     {query.data.missing_evidence.map((missing) => (
                       <li
                         key={missing.engineer_id}
@@ -149,7 +149,7 @@ export function EvidenceDrawer({
             type="button"
             disabled={!query.data}
             onClick={() => setChallengeOpen(true)}
-            className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+            className="motion-press rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
           >
             Challenge assessment
           </button>

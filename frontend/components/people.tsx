@@ -35,8 +35,13 @@ export function ReadinessLadder({ level }: { level: ReadinessLevel }) {
         {BAR_HEIGHTS.map((height, index) => (
           <span
             key={index}
-            className={index < filled ? 'bg-slate-600' : 'bg-slate-300'}
-            style={{ width: 3, height, borderRadius: 1 }}
+            className={`motion-ladder ${index < filled ? 'bg-slate-600' : 'bg-slate-300'}`}
+            style={{
+              width: 3,
+              height,
+              borderRadius: 1,
+              animationDelay: `${index * 40}ms`,
+            }}
           />
         ))}
       </span>

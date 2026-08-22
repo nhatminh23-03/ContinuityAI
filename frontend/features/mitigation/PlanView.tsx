@@ -5,6 +5,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import type { ApprovePlanResponse, MitigationTask } from '@/types/api';
 import { api } from '@/lib/api/endpoints';
 import { ApiError } from '@/lib/api/client';
+import Link from 'next/link';
 import { EngineerBadge } from '@/components/people';
 import { saveApproval, savePlan } from './planStore';
 import { TaskCard } from './TaskCard';
@@ -35,11 +36,14 @@ export function PlanView({
   primaryEngineerId,
   backupEngineerId,
   simulationId,
+  systemId,
 }: {
   capabilityId: string;
   primaryEngineerId: string;
   backupEngineerId: string;
   simulationId?: string;
+  /** Absent on a bare deep link; only the return links depend on it. */
+  systemId?: string;
 }) {
   const planQuery = useQuery({
     queryKey: ['mitigation-plan', capabilityId, primaryEngineerId, backupEngineerId, simulationId],
@@ -80,10 +84,10 @@ export function PlanView({
     return (
       <div className="space-y-4">
         <div className="text-sm text-slate-600">Generating the transfer plan…</div>
-        <div className="frosted-card h-24 animate-pulse" />
+        <div className="frosted-card h-24 skeleton" />
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div className="frosted-card h-56 animate-pulse" />
-          <div className="frosted-card h-56 animate-pulse" />
+          <div className="frosted-card h-56 skeleton" />
+          <div className="frosted-card h-56 skeleton" />
         </div>
       </div>
     );
@@ -103,8 +107,23 @@ export function PlanView({
   const plan = planQuery.data;
   const status = approval?.status ?? plan.status;
 
+  const candidatesHref = systemId
+    ? `/systems/${systemId}/candidates?capability=${capabilityId}${
+        simulationId ? `&simulation=${simulationId}` : ''
+      }`
+    : null;
+
   return (
     <div>
+      {candidatesHref && status === 'DRAFT' ? (
+        <Link
+          href={candidatesHref}
+          className="mb-3 inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:underline"
+        >
+          <span aria-hidden>‹</span>
+          Choose a different backup
+        </Link>
+      ) : null}
       <div className="frosted-card p-6">
         <div className="flex flex-wrap items-center gap-3">
           <h2 className="text-lg font-medium text-slate-900">
@@ -148,7 +167,7 @@ export function PlanView({
         ) : null}
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="motion-stagger mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
         {tasks.map((task, index) => (
           <TaskCard
             key={task.task_id}
@@ -180,12 +199,55 @@ export function PlanView({
             type="button"
             disabled={approveMutation.isPending}
             onClick={() => approveMutation.mutate()}
-            className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+            className="motion-press rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
           >
             {approveMutation.isPending ? 'Approving…' : 'Approve plan'}
           </button>
         </div>
-      ) : null}
+      ) : (
+        <div className="frosted-card motion-rise mt-6 flex flex-wrap items-center justify-between gap-4 p-5">
+          <div className="flex items-center gap-3">
+            <span
+              aria-hidden
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-900 text-white"
+            >
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className="h-4 w-4"
+              >
+                <path d="m3.5 8.5 3 3 6-6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+            <div>
+              <div className="text-sm font-medium text-slate-900">Plan approved</div>
+              <div className="text-xs text-slate-500">
+                {approval
+                  ? `Approved by ${approval.approved_by} · ${approval.approved_at}`
+                  : 'This plan has already been approved.'}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {systemId ? (
+              <Link
+                href={`/systems/${systemId}`}
+                className="motion-press rounded-xl px-4 py-2 text-sm font-medium text-slate-600 hover:bg-white/50 hover:text-slate-900"
+              >
+                Back to the system
+              </Link>
+            ) : null}
+            <Link
+              href="/plans"
+              className="motion-press rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+            >
+              View all plans
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

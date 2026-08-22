@@ -14,7 +14,7 @@ export function MetricStrip({
   onWhyClick?: () => void;
 }) {
   return (
-    <div className="frosted-card grid grid-cols-2 gap-y-6 p-6 lg:grid-cols-4 lg:gap-y-0">
+    <div className="frosted-card motion-stagger grid grid-cols-2 gap-y-6 p-6 lg:grid-cols-4 lg:gap-y-0">
       <div className="lg:border-r lg:border-slate-900/5 lg:pr-6">
         <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
           Continuity Risk Index

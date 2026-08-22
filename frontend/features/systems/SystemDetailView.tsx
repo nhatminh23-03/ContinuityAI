@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { api, queryKeys } from '@/lib/api/endpoints';
 import { ApiError } from '@/lib/api/client';
+import { FlowSteps, goldenPathSteps } from '@/components/FlowSteps';
 import { MetricStrip } from './MetricStrip';
 import { OwnershipCard } from './OwnershipCard';
 import { CapabilityPanel } from './CapabilityPanel';
@@ -62,8 +63,8 @@ export function SystemDetailView({
   if (systemQuery.isPending || graphQuery.isPending) {
     return (
       <div className="mx-auto max-w-6xl space-y-6 py-6">
-        <div className="frosted-card h-28 animate-pulse" />
-        <div className="frosted-card h-72 animate-pulse" />
+        <div className="frosted-card h-28 skeleton" />
+        <div className="frosted-card h-72 skeleton" />
       </div>
     );
   }
@@ -108,6 +109,16 @@ export function SystemDetailView({
         <span className="text-slate-700">{system.name}</span>
       </nav>
 
+      <div className="mt-3">
+        <FlowSteps
+          steps={goldenPathSteps({
+            stage: 'system',
+            systemId,
+            capabilityId: selectedCapabilityId ?? undefined,
+          })}
+        />
+      </div>
+
       <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <h1 className="text-3xl font-medium tracking-tight text-slate-900">{system.name}</h1>
@@ -123,7 +134,7 @@ export function SystemDetailView({
               { scroll: false },
             )
           }
-          className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
+          className="motion-press rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
         >
           Simulate unavailability
         </button>

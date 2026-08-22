@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { AppBackground } from "@/components/AppBackground";
 import { SidebarNav } from "@/components/SidebarNav";
+import { PageTransition } from "@/components/PageTransition";
 
 /**
  * The application frame: ambient gradient behind everything, a floating
@@ -28,7 +29,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div className="text-xs font-medium text-slate-600">Manager</div>
           </div>
         </aside>
-        <main className="min-w-0 flex-1">{children}</main>
+        <main className="min-w-0 flex-1">
+          <PageTransition>{children}</PageTransition>
+        </main>
       </div>
     </div>
   );

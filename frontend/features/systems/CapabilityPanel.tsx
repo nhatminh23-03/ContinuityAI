@@ -23,7 +23,7 @@ export function CapabilityPanel({
   return (
     <div className="frosted-card p-6">
       <h2 className="text-sm font-semibold text-slate-900">Capabilities</h2>
-      <ul className="mt-3 divide-y divide-slate-900/5">
+      <ul className="motion-stagger mt-3 divide-y divide-slate-900/5">
         {capabilities.map((capability) => {
           const selected = capability.id === selectedId;
           return (

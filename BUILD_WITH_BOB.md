@@ -1519,3 +1519,213 @@ only).
 No seed or fixture-refresh script run, no network call made, `backend/.env` never read.
 
 **Open questions.** None introduced. DEC-15 (OPEN-10) still awaits Person A's acknowledgement.
+
+---
+
+### 2026-08-22 — Overlay legibility: modals and drawers become opaque surfaces
+
+**What was built.** The four overlay surfaces — the why-panel, the evidence drawer, the challenge
+drawer, and the simulation sandbox — all carried `.glass-panel`, the same treatment as the sidebar:
+a 0.62 → 0.38 white gradient over a 24px blur. Over the gradient background and the page content
+beneath them, body copy inside those overlays sat on a moving, saturated field and was hard to read.
+Reported from the running application, not from a mockup.
+
+Two rules were added to `frontend/app/globals.css`, both scoped to `[role='dialog']`:
+
+1. `[role='dialog'] .glass-panel` raises the fill to a 0.97 → 0.93 white gradient, deepens the blur
+   to 28px, replaces the white hairline with a dark one at 8% and strengthens the drop shadow so the
+   panel still reads as floating. Every overlay renders its panel inside a `role="dialog"` wrapper
+   and the sidebar is an `<aside>` outside one, so the sidebar's liquid-glass treatment is untouched
+   by construction — no component markup changed.
+2. `[role='dialog'] .glass-panel .bg-white\/50` tints the grouping cards nested inside those panels.
+   Solidifying the panel erased their edge, since a 50% white on a 95% white parent is invisible.
+   They now take a 3.5% neutral fill plus a 6% inset ring; the ring rather than a border avoids the
+   1px layout shift. The selector matches exactly the four nested grouping cards — Tailwind compiles
+   the `hover:` variants to a different class name, so hover states are unaffected.
+
+**Files changed.** `frontend/app/globals.css` (additive; the base `.glass-panel`, `.frosted-card`
+and chip rules are unmodified).
+
+**Which requirement this implements.** None — this is a legibility correction to the design system
+established in the Phase 5 frontend foundation. It changes no data, no copy, and no domain
+semantics.
+
+**How it was validated.** Live in the browser at `localhost:3000` against the running backend, with
+`AI_PROVIDER=openrouter`. All four overlays opened and screenshotted on
+`/systems/system_authentication`: why-panel (68/HIGH with the index arithmetic), evidence drawer
+(Credential Verification, all engineers), challenge drawer (the three challenge modes and the form),
+and the simulation sandbox (68 → 74, HIGH → HIGH, four impact rows and the model-written summary).
+Body copy is legible against the panel in all four, the nested grouping cards read as distinct
+surfaces, and the sidebar still shows the background gradient through it. No console errors from the
+change; the dev server recompiled without a CSS parse error.
+
+**Open questions.** The sidebar's "Systems" link points at `/systems`, which has no route — only
+`/systems/[systemId]` and `/systems/[systemId]/candidates` exist — so it renders the Next.js 404.
+Pre-existing and unrelated to this change; raised here rather than fixed.
+
+---
+
+### 2026-08-22 — The Systems route, and a motion layer across the interface
+
+**What was built.** Two pieces of work, both frontend-only.
+
+*The missing Systems route.* The sidebar's Systems entry pointed at `/systems`, for which no route
+existed — only `/systems/[systemId]` and `/systems/[systemId]/candidates`. One of four primary
+navigation destinations rendered the framework's 404 page. Added `frontend/app/systems/page.tsx`, a
+thin index that fetches the platform list and hands it to the existing `SystemsTable`. The dashboard
+answers "how are we doing?" with platform cards above the table; this route answers "which system do
+I open?" and carries nothing else. No new component and no second sort path — ordering still comes
+from `sortSystemsByRisk`, so both surfaces agree by construction.
+
+*A motion layer.* The interface had almost no motion: two `transition-colors` declarations, opacity
+pulse skeletons, and the background shader. Overlays, lists, and route changes all snapped. There
+were no shared timing values, so anything added piecemeal would have drifted out of rhythm.
+
+Added to `frontend/app/globals.css`: duration and easing tokens (`--motion-fast` 140ms, `--motion`
+220ms, `--motion-slow` 320ms; a decelerating curve for entrances, an accelerating one for exits),
+six keyframe sets, and the utility classes below. Every animation moves `transform` and `opacity`
+only, so none of it can reflow the page or contribute to layout shift.
+
+- `.motion-modal` / `.motion-drawer` / `.motion-fade` — the four overlays now arrive rather than
+  appear: centred modals scale-fade from 0.96, drawers slide in from the right edge, scrims fade.
+  The modal keyframe restates the centring translate, since a bare `scale()` would drop it
+  mid-animation. Entrance only; closing stays immediate, which reads as responsive and leaves the
+  overlays' open/close state, focus return, and Escape handling untouched.
+- `.motion-stagger` — one class on a container animates its children in sequence, so the item
+  components themselves did not change. The delay stops growing after the ninth child; a long list
+  should not take seconds to finish arriving. Applied to the eleven primary content lists and left
+  off the inline chip rows, per the rule that a view should animate one or two things, not
+  everything.
+- `.motion-press` / `.motion-lift` — press and hover feedback on the primary buttons and the system
+  rows. Transform-only, and the row highlight uses cancelling negative margin and padding so the
+  surface extends past the text without moving it.
+- `.motion-ladder` — readiness ladder bars grow from their base, 40ms apart. Still monochrome, still
+  no number, rank, or percentage.
+- `.skeleton` — replaces the opacity pulse with a sweep. A pulse reads as a broken element; a sweep
+  reads as work in progress.
+- `.nav-item` — the active sidebar entry grows a rail on its leading edge instead of only swapping
+  its background, so moving between destinations reads as one change rather than two repaints.
+
+`frontend/components/PageTransition.tsx` re-keys the content column on the pathname so the shared
+rise-in replays on navigation. Keyed rather than merely classed: a CSS animation only restarts on
+remount, and the router reuses one component across paths that share a segment, so
+`/systems/a` → `/systems/b` would otherwise have arrived with no transition.
+
+The simulation panel's before → after row takes a wider beat than the list default — 110ms, set by
+overriding the stagger token on that one container. Current, then arrow, then simulated. The
+sequence is the causal claim the panel makes, so it is worth reading as three steps.
+
+**A decision worth recording.** The obvious treatment for the headline risk indices is a count-up
+from zero. It was rejected. The frontend's contract is that risk, readiness, exposure, and
+confidence are received and rendered, never computed here; a count-up puts 43, then 61, then 74 on
+screen for a system whose index is 74. Under demonstration someone can capture a frame showing a
+number the API never returned. The headline figures instead arrive with the fade-and-rise that
+carries the rest of the interface, so the only value ever painted is the server's.
+
+**Files changed.** Added `frontend/app/systems/page.tsx` and `frontend/components/PageTransition.tsx`.
+Modified `frontend/app/globals.css` and eighteen component and page files, all of them class-string
+edits apart from `people.tsx` (per-bar animation delay), `SimulationOverlay.tsx` (the stagger
+override and its `CSSProperties` import), and `AppShell.tsx` (wrapping the content column). No new
+dependency: the whole layer is CSS plus one nineteen-line client component.
+
+**Which requirement this implements.** None directly. The route is a navigation defect fix; the
+motion layer is a quality change to the design system established in the Phase 5 foundation. No
+data, copy, endpoint, enum, or domain semantic changed, and no value is computed in the frontend
+that was not computed there before.
+
+**How it was validated.** `npx tsc --noEmit` clean. `npm test` 29 passed across 6 files, including
+the fixture contract lock. `npm run lint` reports 7 problems, all pre-existing — confirmed against
+`git diff -U0`, which shows none of the flagged lines falls inside a changed hunk.
+
+In the browser at `localhost:3000` against the live backend: `/systems` renders all five systems in
+risk order (74, 71, 68, 54, 52) with the nav entry correctly marked current. Computed styles confirm
+the tokens resolve, the page wrapper carries `motion-rise`, staggered children receive increasing
+delays, the simulation beat runs 0 / 110 / 220ms, impact rows 0 / 35 / 70ms, and the 25 ladder bars
+step 40ms apart with their transform origin at each bar's base. The active nav rail computes to
+`scaleY(1)` at full opacity and `scaleY(0)` at zero when inactive. Slowing the tokens to 60s and
+navigating captured the sequence mid-flight: page rising, first card in, remaining rows still held
+at zero opacity.
+
+Reduced motion was exercised by injecting the same declarations the media block applies and
+re-mounting: no element among those carrying an entrance animation was left below full opacity or
+holding a translation — the real hazard with a `backwards` fill is content stuck invisible, and it
+does not occur. The media query itself was read back out of the CSSOM to confirm it is present and
+correctly scoped. It was not possible to toggle the operating system setting from this environment,
+so the guard is verified by equivalence rather than by the real preference.
+
+**Open questions.** The graph canvas was deliberately left without entrance motion. The system detail
+view already animates the page, the metric strip, the capability list, and the coverage rows;
+animating the nodes as well would cross into the excess the guidance warns against. Worth revisiting
+only if the graph is ever given its own screen.
+
+---
+
+### 2026-08-22 — Making the golden path legible: a step rail, a route guard, and an ending
+
+**What was built.** The flow from a system to an approved plan worked, but nothing told the manager
+they were in a flow. Four screens were joined only by primary buttons: no indication of position, no
+way back except browser history, and one screen that guessed at its own inputs. Four changes.
+
+*A step rail.* `frontend/components/FlowSteps.tsx` renders the four stages — System, Simulate,
+Choose backup, Plan & approve — with completed stages linking back, the current stage carrying
+`aria-current="step"`, and later stages muted and inert. `goldenPathSteps()` in the same file builds
+the array for one screen and emits a back-link only where the destination is fully determined; a
+stage whose target cannot be constructed still shows as complete rather than pretending to
+navigate. The rail is on the system detail view, the candidates view, and the plan screen.
+
+It reports position; it does not enforce order. Each route stays independently reachable and guards
+its own inputs, which is what keeps deep links and the sidebar's four destinations working.
+
+*A route guard replacing a silent default.* `app/systems/[systemId]/candidates/page.tsx` fell back to
+a hardcoded `cap_incident_recovery` when the `capability` parameter was absent. Reached directly,
+the screen answered a question nobody asked, for a capability that need not belong to the system in
+the URL — on Authentication it offered Incident Recovery candidates with no indication anything was
+substituted. The fallback is gone; the missing parameter now produces a short screen naming what is
+needed and a link back to the system, matching how `/plans/new` already guarded its own inputs.
+
+*Return paths on the plan screen.* The plan screen knew its capability but not its system, so it
+could not offer a way back. `CandidatesView` now carries `system` in the query string it pushes, and
+the plan screen uses it for the rail's links and for a "Choose a different backup" link that returns
+to the comparison with the same capability and simulation. The parameter is optional — a bare deep
+link still renders, only without the return paths.
+
+*An ending.* Approving a plan removed the approve button and showed nothing in its place: no
+confirmation, no next action, no way onward from the last screen of the demo. The approved state now
+renders a confirmation carrying the approver and timestamp, with "Back to the system" and "View all
+plans". The "choose a different backup" link is hidden once the plan leaves DRAFT, since the
+decision is no longer open.
+
+**Files changed.** Added `frontend/components/FlowSteps.tsx`. Modified
+`frontend/app/systems/[systemId]/candidates/page.tsx`, `frontend/app/plans/new/page.tsx`,
+`frontend/features/systems/SystemDetailView.tsx`,
+`frontend/features/recommendations/CandidatesView.tsx`, and
+`frontend/features/mitigation/PlanView.tsx`. No new dependency.
+
+**Which requirement this implements.** None directly. This is navigation and orientation work on the
+flow described in the demo script. No endpoint, field, enum, or domain semantic changed, and the
+`system` query parameter is a frontend routing concern that never reaches the API.
+
+**How it was validated.** `npx tsc --noEmit` clean. `npm test` 29 passed across 6 files. `npm run lint`
+reports the same 7 pre-existing problems as before this change; the only line number that moved is
+`PlanView.tsx:62` to `:66`, displaced by lines added above it, and it is the same pre-existing
+finding.
+
+Walked end to end in the browser against the live backend at 1440×900. System detail shows stage one
+current and the rest muted. The simulation produced 68 HIGH and handed off to the comparison, where
+stages one and two render as completed links and "Choose backup" is current. Selecting Daniel Kim
+drafted the Session Recovery plan with the rail at stage four, all earlier stages linked, and the
+"Choose a different backup" link present. Approving rendered the confirmation with
+`eng_manager_sarah` and the approval timestamp, and "View all plans" landed on a populated plans
+screen showing the approved plan and its five tasks. The plan was the five-task form with a recovery
+drill, which is the AC-09 branch for a candidate at the lowest readiness band.
+
+Navigating to `/systems/system_authentication/candidates` with no query string now renders "Which
+capability?" and a link back to the system, where it previously rendered Incident Recovery
+candidates without comment. On that screen the System stage links back and the Simulate stage
+renders as complete without a link, since no capability is known — the intended behaviour of the
+link builder.
+
+**Open questions.** On the guard screen the rail marks the first two stages complete because the
+route sits at stage three, not because the manager visited them. The rail describes the position of
+the screen rather than the history of the session; the body copy states what is missing, so the two
+do not conflict in practice. Worth revisiting only if the rail is ever given a resume behaviour.

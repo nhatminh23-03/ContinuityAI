@@ -59,12 +59,12 @@ export function WhyPanel({
         type="button"
         aria-label="Close"
         onClick={onClose}
-        className="absolute inset-0 bg-slate-900/40"
+        className="motion-fade absolute inset-0 bg-slate-900/40"
       />
       <div
         ref={panelRef}
         tabIndex={-1}
-        className="glass-panel absolute left-1/2 top-1/2 max-h-[85vh] w-[560px] max-w-[calc(100vw-32px)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-3xl p-6 outline-none"
+        className="glass-panel motion-modal absolute left-1/2 top-1/2 max-h-[85vh] w-[560px] max-w-[calc(100vw-32px)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-3xl p-6 outline-none"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -92,7 +92,7 @@ export function WhyPanel({
             <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
               System rules that fired
             </h3>
-            <ul className="mt-2 space-y-1.5">
+            <ul className="motion-stagger mt-2 space-y-1.5">
               {system.rules_triggered.map((code) => (
                 <li key={code} className="flex items-start gap-2 text-sm text-slate-700">
                   <span aria-hidden className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-slate-400" />
@@ -111,7 +111,7 @@ export function WhyPanel({
               <RiskClassChip riskClass={capability.continuity_risk_class} />
             </div>
             {capability.rules_triggered?.length ? (
-              <ul className="mt-3 space-y-1.5">
+              <ul className="motion-stagger mt-3 space-y-1.5">
                 {capability.rules_triggered.map((code) => (
                   <li key={code} className="flex items-start gap-2 text-sm text-slate-700">
                     <span aria-hidden className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-slate-400" />
@@ -152,7 +152,7 @@ export function WhyPanel({
             The capability breakdown could not be loaded.
           </p>
         ) : capabilityId ? (
-          <div className="mt-5 h-24 animate-pulse rounded-2xl bg-white/40" />
+          <div className="mt-5 h-24 skeleton rounded-2xl" />
         ) : null}
 
         <p className="mt-4 text-xs text-slate-500">

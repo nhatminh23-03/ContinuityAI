@@ -22,7 +22,7 @@ export default function PlansPage() {
   if (stored === 'loading') {
     return (
       <div className="mx-auto max-w-4xl py-6">
-        <div className="frosted-card h-40 animate-pulse" />
+        <div className="frosted-card h-40 skeleton" />
       </div>
     );
   }
@@ -38,7 +38,7 @@ export default function PlansPage() {
           </p>
           <Link
             href="/"
-            className="mt-5 inline-block rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+            className="motion-press mt-5 inline-block rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
           >
             Go to the dashboard
           </Link>
@@ -92,7 +92,7 @@ export default function PlansPage() {
         ) : null}
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <div className="motion-stagger mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
         {plan.tasks.map((task, index) => (
           <TaskCard key={task.task_id} index={index} task={task} editable={false} />
         ))}

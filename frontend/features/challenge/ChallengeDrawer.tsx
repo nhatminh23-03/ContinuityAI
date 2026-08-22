@@ -181,11 +181,11 @@ export function ChallengeDrawer({
 
   return (
     <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label="Challenge assessment">
-      <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 bg-slate-900/40" />
+      <button type="button" aria-label="Close" onClick={onClose} className="motion-fade absolute inset-0 bg-slate-900/40" />
       <div
         ref={panelRef}
         tabIndex={-1}
-        className="glass-panel absolute inset-y-3 right-3 flex w-[520px] max-w-[calc(100vw-24px)] flex-col rounded-3xl outline-none"
+        className="glass-panel motion-drawer absolute inset-y-3 right-3 flex w-[520px] max-w-[calc(100vw-24px)] flex-col rounded-3xl outline-none"
       >
         <header className="flex items-center justify-between gap-3 border-b border-slate-900/5 px-6 py-4">
           <div>
@@ -385,7 +385,7 @@ export function ChallengeDrawer({
               type="button"
               disabled={!canSubmit || mutation.isPending}
               onClick={submit}
-              className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+              className="motion-press rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
             >
               {mutation.isPending ? 'Submitting…' : 'Submit challenge'}
             </button>

@@ -64,7 +64,7 @@ export function SidebarNav() {
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
-            className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
+            className={`nav-item motion-press flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium ${
               active
                 ? "bg-white/70 text-slate-900 shadow-sm ring-1 ring-white/60"
                 : "text-slate-600 hover:bg-white/40 hover:text-slate-900"

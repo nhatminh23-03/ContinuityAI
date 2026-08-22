@@ -23,7 +23,7 @@ export function SystemsTable({ platforms }: { platforms: PlatformSummary[] }) {
     return (
       <div className="frosted-card mt-6 space-y-3 p-6">
         {[0, 1, 2].map((row) => (
-          <div key={row} className="h-12 animate-pulse rounded-xl bg-slate-200/50" />
+          <div key={row} className="h-12 skeleton rounded-xl" />
         ))}
       </div>
     );
@@ -45,10 +45,10 @@ export function SystemsTable({ platforms }: { platforms: PlatformSummary[] }) {
             : 'Some systems could not be loaded; showing the rest.'}
         </p>
       ) : null}
-      <ul className="mt-4 divide-y divide-slate-900/5">
+      <ul className="motion-stagger mt-4 divide-y divide-slate-900/5">
         {systems.map((system) => (
           <li key={system.system_id}>
-            <div className="flex items-center gap-4 py-4">
+            <div className="motion-press -mx-2 flex items-center gap-4 rounded-xl px-2 py-4 hover:bg-white/50">
               <Link
                 href={`/systems/${system.system_id}`}
                 className="group flex min-w-0 flex-1 items-center gap-4"
