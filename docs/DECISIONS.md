@@ -630,7 +630,9 @@ MEDIUM.
 | OPEN-07 | Runtime AI provider is rule-based. Interface, validation, and prompt specification are model-ready; a provider and credential are needed. See R-01 | Both | Before the demo is recorded |
 | OPEN-09 | `ARCHITECTURE.md` section 29 and `API_CONTRACT.md` section 10.2 still carry the superseded reason-code spelling and extraction shape (DEC-05, DEC-06). Amend for self-consistency | Both | Next contract touch |
 
-OPEN-01 is closed by DEC-10. OPEN-08 is closed by DEC-14. OPEN-06 was closed by the previous build.
+OPEN-01 is closed by DEC-10. OPEN-08 is closed by DEC-14. OPEN-06 was closed by the previous
+build. **OPEN-07 is closed by DEC-15**: a fourth provider was implemented and run against a
+real credential, so the runtime AI provider is no longer rule-based in every configuration.
 
 ---
 
@@ -737,3 +739,40 @@ capture policy), `backend/.env.example` (three new operator-facing variables, no
 | ID | Item | Owner | Resolve by |
 |---|---|---|---|
 | OPEN-10 | DEC-15 (OpenRouter narrative provider) needs Person A's acknowledgement | Person A | Next sync |
+
+---
+
+## Implementation decision — frontend presentation of received values
+
+### DEC-16 — Headline risk indices are revealed, never counted up
+
+**Date:** 2026-08-22 · **Category:** B · **Owner:** Person B · **No contract change**
+
+A motion layer was added across the frontend. The conventional treatment for a large headline
+number is a count-up from zero, and it was rejected for the continuity risk index, the degraded
+capability count, and the critical gap count.
+
+The frontend's standing constraint is that risk, readiness, exposure, evidence confidence, and
+technical overlap are received from the API and rendered, never computed here. A count-up paints
+43, then 61, then 74 for a system whose index is 74. Those intermediate figures are produced by the
+browser, are not values the engine ever returned, and are indistinguishable on screen from ones
+that were. Under demonstration a paused frame or a screenshot shows a continuity risk index that
+does not exist — against a product whose entire argument is that its numbers are traceable to
+evidence.
+
+The headline figures instead arrive with the same fade-and-rise entrance as the rest of the
+interface, so the only value ever painted is the one the API returned. `RiskIndex`
+(`frontend/components/status.tsx`) therefore renders its value directly and holds no animation
+state; the entrance belongs to the container.
+
+**Recorded rather than left as a styling preference** because the reasoning is not visible from the
+code. A later contributor adding a count-up would see only an unanimated number and a tempting
+improvement, and would be reversing a decision about the compute boundary without knowing it.
+
+**Documents affected:** none. No endpoint, field, enum, or domain semantic is involved.
+
+### Open items after this build
+
+| ID | Item | Owner | Resolve by |
+|---|---|---|---|
+| OPEN-11 | AC-14 latency is breached under `AI_PROVIDER=openrouter`, measured live on 2026-08-21: `POST /simulations` 2.85s against the 2s deterministic-simulation budget, and `POST /recommendations/backup-candidates` 11.93s typical and 16.91s worst against the 12s AI-operation budget. Reads are unaffected at 16–23ms. The cause is roughly 6s per model call against a 3.5s nominal timeout, because httpx's read timeout bounds the gap between socket reads rather than total generation. Four responses are open: cap `max_tokens`, use a faster model, run the candidate calls concurrently, or accept and document the breach. `AI_PROVIDER=deterministic` is unaffected and remains the default | Both | Before the demo is recorded under `openrouter` |

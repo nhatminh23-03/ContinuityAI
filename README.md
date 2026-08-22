@@ -213,9 +213,19 @@ third narrative does not fit that budget at all: `summarize_simulation` runs ins
 `POST /simulations` (`app/simulation/service.py`), and AC-14's figure for that endpoint is not the
 12-second "AI plan/explanation" one but the 2-second "deterministic simulation" one (`PRD.md`,
 AC-14) — a target set before this narrative call existed. A single call at the 3.5-second default
-timeout can, on its own, take longer than the endpoint's entire stated budget; nothing in this build
-reconciles the two, and a live measurement against `POST /simulations` specifically (not only the
-two 12-second operations) is worth doing before treating `openrouter` as demo-ready.
+timeout can, on its own, take longer than the endpoint's entire stated budget, and nothing in this
+build reconciles the two.
+
+**That measurement has since been taken, and both budgets are breached.** On a live pass against a
+real key on 2026-08-21: `POST /simulations` 2.85s against the 2-second deterministic-simulation
+budget, and `POST /recommendations/backup-candidates` 11.93s typically and 16.91s at worst against
+the 12-second AI-operation budget. Reads are unaffected at 16–23ms. The arithmetic above assumes a
+call completes near its 3.5-second nominal timeout; in practice each took roughly 6 seconds, because
+httpx's read timeout bounds the gap between successive socket reads rather than the time to generate
+a whole response. Four responses are open — cap `max_tokens`, use a faster model, run the candidate
+calls concurrently, or accept and document the breach — and none is implemented here (`OPEN-11`,
+`docs/DECISIONS.md`). `AI_PROVIDER=deterministic` is unaffected and remains the default, so the
+shipped configuration meets AC-14.
 
 **Nothing above changes a number.** `OpenRouterProvider.extract_artifact_semantics` delegates
 straight to `DeterministicProvider`, so the seeded baseline is untouched under this provider exactly
@@ -499,7 +509,7 @@ Neither regeneration command is needed for normal work: both corpora are committ
 ### Checks
 
 ```bash
-cd backend && .venv/bin/python -m pytest -q                 # 262 tests, ~2 seconds
+cd backend && .venv/bin/python -m pytest -q                 # 269 tests, ~3 seconds
 cd ../frontend && npm run typecheck && npm run build
 ```
 
@@ -507,11 +517,15 @@ cd ../frontend && npm run typecheck && npm run build
 
 ```bash
 git clone <repo> && cd ContinuityAI
-cd backend && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+cd backend && python3.11 -m venv .venv && .venv/bin/pip install -r requirements.txt
 PYTHONPATH=. .venv/bin/python -m scripts.seed_demo          # 640 artifacts -> 126 evidence records
 PYTHONPATH=. .venv/bin/python -m scripts.run_evaluation     # every check should pass
 .venv/bin/python -m uvicorn app.main:app --reload
 ```
+
+The interpreter is named explicitly because on macOS a bare `python3` is often the system 3.9, which
+cannot run this application — the version floor is 3.10. Substitute whatever 3.10+ interpreter is on
+the machine.
 
 The seeded organisation, the hidden ground truth, and both artifact corpora are committed, so the
 demo reproduces byte for byte from a fresh clone with no network access.

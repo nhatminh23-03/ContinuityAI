@@ -760,3 +760,105 @@ Walk Person A through DEC-15. Separately: a live pass with a real OpenRouter key
 against AC-14 for `POST /mitigation-plans` and `POST /recommendations/backup-candidates` — the
 budget arithmetic in this build is sized correctly but has not yet been measured against a live
 model.
+
+---
+
+## 2026-08-22 — Overlay legibility, a motion layer, and the golden path made navigable (Person B)
+
+### Completed
+
+Four units of frontend work, plus the runtime flip that preceded them. No backend source was
+touched in any of it.
+
+1. **`AI_PROVIDER` flipped to `openrouter`** in `backend/.env` (gitignored, untracked, backed up
+   first) and verified end to end: `get_provider()` returns `OpenRouterProvider`, extraction still
+   delegates to the rules, no reseed occurs, and the frozen numbers hold. The narrative gate was
+   observed firing in production — it rejected a candidate strength claiming independence for an
+   assisted-only capability and fell back to the template with a WARN, and a malformed JSON reply
+   fell back cleanly on the same pass.
+
+2. **Overlay legibility.** The four overlays carried `.glass-panel`, the same 0.62 → 0.38 white
+   treatment as the sidebar, and body copy sat on a moving saturated field. Two rules scoped to
+   `[role='dialog']` raise the fill to 0.97 → 0.93 and tint the grouping cards nested inside them.
+   Both are additive; the sidebar is outside any dialog, so its liquid glass is untouched by
+   construction and no component markup changed.
+
+3. **A motion layer.** Duration and easing tokens, six keyframe sets, and utility classes for
+   overlay entrances, staggered lists, press and hover feedback, the readiness ladder, shimmer
+   skeletons, and the sidebar's active rail — plus `PageTransition`, which re-keys the content
+   column on the pathname so route changes replay the entrance. Everything moves `transform` and
+   `opacity` only. One `prefers-reduced-motion` block neutralises all of it. No new dependency.
+
+4. **The `/systems` route, which did not exist.** One of four sidebar destinations rendered the
+   framework 404. Added `frontend/app/systems/page.tsx`, reusing `SystemsTable` and its existing
+   sort so the dashboard and the index cannot disagree.
+
+5. **The golden path made navigable.** `frontend/components/FlowSteps.tsx` renders the four stages
+   with completed ones linking back. `app/systems/[systemId]/candidates/page.tsx` no longer falls
+   back to a hardcoded `cap_incident_recovery` when its parameter is missing — reached directly it
+   had been offering Incident Recovery candidates on systems that do not have that capability, with
+   no indication anything was substituted. `CandidatesView` now carries `system` forward so the plan
+   screen can offer return paths, and approving a plan renders a confirmation with two onward
+   actions instead of silently removing the approve button.
+
+### Decisions made
+
+**DEC-16** (`docs/DECISIONS.md`), Category B, no acknowledgement needed: headline risk indices are
+revealed, never counted up. A count-up paints intermediate figures the engine never returned and
+that are indistinguishable on screen from ones it did. Recorded because the reasoning is invisible
+from the code — a later contributor would see an unanimated number and a tempting improvement.
+
+Three amendments to `docs/DECISIONS.md` were made with explicit approval this session: DEC-16 above,
+closing **OPEN-07** (the runtime provider is no longer rule-based in every configuration), and
+opening **OPEN-11** for the AC-14 breach below.
+
+### Files changed
+
+Added `frontend/app/systems/page.tsx`, `frontend/components/FlowSteps.tsx`,
+`frontend/components/PageTransition.tsx`. Modified `frontend/app/globals.css` and eighteen frontend
+component and page files, `README.md`, `docs/DECISIONS.md`, `BUILD_WITH_BOB.md`, `HANDOFF.md`.
+`backend/` was not modified; `backend/.env` is gitignored and carries the provider flip only.
+
+`README.md` corrections: the Checks section said 262 tests against a suite of 269; the OpenRouter
+timing section said a live measurement against `POST /simulations` was "worth doing", which has
+since been done and is now reported with its numbers; the clean-clone walkthrough said
+`python3 -m venv`, which on macOS commonly resolves to the system 3.9 that the README's own
+prerequisite line rules out.
+
+### In progress / blocked
+
+Nothing in progress.
+
+**OPEN-11 — AC-14 is breached under `openrouter`.** Measured live 2026-08-21: `POST /simulations`
+2.85s against a 2s budget, `POST /recommendations/backup-candidates` 11.93s typical and 16.91s
+worst against 12s. Reads are fine at 16–23ms. The cause is roughly 6s per model call against a
+3.5s nominal timeout, because httpx's read timeout bounds the gap between socket reads rather than
+total generation. Four responses are open — cap `max_tokens`, use a faster model, run the candidate
+calls concurrently, or accept and document — and none is chosen. `deterministic` is unaffected and
+remains the committed default.
+
+**OPEN-10 — DEC-15 still needs Person A's acknowledgement.**
+
+### Things a fresh session will trip over
+
+- **`pydantic-settings` resolves `env_file=".env"` relative to the working directory.** Started from
+  `backend/` the provider is `openrouter`; started from the repository root it is `deterministic`,
+  silently, with no error and a 200 response. Uvicorn must be started from `backend/`.
+- **The full suite must be run with `AI_PROVIDER=deterministic`.** Under `openrouter` two tests fail
+  by design — `test_the_configured_provider_satisfies_the_interface` and
+  `test_the_returned_candidates_still_match_the_contract_fixture` — because fixtures are captured
+  under the deterministic provider. They pass in 0.5s once the variable is set. The run also takes
+  four minutes and spends real credit.
+- **`refresh_fixtures --check` calls `drop_all()`** despite its name, and `verify_golden_path` writes
+  a simulation, a plan, and an approval. Neither is safe against a demo database you care about.
+- **The frontend must run on port 3000 and be reached as `localhost`**, not `127.0.0.1` — CORS pins
+  the literal origin string.
+- `UI Design/` is 2 MB of source mockups, deliberately untracked. It is not recoverable from the
+  repository.
+
+### Recommended next task
+
+Decide OPEN-11. Capping `max_tokens` is the cheapest of the four responses and the most likely to
+work, since the model's narratives run considerably longer than the templates they replace; it needs
+measuring rather than assuming. Everything else is either Person A's (OPEN-10, OPEN-09, GAP-01) or
+already recorded.
