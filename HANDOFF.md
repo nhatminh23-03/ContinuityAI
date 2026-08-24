@@ -862,3 +862,145 @@ Decide OPEN-11. Capping `max_tokens` is the cheapest of the four responses and t
 work, since the model's narratives run considerably longer than the templates they replace; it needs
 measuring rather than assuming. Everything else is either Person A's (OPEN-10, OPEN-09, GAP-01) or
 already recorded.
+
+---
+
+## 2026-08-24 — Your gap register, closed (Person A)
+
+I merged `feature/frontend-screens`, checked it first, and worked through `docs/BACKEND_GAPS.md`.
+**GAP-01, GAP-03, OPEN-10 and OPEN-11 are all closed.** 281 backend tests, 29 frontend tests, all
+seven evaluation checks still at 100%, no fixture drift, every endpoint inside AC-14.
+
+Your branch was a clean descendant of the backend branch — merge base was exactly its tip — so this
+was a fast-forward with nothing of either side bypassed. Your gap register was accurate throughout:
+every value you captured live by hand was already correct, and the only difference regeneration
+produced anywhere was one timestamp that needed pinning.
+
+### GAP-01 — `single_expert_dependency_count` is on the wire
+
+One new required field on `PlatformSummary` (contract §6.1, logged as DEC-17):
+
+```json
+{ "platform_id": "platform_payments", "system_count": 3, "critical_gap_count": 1,
+  "single_expert_dependency_count": 4, "highest_system_risk_index": 74, "drift_status": "NEW_RISK" }
+```
+
+**Seeded values are Payments 4 and Identity 2.** The brief's 3 and 1 were stale, as your register
+already suspected. Payment Gateway contributes two of Payments' four (Incident Recovery, Certificate
+Management), Refund Engine and Billing Integration one each.
+
+You were right that it is not client-derivable, and there is now a test that proves it rather than
+just asserting it: `test_single_expert_dependency_count_is_not_the_degraded_count` fails if the two
+numbers ever coincide on the seeded data, so nobody can later conclude the shortcut was equivalent.
+
+Already done on your side so nothing breaks: `types/api.ts`, the `strictObject` in
+`lib/api/schemas.ts` — which would have rejected the response otherwise — and `PlatformCard.tsx`,
+where I removed your `no transport yet — GAP-01` comment and rendered it as "N single-expert
+capabilities". **Restyle that freely, it is your card.** I only wanted the stale comment gone and the
+number visible.
+
+### GAP-03 — captured, and the deeper problem fixed
+
+You asked for a challenge fixture. What I found was that `refresh_fixtures.py` captured ten of the
+twelve files in `fixtures/`, so `--check` was printing "all fixtures match live engine output"
+without ever comparing `identity-systems.json` or `challenge-attest-jordan.json` to anything.
+
+An uncaptured fixture is worse than a missing one, because the check built to catch drift reports
+success over it. Both are captured now. `challenge-attest-jordan.json` is captured last, because the
+challenge is the only golden-path call that mutates an assessment, and the script reseeds afterwards
+so running it does not leave you with an attestation you did not make. `submitted_at` is pinned to an
+illustrative instant for the same reason `approved_at` is.
+
+There is now a `CAPTURED_FIXTURES` manifest, verified against what the run actually captured, and a
+test asserting it matches the directory. **If you add a fixture, add it to that map too** — the same
+way `fixtureSchemas` works on your side — and a test will tell you rather than a screen.
+
+### OPEN-11 — one real breach, one misread requirement
+
+Worth reading both halves, because only one was a bug.
+
+**The simulation was never a breach.** AC-14 says "*Deterministic* simulation returns in <2 seconds".
+Under `openrouter` the summary sentence is model-written, so it is an AI explanation operation with a
+12-second target, and 2.85s was always comfortably inside it. The deterministic simulation, which is
+what that clause actually governs, measures 7.3ms. I recorded this rather than quietly "fixing" it,
+because claiming a fix for a requirement we had read wrong is worse than the original mistake.
+
+**The candidates endpoint was real**, and your diagnosis of the cause was right and worth spelling
+out: `openrouter_timeout_seconds` bounded nothing at all. httpx has no total-request setting, its
+`read` timeout bounds the gap *between* socket reads, and the gateway keeps the socket warm while the
+model generates — so the clock kept resetting. The code's own docstring had flagged this as a
+"pathological slow trickle"; it turns out to be the normal case. A timeout the transport does not
+honour is not a budget.
+
+Fixed in `app/ai/budget.py` (DEC-18). The three candidate narratives describe three different people
+and share nothing, so they now run concurrently under one real wall-clock deadline
+(`NARRATIVE_DEADLINE_SECONDS`, default 8 against AC-14's 12). Anything that misses it is answered from
+the deterministic template. Ranked order is preserved regardless of which finishes first, so
+candidates cannot get reordered by latency.
+
+**Nothing changes for you.** No endpoint, DTO, or fixture moved, and the default provider is still
+`deterministic`. Two things you might find useful: setting `NARRATIVE_DEADLINE_SECONDS=0` skips model
+narration entirely and always uses the templates, which is the escape hatch if you are demoing on bad
+wifi; and a narrative that times out is invisible in the response — the candidate still has
+`strengths`, `gaps`, and every structured field, just template wording. That is by design, but it
+means you cannot tell from the payload whether the model answered.
+
+**One caveat, tracked as OPEN-12.** The fix is verified against a stub provider that sleeps, not the
+live gateway. The mechanism is proven; the numbers under a real key are now *predicted* rather than
+measured. Neither of us should quote them until someone re-runs it with a key.
+
+### DEC-15 — acknowledged, the provider stands
+
+OPEN-10 is closed. Your reading was right: the objection recorded in `watsonx.py` was about
+*unchecked* model prose, and that is not what you built. Every generation passes the gate before it
+can be returned, the plan that reaches a caller is the gate's filtered draft rather than the model's,
+and extraction stays rule-based so nothing model-written reaches the graph the numbers come from. The
+split you drew — model on the prose, rules on the numbers — is what `watsonx.py` was reaching for from
+the other side. Full reasoning in `docs/DECISIONS.md`.
+
+### Two setup things I hit, so you do not have to
+
+1. **`npm install` failed** with `errno -13` on a root-owned npm cache — nothing to do with this
+   project. `npm install --cache /tmp/continuityai-npm-cache` sidesteps it with no `sudo`. That is how
+   the current `node_modules` was installed.
+2. **`npm run typecheck` fails on a clean clone** with `app/layout.tsx: TS2304 Cannot find name
+   'LayoutProps'`. Not a real error and not something you broke: Next 16 generates that global into
+   `.next/types` during a build, so `tsc --noEmit` has nothing to resolve until `npm run build` has run
+   once. After a build it is clean. Worth a README line, and it is `RECOMMENDATIONS.md` R-27.
+
+Current frontend state on my machine: `npm run build` compiles clean with a clean TypeScript pass and
+9 routes, `npm test` is 29 passing in 6 files, `npm run typecheck` clean after the build.
+
+### Verified, not assumed
+
+| Check | Result |
+|---|---|
+| `pytest -q` | 281 passed |
+| `npm test` | 29 passed, 6 files — includes the contract lock over all 12 fixtures |
+| `npm run build` | clean, TypeScript pass clean |
+| `scripts.run_evaluation` | all 7 checks 100% |
+| `refresh_fixtures --check` | all fixtures match live engine output |
+| `verify_golden_path` | every endpoint inside AC-14; reads 2.8–39.9ms, simulation 7.3ms |
+| live `GET /api/v1/platforms` | returns the new field, byte-identical to the fixture |
+
+Every frozen number still holds: 72/HIGH, 74/HIGH with 0/2/3, 74 → 93 HIGH → CRITICAL with 2/1/2,
+Payments highest 74, Identity highest 68, Maria HIGH, Jordan MEDIUM.
+
+### What is still open
+
+| Item | Owner | Note |
+|---|---|---|
+| OPEN-12 — re-measure AC-14 under `openrouter` with a live key | Both | Ten minutes. Do it before the demo is recorded under that provider |
+| GAP-02, GAP-04, GAP-05, GAP-06, GAP-09 | Both | All still deferrable, all still correct as you wrote them (OPEN-13) |
+| watsonx extraction stuck at 313/640 on a spent token quota | Person A | Needs quota headroom. If the model then beats the rules on accuracy, some readiness values shift and frozen fixtures move with them — a contract change to coordinate |
+| Delete `keys.md`, rotate the three keys | User | R-23 |
+| R-27 — README line about building before typechecking | Person B | 10 minutes |
+| Demo video, screenshots, product narrative | Person B | — |
+
+### Recommended next task
+
+**You:** carry on with the screens. The dashboard card now has every number §C.1 asked for, and the
+graph is the largest remaining piece.
+
+**Me:** nothing that does not need a decision or a credential. OPEN-12 needs a key; the watsonx
+extraction needs quota. Say the word on either and I will pick it up.

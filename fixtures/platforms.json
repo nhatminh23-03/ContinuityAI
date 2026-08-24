@@ -6,6 +6,7 @@
       "description": "Customer payment and transaction services",
       "system_count": 3,
       "critical_gap_count": 1,
+      "single_expert_dependency_count": 4,
       "highest_system_risk_index": 74,
       "drift_status": "NEW_RISK"
     },
@@ -15,6 +16,7 @@
       "description": "Authentication and authorization services",
       "system_count": 2,
       "critical_gap_count": 1,
+      "single_expert_dependency_count": 2,
       "highest_system_risk_index": 68,
       "drift_status": "STABLE"
     }

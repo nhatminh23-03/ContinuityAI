@@ -125,6 +125,12 @@ export interface PlatformSummary {
   description: string | null;
   system_count: number;
   critical_gap_count: number;
+  /**
+   * Capabilities resting on exactly one adequate engineer — "one person away from a gap".
+   * Not derivable from `degraded_capability_count`, which also counts capabilities with no
+   * adequate engineer at all (DEC-07). Contract 6.1, added by DEC-17.
+   */
+  single_expert_dependency_count: number;
   /** Highest system risk. The MVP calculates no platform-level score. */
   highest_system_risk_index: number | null;
   drift_status: KnowledgeDriftStatus;

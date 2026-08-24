@@ -35,6 +35,7 @@ import json
 import logging
 import re
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -109,14 +110,22 @@ _JSON_BLOCK = re.compile(r"\{.*\}", re.DOTALL)
 
 
 def _call_budget(total_seconds: float) -> httpx.Timeout:
-    """One per-call budget, split so that `total_seconds` is the ceiling for the whole call.
+    """Per-phase timeouts derived from one number.
 
     See `TIMEOUT_PHASE_SHARES` for why this is not simply `httpx.Timeout(total_seconds)`.
 
-    One qualification on "ceiling": httpx's `read` timeout bounds the gap between socket reads,
-    not the whole response body. For an ordinary, non-streaming reply that is a real total, but a
-    pathological slow trickle — the far end dribbling bytes just inside each read window — could
-    still keep resetting that clock and run past `total_seconds` overall.
+    **`total_seconds` is not a wall-clock ceiling, and measurement showed it is not even close to
+    one.** httpx's `read` timeout bounds the gap *between* socket reads rather than the whole
+    response, so anything that keeps the socket warm keeps resetting the clock. That was written
+    here as a hypothetical "pathological slow trickle"; it is in fact the normal behaviour of the
+    gateway, which sends padding while the model generates. Measured on 2026-08-21, calls nominally
+    budgeted at 3.5s took about 6s, and the candidates endpoint reached 16.91s against AC-14's 12
+    (OPEN-11).
+
+    The fix is not a different number here. A total has to be enforced by something that can stop
+    waiting, which is why `narrate_in_parallel` in `app/ai/budget.py` applies a real deadline and
+    the callers use that. These phase timeouts remain useful for what they can bound — a dead host,
+    a hung connect, a stalled socket — and that is all they are now relied on for.
     """
     return httpx.Timeout(
         connect=total_seconds * TIMEOUT_PHASE_SHARES["connect"],
@@ -124,6 +133,43 @@ def _call_budget(total_seconds: float) -> httpx.Timeout:
         read=total_seconds * TIMEOUT_PHASE_SHARES["read"],
         pool=total_seconds * TIMEOUT_PHASE_SHARES["pool"],
     )
+
+
+# One connection pool for the process, not one per provider instance.
+#
+# A provider is constructed per request, so a per-instance client meant every request paid a fresh
+# TCP connect and TLS handshake *inside* its own latency budget — which is why `connect` was given
+# a quarter of it. Sharing the pool lets a warm connection be reused, so that quarter goes back to
+# generation. `httpx.Client` is documented as thread-safe, and every call passes its own `timeout`,
+# so nothing here depends on the client's construction-time timeout.
+#
+# Deliberately not closed per request. Closing it is what would defeat the purpose; the pool lives
+# for the life of the process and is released when it exits.
+_SHARED_CLIENT: httpx.Client | None = None
+_SHARED_CLIENT_LOCK = threading.Lock()
+
+
+def _shared_client() -> httpx.Client:
+    global _SHARED_CLIENT
+    if _SHARED_CLIENT is None:
+        with _SHARED_CLIENT_LOCK:
+            if _SHARED_CLIENT is None:
+                _SHARED_CLIENT = httpx.Client(
+                    timeout=_call_budget(settings.openrouter_timeout_seconds),
+                    # Room for the parallel candidate narration, which issues up to `limit` calls
+                    # at once.
+                    limits=httpx.Limits(max_connections=8, max_keepalive_connections=4),
+                )
+    return _SHARED_CLIENT
+
+
+def reset_shared_client() -> None:
+    """Drop the pooled client. For tests that swap transports or settings between cases."""
+    global _SHARED_CLIENT
+    with _SHARED_CLIENT_LOCK:
+        if _SHARED_CLIENT is not None:
+            _SHARED_CLIENT.close()
+        _SHARED_CLIENT = None
 
 
 class CacheBuildRefusedError(AIExtractionError):
@@ -168,7 +214,9 @@ class OpenRouterProvider:
         self._simulation_prompt = SIMULATION_PROMPT_FILE.read_text()
         self._candidate_prompt = CANDIDATE_PROMPT_FILE.read_text()
         self._plan_prompt = PLAN_PROMPT_FILE.read_text()
-        self._client = httpx.Client(timeout=_call_budget(settings.openrouter_timeout_seconds))
+        # The process-wide pool, not a new client. Kept as an instance attribute so a test can
+        # install its own transport without touching the pool.
+        self._client = _shared_client()
 
     @staticmethod
     def _refuse_to_build_an_extraction_cache() -> None:
@@ -443,4 +491,10 @@ class OpenRouterProvider:
         logger.warning("openrouter %s failed (%s); using the deterministic template", subject, exc)
 
     def close(self) -> None:
-        self._client.close()
+        """Deliberately does not close the connection pool.
+
+        A provider is constructed per request but the pool is shared across the process, so closing
+        it here would discard the warm connection the next request needs — and could close it under
+        a request still using it. That per-request handshake is what OPEN-11 was partly paying for.
+        The pool is released when the process exits; `reset_shared_client` exists for tests.
+        """

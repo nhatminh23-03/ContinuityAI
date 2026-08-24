@@ -31,8 +31,11 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
+from app.ai.budget import narrate_in_parallel
+from app.ai.deterministic import DeterministicProvider
 from app.ai.provider import AIProvider, get_provider
 from app.ai.schemas import CandidateNarrativeContext
+from app.core.config import settings
 from app.continuity.facts import CapabilityFacts
 from app.core.errors import NotFoundError
 from app.evidence.strength import is_adequate, readiness_rank
@@ -87,6 +90,11 @@ DISCLAIMER = (
 NO_CANDIDATE_MESSAGE = (
     "No strong internal technical backup candidate was identified from the available evidence."
 )
+
+# The templates a narrative falls back to when it runs out of budget. Shared at module level
+# because `DeterministicProvider` holds no state — every method derives its answer from the context
+# it is handed — so one instance is safe on any thread and there is nothing to construct per call.
+_TEMPLATES = DeterministicProvider()
 
 
 class BackupCandidateService:
@@ -148,10 +156,20 @@ class BackupCandidateService:
         # model-backed provider was being paid for narratives on candidates that were then
         # discarded, and enough of them to put AC-14's 12-second budget out of reach. Deferring
         # bounds the provider calls at `limit`, which the contract caps at 3.
-        candidates = [
-            self._narrate(candidate, narrative_context)
-            for _, candidate, narrative_context in scored[: request.limit]
-        ]
+        #
+        # Bounding them at three was necessary but not sufficient: three *sequential* model calls
+        # still measured 16.91s against that 12-second budget (OPEN-11). These three narratives
+        # describe three different people and share nothing, so they run together under one
+        # wall-clock deadline, and any that miss it are answered with the deterministic template.
+        # See app/ai/budget.py for why the deadline cannot be left to the transport.
+        selected = [(candidate, context) for _, candidate, context in scored[: request.limit]]
+        candidates = narrate_in_parallel(
+            selected,
+            narrate=lambda pair: self._narrate(pair[0], pair[1]),
+            fallback=lambda pair: self._narrate_from_template(pair[0], pair[1]),
+            deadline_seconds=settings.narrative_deadline_seconds,
+            max_workers=settings.narrative_max_workers,
+        )
 
         # `message` is omitted rather than sent as null when candidates exist: the contract only
         # documents it for the empty case, and an explicit null would show up as a contract diff.
@@ -332,8 +350,25 @@ class BackupCandidateService:
         candidate. Whatever the provider is, the facts it narrates were decided above by the
         rules; a provider that fails or wanders returns the deterministic template instead, so
         the structured half of the candidate is unaffected either way.
+
+        Called on a worker thread when there is more than one candidate. It reads no session and
+        mutates no service state — the context was built before narration began, and
+        `model_copy` returns a new object — so there is nothing here for concurrency to corrupt.
         """
-        narrative = self.provider.explain_candidate(context)
+        return self._apply(candidate, self.provider.explain_candidate(context))
+
+    def _narrate_from_template(
+        self, candidate: BackupCandidate, context: CandidateNarrativeContext
+    ) -> BackupCandidate:
+        """The same shape from the deterministic templates, for a narrative that ran out of time.
+
+        Not routed through `self.provider`: the provider is what just failed to answer inside the
+        budget, and asking it again would spend more of a budget that is already gone.
+        """
+        return self._apply(candidate, _TEMPLATES.explain_candidate(context))
+
+    @staticmethod
+    def _apply(candidate: BackupCandidate, narrative) -> BackupCandidate:
         return candidate.model_copy(
             update={
                 "strengths": narrative.strengths[:MAX_STRENGTHS],

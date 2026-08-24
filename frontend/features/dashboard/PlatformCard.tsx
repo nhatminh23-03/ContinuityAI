@@ -2,8 +2,13 @@ import type { PlatformSummary } from '@/types/api';
 import { DriftLabel, RiskIndex } from '@/components/status';
 
 /**
- * Platform overview card. No platform-level exposure pill (frozen out under
- * CI-10) and no single-expert count (no transport yet — GAP-01).
+ * Platform overview card. No platform-level exposure pill (frozen out under CI-10).
+ *
+ * `single_expert_dependency_count` now has transport (DEC-17 closed GAP-01) and is rendered
+ * straight from the response. It is deliberately not derived from the degraded counts: under
+ * DEC-07 those also include capabilities with no adequate engineer at all, so the two numbers
+ * answer different questions. Copy stays descriptive — it reports what the evidence shows, not
+ * a judgement about anyone.
  */
 export function PlatformCard({ platform }: { platform: PlatformSummary }) {
   return (
@@ -25,6 +30,10 @@ export function PlatformCard({ platform }: { platform: PlatformSummary }) {
         <div className="flex flex-col items-end gap-1.5 pb-0.5 text-right">
           <span className="text-xs font-medium text-slate-600 tabular-nums">
             {platform.critical_gap_count} critical {platform.critical_gap_count === 1 ? 'gap' : 'gaps'}
+          </span>
+          <span className="text-xs font-medium text-slate-600 tabular-nums">
+            {platform.single_expert_dependency_count} single-expert{' '}
+            {platform.single_expert_dependency_count === 1 ? 'capability' : 'capabilities'}
           </span>
           <DriftLabel status={platform.drift_status} />
         </div>

@@ -14,6 +14,10 @@ class PlatformSummary(BaseModel):
     description: str | None = None
     system_count: int = Field(ge=0)
     critical_gap_count: int = Field(ge=0)
+    # Capabilities under this platform that rest on exactly one adequate engineer. Distinct from
+    # `critical_gap_count`, which counts capabilities with no adequate engineer at all: this is the
+    # "one person away from a gap" number, and it is the one the dashboard card leads with.
+    single_expert_dependency_count: int = Field(ge=0)
     highest_system_risk_index: int | None = Field(default=None, ge=0, le=100)
     drift_status: KnowledgeDriftStatus
 

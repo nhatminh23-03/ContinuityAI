@@ -120,6 +120,7 @@ export const platformSummarySchema = z.strictObject({
   description: z.string().nullable().optional(),
   system_count: count,
   critical_gap_count: count,
+  single_expert_dependency_count: count,
   highest_system_risk_index: riskIndex.nullable(),
   drift_status: knowledgeDriftStatus,
 });

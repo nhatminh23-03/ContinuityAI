@@ -501,3 +501,103 @@ at that point is rotation.
 **Worth noting for the submission:** `docs/DOMAIN_MODEL.md` and the PRD both commit to strong data
 boundaries, and a judge who finds credentials in the repository will weigh that against the
 responsible-data claims regardless of what the code does. Keeping this clean is part of the story.
+
+---
+
+# Items from Person B's gap register — 2026-08-24
+
+## R-24 — `single_expert_dependency_count` had no transport — **RESOLVED 2026-08-24**
+
+`docs/BACKEND_GAPS.md` GAP-01, and the only blocking item in Person B's three-way review of the PRD,
+the contract, and the implementation. The corrected dashboard puts a single-expert-dependency count on
+each platform card, and no field carried it anywhere — not in the contract, not in `PlatformSummary`,
+not in a fixture, not in `frontend/types/api.ts`. It had never been added.
+
+Added as a required field on `PlatformSummary` and logged as DEC-17. It counts capabilities under the
+platform whose adequate coverage is exactly one engineer, aggregated in SQL from the already-persisted
+`capability_assessments.adequate_engineer_count`, so no rule or column changed. Seeded values are
+Payments 4 and Identity 2; the brief's 3 and 1 were stale-brief figures.
+
+**The part worth remembering** is why the frontend could not have derived it. Summing
+`degraded_capability_count` looks equivalent and is not: under DEC-07 a lower-criticality capability
+with *zero* adequate engineers is `DEGRADED` rather than a critical gap, so the degraded count spans
+both the one-expert and no-expert cases. There is now a test that asserts the two numbers differ on
+the seeded data, purely so nobody later concludes the shortcut was fine.
+
+---
+
+## R-25 — A configured timeout that the transport does not honour is not a budget — **RESOLVED 2026-08-24**
+
+`OPEN-11` recorded `POST /recommendations/backup-candidates` at 16.91s against AC-14's 12 seconds under
+`AI_PROVIDER=openrouter`. Two causes, and the first is the interesting one.
+
+`openrouter_timeout_seconds` was applied through `httpx.Timeout`, and httpx has no total-request
+setting — its `read` timeout bounds the gap *between* socket reads. The gateway keeps the socket warm
+while the model generates, so the clock kept resetting and a call nominally budgeted at 3.5s ran to
+about 6. The code had already flagged this in a docstring as a "pathological slow trickle" that could
+defeat the budget. It is not pathological; it is the normal case. **Every latency number that budget
+implied was fiction, and nothing failed to make that visible** — the calls simply took as long as they
+took.
+
+Fixed in `app/ai/budget.py`: the three independent candidate narratives now run concurrently under one
+real wall-clock deadline, and anything that misses it is answered from the deterministic template.
+Logged as DEC-18. Also fixed the `httpx.Client` being rebuilt per request, which was paying a TLS
+handshake inside the very budget it was spending.
+
+The second finding was that the simulation half of OPEN-11 was **not a breach at all**: AC-14's
+2-second clause governs *deterministic* simulation, and under `openrouter` the summary is model-written,
+which makes it a 12-second AI explanation operation. 2.85s was always inside it.
+
+**Residual concern, tracked as OPEN-12.** The fix is verified against a stub provider that sleeps, not
+against the live gateway. The mechanism is proven — the endpoint returns on the deadline and falls back
+to templates — but the *numbers* under a real key are now predicted rather than measured. Re-measure
+before quoting them.
+
+**Effort to close OPEN-12:** one run with a live key, about ten minutes.
+
+---
+
+## R-26 — The fixture check was reporting success over files it never read — **RESOLVED 2026-08-24**
+
+Raised as GAP-03, which asked only for a challenge fixture. The underlying problem was worse.
+`scripts/refresh_fixtures.py` captured ten of the twelve files in `fixtures/`, so
+`refresh_fixtures --check` printed "all fixtures match live engine output" while
+`identity-systems.json` and `challenge-attest-jordan.json` were never compared to anything.
+
+**An uncaptured fixture is worse than a missing one**, because the mechanism that exists to catch drift
+actively reports success over it. Both fixtures happened to be accurate — the only difference
+regeneration produced was a live timestamp that needed pinning — so this had cost nothing yet. It would
+have, silently, on the first divergence.
+
+Both are captured now, the challenge last because it is the only golden-path call that mutates an
+assessment, with a reseed afterwards. `CAPTURED_FIXTURES` is declared, verified against what the run
+actually captured, and asserted against the directory by a test, so the next fixture added on either
+side fails a test instead of drifting.
+
+**Generalisable lesson worth carrying into the submission:** every check in this repository should be
+asked what it would *fail* to notice. This one had a blind spot exactly where it mattered, and it read
+as green.
+
+---
+
+## R-27 — A clean clone cannot run `npm run typecheck` before a build
+
+Minor, but it touches AC-15 (fresh clone plus documented setup reproduces the demo), so it is worth
+writing down rather than each of us rediscovering it.
+
+Two friction points on a fresh frontend setup:
+
+1. **`npm install` can fail on a root-owned npm cache** with `errno -13`, unrelated to this project.
+   The fix that needs no `sudo` is `npm install --cache /tmp/continuityai-npm-cache`, which sidesteps
+   the bad cache entirely. The `sudo chown -R 501:20 ~/.npm` that npm suggests also works but asks for
+   a password.
+2. **`npm run typecheck` fails on a clean clone** with `app/layout.tsx: TS2304 Cannot find name
+   'LayoutProps'`. Not a real error: `LayoutProps` is a global that Next 16 generates into
+   `.next/types` during a build, so `tsc --noEmit` has nothing to resolve until `npm run build` has run
+   once. `npm run build` passes, and its own TypeScript pass is clean.
+
+**Recommendation:** one line in the README setup section — run `npm run build` once before
+`npm run typecheck` — and, if it seems worth it, a `prebuild`-style step so the ordering is not
+folklore.
+
+**Effort:** 10 minutes · **Owner:** Person B, since it is the frontend setup path.

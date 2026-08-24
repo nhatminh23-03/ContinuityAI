@@ -59,6 +59,20 @@ class Settings(BaseSettings):
     # budgeted.
     openrouter_max_retries: int = 0
 
+    # The wall-clock ceiling on the narration phase of one request, enforced by app/ai/budget.py
+    # rather than by the transport. `openrouter_timeout_seconds` above turned out not to bound a
+    # call at all — httpx's read timeout bounds the gap between socket reads, and the gateway keeps
+    # the socket warm while the model generates — so a real total has to be imposed by something
+    # that can stop waiting. See OPEN-11.
+    #
+    # 8 seconds against AC-14's 12 for an AI explanation operation. The margin is for the rest of
+    # the request: scoring, evidence reads, serialisation. Measured generation is about 6 seconds,
+    # so a healthy call fits and a stalled one is cut off with the template in its place. Set to 0
+    # to skip model narration entirely and always use the templates.
+    narrative_deadline_seconds: float = 8.0
+    # The contract caps `limit` at 3, so three is the most that is ever asked for at once.
+    narrative_max_workers: int = 3
+
     # Shared contract fixtures, jointly owned. Contract decision CI-14.
     fixtures_path: Path = REPO_ROOT / "fixtures"
 

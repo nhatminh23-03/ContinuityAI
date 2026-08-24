@@ -67,6 +67,7 @@ class PlatformService:
     def list_platforms(self) -> PlatformListResponse:
         platforms = PlatformRepository(self.session)
         systems = SystemRepository(self.session)
+        capabilities = CapabilityRepository(self.session)
         summaries: list[PlatformSummary] = []
 
         for platform in platforms.list_all():
@@ -79,6 +80,14 @@ class PlatformService:
                     description=platform.description,
                     system_count=len(systems.list_by_platform(platform.platform_id)),
                     critical_gap_count=sum(a.critical_gap_count for a in assessments),
+                    # Counted in the database from the persisted per-capability adequate-engineer
+                    # count, not derived here and not derivable by the client: summing
+                    # `degraded_capability_count` would conflate "one expert" with "no expert"
+                    # under DEC-07. See the repository method for why the `== 1` test is shared
+                    # with the sole-expert reason codes.
+                    single_expert_dependency_count=capabilities.sole_expert_count_for_platform(
+                        platform.platform_id
+                    ),
                     # No synthesised platform score (contract decision CI-10). The highest system
                     # answers "where do I look first?" without a second aggregation formula.
                     highest_system_risk_index=max(indexes) if indexes else None,

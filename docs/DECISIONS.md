@@ -776,3 +776,162 @@ improvement, and would be reversing a decision about the compute boundary withou
 | ID | Item | Owner | Resolve by |
 |---|---|---|---|
 | OPEN-11 | AC-14 latency is breached under `AI_PROVIDER=openrouter`, measured live on 2026-08-21: `POST /simulations` 2.85s against the 2s deterministic-simulation budget, and `POST /recommendations/backup-candidates` 11.93s typical and 16.91s worst against the 12s AI-operation budget. Reads are unaffected at 16–23ms. The cause is roughly 6s per model call against a 3.5s nominal timeout, because httpx's read timeout bounds the gap between socket reads rather than total generation. Four responses are open: cap `max_tokens`, use a faster model, run the candidate calls concurrently, or accept and document the breach. `AI_PROVIDER=deterministic` is unaffected and remains the default | Both | Before the demo is recorded under `openrouter` |
+
+---
+
+## Contract amendment and latency — closing Person B's gap register
+
+### DEC-17 — `single_expert_dependency_count` is added to `PlatformSummary`
+
+**Date:** 2026-08-24 · **Category:** C · **Owner:** Person A implements, jointly agreed ·
+**Contract change: additive, one new required field**
+
+`docs/BACKEND_GAPS.md` GAP-01 was the only blocking item in Person B's three-way review: the
+corrected dashboard puts a single-expert-dependency count on each platform card, and no field
+anywhere carried it — not in `API_CONTRACT.md` §6.1, not in `PlatformSummary`, not in any fixture,
+not in `frontend/types/api.ts`. It had simply never been added.
+
+`single_expert_dependency_count: integer >= 0` now sits on `PlatformSummary`, defined as the number
+of capabilities under the platform whose adequate coverage is exactly one engineer.
+
+**Why it could not be left to the frontend.** GAP-01 anticipated the shortcut and it is worth
+recording why the shortcut is wrong, because it is the kind that looks right on the seeded data.
+Summing `degraded_capability_count` across the platform's systems does not give this number: under
+DEC-07 a lower-criticality capability with *zero* adequate engineers is `DEGRADED` rather than a
+critical gap, so the degraded count spans both the one-expert and the no-expert cases. On the seeded
+dataset the two figures differ, and `test_single_expert_dependency_count_is_not_the_degraded_count`
+asserts that they differ — a test that exists purely so a future contributor cannot conclude the
+client-side derivation is equivalent. Deriving it client-side would also breach the standing rule
+that the frontend renders received values and computes no domain quantity.
+
+**Why no new engine work was needed.** `capability_assessments.adequate_engineer_count` is already
+persisted by every recompute path and is already staleness-aware — `CoverageFact.is_adequate`
+excludes `STALE` evidence per PRD rule R6. The field is therefore a read-path aggregate, counted in
+SQL and joined up to the platform through `Capability.system_id`. No column, no migration, no rule.
+
+**The `== 1` test is shared, not re-invented.** It is the same condition
+`app/continuity/aggregation.py` already uses to raise `SOLE_EXPERT_CAPABILITY` and
+`MULTIPLE_SOLE_EXPERT_CAPABILITIES`. Writing a second definition here would have let a platform card
+disagree with the reason codes displayed on the systems beneath it, which is the sort of
+inconsistency nobody notices until it is on a screen in front of judges.
+
+**Seeded values: Payments 4, Identity 2.** The working brief said 3 and 1. Those were stale-brief
+figures, as GAP-01 itself noted, and the derived numbers are what ship. Payment Gateway contributes
+two of Payments' four (Incident Recovery, Certificate Management) and Refund Engine and Billing
+Integration one each.
+
+**Documents affected:** `docs/API_CONTRACT.md` §6.1 and the §8.1 example, `fixtures/platforms.json`,
+`frontend/types/api.ts`, `frontend/lib/api/schemas.ts`. `PlatformCard.tsx` renders it; the copy is
+descriptive ("N single-expert capabilities") and Person B should restyle freely.
+
+### DEC-18 — The narrative latency budget is enforced by a deadline, not by a transport timeout
+
+**Date:** 2026-08-24 · **Category:** B · **Owner:** Person A · **No contract change** ·
+**Closes OPEN-11**
+
+OPEN-11 recorded two AC-14 breaches under `AI_PROVIDER=openrouter`. They turned out to be different
+kinds of problem and only one of them was real.
+
+**The simulation was not a breach.** AC-14 reads: "Deterministic simulation returns in \<2 seconds on
+seeded dataset; normal read APIs target \<800ms local p95; AI plan/explanation operations target
+\<12 seconds." Under `openrouter` the simulation summary is written by a model, so the operation is
+not a deterministic simulation and the 2-second clause is not the one that applies to it — it is an
+AI explanation operation, and 2.85s is comfortably inside 12. The deterministic simulation, which is
+what that clause governs, measures 7.3ms. OPEN-11 applied the stricter clause to a configuration it
+does not cover. Recorded rather than quietly dropped, because "we fixed it" would have been a
+misdescription of a requirement we had simply read wrong.
+
+**The candidates endpoint was a real breach**, at 16.91s worst against 12. Two causes, both now
+addressed:
+
+*The configured timeout bounded nothing.* `openrouter_timeout_seconds` is applied through
+`httpx.Timeout`, and httpx has no total-request setting: its `read` timeout bounds the gap *between*
+socket reads. The gateway keeps the socket warm while the model generates, so the clock kept
+resetting and calls nominally budgeted at 3.5s ran to about 6. `_call_budget` had already flagged
+this in its own docstring as a "pathological slow trickle" that could defeat the budget; the
+measurement showed it is not pathological, it is the normal case. **A timeout the transport does not
+honour is not a budget.**
+
+*Three independent calls ran in sequence.* The three candidate narratives describe three different
+people and share nothing, so sequencing them multiplied one call's latency by `limit`.
+
+The fix is `app/ai/budget.py`. `narrate_in_parallel` runs the narratives concurrently under one
+shared wall-clock deadline (`narrative_deadline_seconds`, default 8s against AC-14's 12), preserves
+the input order so ranked candidates are not reordered by completion order, and answers anything that
+raises or misses the deadline from the deterministic template. Setting the deadline to 0 skips model
+narration entirely, which is the escape hatch for demonstrating on a bad connection.
+
+**What was rejected.** Capping `max_tokens` harder was rejected as the primary fix: truncated output
+fails JSON parsing and falls back to the template *silently*, so it would have bought latency by
+quietly turning the model off and would have looked like success. A faster model was rejected as a
+fix rather than a preference — it would move the number without removing the unbounded wait, and the
+next slow response would breach again. Accepting and documenting the breach was rejected because the
+endpoint is on the demo path.
+
+**A limit worth being honest about.** Missing the deadline does not cancel the HTTP call. A thread
+already inside a blocking `post` cannot be interrupted, so it finishes and its answer is discarded.
+Those threads are bounded by the phase timeouts, which is what those timeouts are still good for.
+Real cancellation would need an async transport throughout, which is a larger change than the problem
+justifies. The work is wasted, not leaked, and it is documented at the top of `budget.py`.
+
+Also fixed while here: the `httpx.Client` was constructed per provider, and a provider is constructed
+per request, so every request paid a TCP connect and TLS handshake *inside* its own budget — which is
+why `connect` had been given a quarter of it. The pool is now shared for the life of the process.
+
+**Documents affected:** none of the frozen specifications. `backend/.env.example` gains two
+operator-facing variables with defaults.
+
+### DEC-15 acknowledged — the OpenRouter narrative provider stands
+
+**Date:** 2026-08-24 · **Owner:** Person A · **Closes OPEN-10**
+
+DEC-15 overrode a decision recorded in `watsonx.py`: that a model should not write the candidate
+narrative or the mitigation plan, because a rephrasing that drifts is worse than a plain one and an
+invented step in a plan a manager approves is a real cost. Person A acknowledges DEC-15 and the
+provider stands.
+
+The objection those passages raised was about *unchecked* model output, and that is no longer the
+shape of the thing. Every generation now passes `app/ai/validation.py` before it can be returned, and
+anything rejected falls back to the same deterministic text those passages were defending. The plan
+returned to a caller is `outcome.draft` — the gate's filtered version, with unresolvable citations
+removed — not the model's. That is a materially different proposition from letting a model's prose
+through, and the original reasoning does not argue against it.
+
+Two things keep this acknowledgement narrow. The gate's `find_unattested_names` is a documented
+heuristic rather than closed-world grounding, and DEC-15 says so plainly, including which inventions
+it cannot catch; the prompts are the primary defence and the gate is the net. And extraction remains
+rule-based under this provider, so no model output reaches the graph that the risk numbers are
+computed from. The split DEC-15 draws — model on the prose, rules on the numbers — is the same split
+`watsonx.py` was reaching for from the other direction.
+
+`AI_PROVIDER` stays `deterministic` by default. Both model-backed providers remain opt-in and
+credential-gated, which is what makes a clean clone reproduce the demo offline (AC-15).
+
+### Fixture capture policy — closing GAP-03
+
+GAP-03 asked for a challenge fixture. The underlying problem was worse than a missing file:
+`scripts/refresh_fixtures.py` captured ten of the twelve files in `fixtures/`, so
+`refresh_fixtures --check` printed "all fixtures match live engine output" without having looked at
+`identity-systems.json` or `challenge-attest-jordan.json` at all. **An uncaptured fixture is worse
+than a missing one, because the check that exists to catch drift reports success over it.**
+
+Both are captured now. The challenge is captured last and the database reseeded afterwards, because
+it is the only call in the golden path that changes an assessment — anything captured after it would
+show the corrected graph instead of the demo baseline. Its `submitted_at` is pinned to an
+illustrative instant for the same reason `approved_at` is: a live timestamp would churn the fixture
+on every run.
+
+To stop this recurring, `refresh_fixtures.py` declares `CAPTURED_FIXTURES`, `main()` verifies the
+declaration against what the run actually captured, and
+`test_every_shared_fixture_is_captured_by_the_refresh_script` asserts set equality with the directory.
+A fixture added on either side now fails a test instead of drifting quietly.
+
+Every value Person B captured by hand was already correct; the only difference the regeneration
+produced was the pinned timestamp.
+
+### Open items after this build
+
+| ID | Item | Owner | Resolve by |
+|---|---|---|---|
+| OPEN-12 | The AC-14 figures under `openrouter` are now predicted rather than measured: the fix is verified against a stub provider that sleeps, not against the live gateway. Re-measure `POST /recommendations/backup-candidates` and `POST /mitigation-plans` with a real key before claiming the numbers | Both | Before the demo is recorded under `openrouter` |
+| OPEN-13 | `docs/BACKEND_GAPS.md` GAP-02 (approved plans cannot be read back), GAP-04 (candidate `evidence_confidence` definition, R-14), and the doc-refresh items GAP-05, GAP-06, GAP-09 are all still open and all still deferrable | Both | Post-MVP |

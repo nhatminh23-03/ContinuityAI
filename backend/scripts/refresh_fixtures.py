@@ -11,8 +11,16 @@ The fixtures remain subordinate to `docs/API_CONTRACT.md`: where a regenerated p
 with the contract, the contract is right and the implementation is wrong. This script does not get
 to decide that — it only makes the disagreement visible.
 
-One value is pinned rather than captured: `approved_at` is a real timestamp, so recording it live
-would churn the fixture on every run. It is frozen to an illustrative instant.
+Two values are pinned rather than captured: `approved_at` and a challenge's `submitted_at` are real
+timestamps, so recording them live would churn their fixtures on every run. Both are frozen to an
+illustrative instant.
+
+Every file in `fixtures/` must be captured here. Two of them were not, having been added from live
+captures by hand: `identity-systems.json` and `challenge-attest-jordan.json`. An uncaptured fixture
+is worse than a missing one, because `--check` reports "all fixtures match live engine output"
+without ever having looked at it, so it can drift from the API indefinitely while the check stays
+green. Both are captured now (GAP-03), and `test_fixture_coverage` asserts the set matches the
+directory so the next addition cannot repeat it.
 """
 
 from __future__ import annotations
@@ -28,13 +36,36 @@ if str(REPO_ROOT / "backend") not in sys.path:
 FIXTURES = REPO_ROOT / "fixtures"
 
 PLATFORM = "platform_payments"
+IDENTITY_PLATFORM = "platform_identity"
 SYSTEM = "system_payment_gateway"
 CAPABILITY = "cap_incident_recovery"
 ALEX = "eng_alex_chen"
 MARIA = "eng_maria_gomez"
+JORDAN = "eng_jordan_lee"
 MANAGER = "eng_manager_sarah"
 
 ILLUSTRATIVE_APPROVED_AT = "2026-08-15T10:30:00Z"
+ILLUSTRATIVE_SUBMITTED_AT = "2026-08-15T10:35:00Z"
+
+# Every fixture this script is responsible for. Declared rather than inferred so a test can compare
+# it against `fixtures/` without seeding a database and replaying the golden path, and verified
+# against the real capture in `main()` so the declaration cannot quietly become a lie.
+CAPTURED_FIXTURES = frozenset(
+    {
+        "platforms",
+        "payments-systems",
+        "identity-systems",
+        "payment-gateway",
+        "payment-gateway-graph",
+        "incident-recovery",
+        "incident-recovery-evidence",
+        "alex-simulation",
+        "backup-candidates",
+        "mitigation-plan",
+        "mitigation-plan-approved",
+        "challenge-attest-jordan",
+    }
+)
 
 
 def _capture() -> dict[str, dict]:
@@ -59,6 +90,7 @@ def _capture() -> dict[str, dict]:
 
     get("platforms", "/api/v1/platforms")
     get("payments-systems", f"/api/v1/platforms/{PLATFORM}/systems")
+    get("identity-systems", f"/api/v1/platforms/{IDENTITY_PLATFORM}/systems")
     get("payment-gateway", f"/api/v1/systems/{SYSTEM}")
     get("payment-gateway-graph", f"/api/v1/systems/{SYSTEM}/graph")
     get("incident-recovery", f"/api/v1/capabilities/{CAPABILITY}")
@@ -95,6 +127,30 @@ def _capture() -> dict[str, dict]:
     )
     approved["approved_at"] = ILLUSTRATIVE_APPROVED_AT
 
+    # Captured last, and deliberately so: this is the only call here that changes the assessment.
+    # The manager attests that Jordan once recovered the gateway unaided, readiness is recomputed,
+    # and Incident Recovery gains a second adequate engineer. Anything captured after it would show
+    # the corrected graph rather than the demo baseline, so every fixture above must already be on
+    # disk before this runs.
+    challenge = post(
+        "challenge-attest-jordan",
+        f"/api/v1/capabilities/{CAPABILITY}/challenge",
+        {
+            "challenge_type": "MANAGER_ATTESTATION",
+            "engineer_id": JORDAN,
+            "submitted_by": MANAGER,
+            "evidence_role": "INDEPENDENT_EXECUTION",
+            "comment": "Jordan restored the gateway alone during the March incident; never written up.",
+        },
+    )
+    challenge["submitted_at"] = ILLUSTRATIVE_SUBMITTED_AT
+
+    # Undo it. A developer who runs this script and then starts the server should get the demo
+    # baseline, not a database carrying an attestation they did not make.
+    from scripts.seed_demo import seed
+
+    seed(verbose=False)
+
     return captured
 
 
@@ -111,6 +167,15 @@ def main() -> int:
     # keep the identifiers the contract examples use.
     seed(verbose=False)
     captured = _capture()
+
+    # The manifest must describe what actually happened, or the test that trusts it proves nothing.
+    if set(captured) != CAPTURED_FIXTURES:
+        print(
+            "CAPTURED_FIXTURES does not match what this run captured. "
+            f"Captured but undeclared: {sorted(set(captured) - CAPTURED_FIXTURES)}. "
+            f"Declared but not captured: {sorted(CAPTURED_FIXTURES - set(captured))}."
+        )
+        return 1
 
     stale: list[str] = []
     for name, payload in captured.items():
