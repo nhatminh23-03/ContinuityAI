@@ -21,6 +21,26 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     database_url: str = f"sqlite:///{REPO_ROOT / 'backend' / 'continuity.db'}"
 
+    # Browser origins allowed to call the API. Comma-separated so it can be set from a shell
+    # without JSON quoting.
+    #
+    # This was hardcoded to `http://localhost:3000`, which is fine until port 3000 is taken — and
+    # then the failure is unpleasant to diagnose: the frontend loads, every page renders its shell,
+    # and only the data fetches fail, in the browser, with a CORS error that never reaches the
+    # backend log. Running the frontend on another port is a normal thing to have to do, so it must
+    # not require editing Python.
+    #
+    # Kept to an explicit list rather than `*`. A wildcard would work here and is the wrong habit to
+    # leave in a repository that argues for careful data boundaries.
+    cors_origins: str = (
+        "http://localhost:3000,http://127.0.0.1:3000,"
+        "http://localhost:3001,http://127.0.0.1:3001"
+    )
+
+    @property
+    def cors_origin_list(self) -> list[str]:
+        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+
     # Provider: `deterministic` (offline, reproducible), `cached` (replayed model extraction),
     # `watsonx` (IBM watsonx.ai) or `openrouter` (model-written narratives, rule-based extraction).
     ai_provider: str = "deterministic"

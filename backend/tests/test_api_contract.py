@@ -325,3 +325,34 @@ def test_a_sparse_capability_returns_insufficient_evidence_and_no_index(client) 
     assert body["exposure"] == "INSUFFICIENT_EVIDENCE"
     assert body["continuity_risk_index"] is None
     assert body["continuity_risk_class"] is None
+
+
+def test_cors_allows_the_frontend_origin_and_is_configurable() -> None:
+    """The browser is the only client that matters here, and CORS is invisible to the backend log.
+
+    A rejected origin produces a failure the frontend sees and this process does not: pages render,
+    fetches fail, nothing is logged server-side. So the allowlist is asserted rather than assumed,
+    and asserted through `settings` so that running the frontend on a non-default port is a
+    configuration change rather than a code change.
+    """
+    from app.core.config import Settings, settings
+
+    assert "http://localhost:3000" in settings.cors_origin_list
+
+    configured = Settings(cors_origins="http://localhost:3100, http://127.0.0.1:3100")
+    assert configured.cors_origin_list == [
+        "http://localhost:3100",
+        "http://127.0.0.1:3100",
+    ], "whitespace around a comma-separated origin must not produce an entry that never matches"
+
+
+def test_a_browser_request_from_the_frontend_origin_is_allowed(client) -> None:
+    """End to end through the middleware, not just the setting.
+
+    The header is what the browser actually enforces on, so this checks the response carries it.
+    """
+    response = client.get(
+        "/api/v1/platforms", headers={"Origin": "http://localhost:3000"}
+    )
+    assert response.status_code == 200
+    assert response.headers.get("access-control-allow-origin") == "http://localhost:3000"

@@ -1004,3 +1004,48 @@ graph is the largest remaining piece.
 
 **Me:** nothing that does not need a decision or a credential. OPEN-12 needs a key; the watsonx
 extraction needs quota. Say the word on either and I will pick it up.
+
+### Addendum, same day — verified running end to end, and one defect that found
+
+I ran both halves together rather than inferring it from green tests, and it was worth doing.
+
+**The app works.** Every one of the eight frontend routes returns 200 against the live backend, every
+endpoint answers 200/201 in the backend log, and — the check I would trust most — every live payload
+validates against *your* Zod schemas, not just against the fixtures. I walked the full golden path
+through `lib/api/schemas.ts`: platforms, both platform system lists, system detail, the graph both
+unfocused and focused, capability detail, evidence, simulation, candidates, plan. All eleven pass. The
+demo numbers are correct live: Payments highest 74 with 4 single-expert capabilities, Payment Gateway
+74/HIGH, simulation 74 → 93 and HIGH → CRITICAL with 2/1/2.
+
+**The defect: CORS was hardcoded to `http://localhost:3000`.**
+
+On this machine both of our documented ports are occupied by an unrelated project — a FastAPI app on
+8000 and a Next 14 server on 3000. Moving the backend is easy, because
+`NEXT_PUBLIC_API_BASE_URL` exists. Moving the *frontend* was not: the origin allowlist was a literal in
+`main.py`, so a frontend on any other port had its fetches rejected by the browser.
+
+That failure mode is nastier than it sounds. The page loads, every shell renders, the navigation works
+— and only the data fetches fail, in the browser, with a CORS error that **never appears in the backend
+log at all**. Nothing on the server knows anything went wrong. If you had hit this cold you would
+reasonably have gone looking for a bug in the adapter.
+
+`CORS_ORIGINS` is now a comma-separated setting, defaulting to ports 3000 and 3001 on both `localhost`
+and `127.0.0.1`. Two tests cover it: one asserts the setting parses and tolerates whitespace, one
+drives a request through the middleware and checks the response header. Kept as an explicit list rather
+than `*`, because a wildcard is the wrong habit for a repository that argues for careful boundaries.
+
+**If you hit a port clash**, this is the whole workaround, no code edits:
+
+```bash
+# backend on another port, allowing the frontend's origin
+cd backend && CORS_ORIGINS=http://localhost:3100 .venv/bin/python -m uvicorn app.main:app --port 8001
+
+# frontend/.env.local
+NEXT_PUBLIC_USE_MOCKS=false
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8001
+```
+
+One more thing you will want to know: **`frontend/.env.local` did not exist**, and without it the app
+defaults to mock mode. So it would have rendered perfectly while never once calling the backend, which
+is the other failure that looks like success. `cp .env.local.example .env.local` is the step; I have
+done it locally, and the file is gitignored so it is not in the commit.
