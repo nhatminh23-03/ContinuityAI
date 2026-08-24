@@ -328,7 +328,12 @@ class OpenRouterProvider:
         return extract_with(
             artifact,
             context,
-            chat=lambda system, user, max_tokens: self._chat(system, user, max_tokens),
+            # The batch budget, not the narrative one. Extraction runs at seed time, outside any API
+            # request, so AC-14's 12 seconds does not apply and the narrative timeout is far too tight
+            # for a cold connection — see `openrouter_batch_timeout_seconds`.
+            chat=lambda system, user, max_tokens: self._chat(
+                system, user, max_tokens, timeout=settings.openrouter_batch_timeout_seconds
+            ),
             provider_label=f"openrouter/{self.model_id}",
             is_conflicting=self._fallback._looks_conflicting(artifact),
         )

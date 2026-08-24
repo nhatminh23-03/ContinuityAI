@@ -251,6 +251,52 @@ class ChainedProvider:
         self.provenance.record(method, TEMPLATE_LABEL)
         return call(self._templates)
 
+    # -- raw transport, for the optional enrichments -------------------------------------
+
+    def _chat(self, system: str, user: str, max_tokens: int, timeout: float | None = None) -> str:
+        """One model call through the chain, with the same failover and retirement.
+
+        Defaults to the batch budget rather than the narrative one, because everything that reaches
+        this method is an enrichment running outside an API request. See
+        `openrouter_batch_timeout_seconds`.
+
+        Exposed because `app/ai/criticality.py` (FR-010) needs a model but is not one of the four
+        `AIProvider` methods. Adding a fifth method to the protocol would force every provider —
+        including the deterministic one, which has no model and no opinion on business criticality — to
+        implement something only two of them can do. A capability that some providers have is better
+        expressed as an optional attribute callers can test for than as a protocol method most
+        implementations would have to refuse.
+
+        No template fallback here on purpose: the deterministic provider has no answer to give, and an
+        enrichment that cannot be produced is correctly absent rather than invented. Callers treat a
+        raised error as "no suggestion".
+        """
+        from app.core.config import settings
+
+        budget = timeout if timeout is not None else settings.openrouter_batch_timeout_seconds
+        errors: list[str] = []
+        for provider in self._live_providers():
+            call = getattr(provider, "_chat", None)
+            if call is None:
+                continue
+            try:
+                try:
+                    answer = call(system, user, max_tokens, timeout=budget)
+                except TypeError:
+                    # Not every provider's transport takes a timeout. watsonx sizes its own.
+                    answer = call(system, user, max_tokens)
+            except Exception as exc:  # noqa: BLE001
+                errors.append(f"{provider.name}: {exc}")
+                if _is_permanent(exc):
+                    self._retire(provider, exc)
+                continue
+            self.provenance.record("_chat", provider.name)
+            return answer
+
+        raise AllProvidersFailedError(
+            "Every configured model failed on a direct call.", {"errors": errors}
+        )
+
     def close(self) -> None:
         for provider in self._providers:
             closer = getattr(provider, "close", None)

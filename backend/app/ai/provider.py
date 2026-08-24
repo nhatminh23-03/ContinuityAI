@@ -110,10 +110,19 @@ def get_provider(name: str | None = None) -> AIProvider:
 
         return OpenRouterProvider()
     if requested == "cached":
-        # Extraction replayed from a committed cache: model-derived evidence, offline seeding.
+        # Extraction replayed from a committed cache: model-derived evidence, offline seeding. The
+        # narratives stay live, through the model chain when credentials allow it, because caching
+        # prose would only make it stale and defaulting it to templates would quietly turn a
+        # model-backed configuration into half of one.
         from app.ai.cache import CachedProvider
 
-        return CachedProvider()
+        narrator = None
+        if settings.openrouter_api_key or settings.watsonx_api_key:
+            try:
+                narrator = build_chain()
+            except ValueError:
+                narrator = None
+        return CachedProvider(narrator=narrator)
     if requested in {"chain", "chained", "auto"}:
         return build_chain()
     raise ValueError(

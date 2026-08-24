@@ -144,6 +144,22 @@ class CriticalitySource(StrEnum):
     AI_SUGGESTED = "AI_SUGGESTED"
 
 
+class TaxonomyProposalKind(StrEnum):
+    """What a model is proposing the taxonomy is missing. FR-005."""
+
+    CAPABILITY = "CAPABILITY"
+    COMPONENT = "COMPONENT"
+
+
+class TaxonomyProposalStatus(StrEnum):
+    """A proposal's review state. FR-005 requires low-confidence concepts to be *flagged for review*,
+    which only means something if review is a state a proposal can be in and move out of."""
+
+    PROPOSED = "PROPOSED"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+
+
 class ChallengeType(StrEnum):
     """How a manager disputes an assessment. PRD section 21, contract decision CI-13.
 

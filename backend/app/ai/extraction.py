@@ -36,10 +36,15 @@ from pathlib import Path
 from typing import Callable
 
 from app.ai.provider import ExtractionContext
-from app.ai.schemas import ArtifactExtraction, ArtifactInput, CapabilityClaim
+from app.ai.schemas import (
+    ArtifactExtraction,
+    ArtifactInput,
+    CapabilityClaim,
+    TaxonomyProposal,
+)
 from app.core.errors import AIExtractionError
 from app.evidence.strength import strength_for_role
-from app.schemas.enums import EvidenceConfidence, EvidenceRole
+from app.schemas.enums import EvidenceConfidence, EvidenceRole, TaxonomyProposalKind
 
 PROMPT_DIR = Path(__file__).parent / "prompts"
 EXTRACTION_SYSTEM_PROMPT_FILE = PROMPT_DIR / "extraction_system.txt"
@@ -198,7 +203,66 @@ def parse_extraction(
         component_id=component_id,
         claims=claims,
         ambiguity=ambiguity,
+        taxonomy_proposals=_parse_proposals(payload, artifact, capabilities, ambiguity),
     )
+
+
+def _parse_proposals(
+    payload: dict,
+    artifact: ArtifactInput,
+    capabilities: list,
+    ambiguity: list[str],
+) -> list[TaxonomyProposal]:
+    """FR-005 proposals, filtered but not scored.
+
+    Two filters, and both exist to keep the reviewer's list worth reading rather than to protect the
+    graph — the graph is already safe, because a proposal is structurally incapable of carrying
+    evidence.
+
+    The first drops anything that duplicates a capability the model was already given, by name or
+    alias. FR-005 says "using existing metadata first", and a proposal for something already in the
+    taxonomy is a rewording, not a discovery; it is recorded as ambiguity so the near-miss is not lost.
+    The second drops the unnamed and the unjustified, on the same rule every claim obeys: nothing
+    enters the record that cannot say why.
+
+    Low confidence is deliberately **not** filtered. FR-005 asks for low-confidence concepts to be
+    flagged for review, and a half-recognised concept is frequently the interesting one.
+    """
+    known = {c.name.strip().lower() for c in capabilities}
+    for capability in capabilities:
+        known.update(a.strip().lower() for a in capability.aliases)
+
+    proposals: list[TaxonomyProposal] = []
+    for entry in payload.get("taxonomy_proposals", []) or []:
+        if not isinstance(entry, dict):
+            continue
+        name = str(entry.get("name") or "").strip()
+        rationale = str(entry.get("rationale") or "").strip()
+        if not name or not rationale:
+            continue
+        if name.lower() in known:
+            ambiguity.append(f"proposed {name!r}, which the taxonomy already covers")
+            continue
+        try:
+            kind = TaxonomyProposalKind(str(entry.get("kind", "CAPABILITY")).strip().upper())
+        except ValueError:
+            kind = TaxonomyProposalKind.CAPABILITY
+        try:
+            confidence = EvidenceConfidence(str(entry.get("confidence", "LOW")).strip().upper())
+        except ValueError:
+            confidence = EvidenceConfidence.LOW
+
+        proposals.append(
+            TaxonomyProposal(
+                kind=kind,
+                name=name,
+                system_id=artifact.system_hint,
+                rationale=rationale,
+                confidence=confidence,
+                source_reference=artifact.source_reference,
+            )
+        )
+    return proposals
 
 
 def extract_with(

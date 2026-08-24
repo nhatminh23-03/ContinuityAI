@@ -17,6 +17,7 @@ from .tables import (
     Simulation,
     System,
     SystemAssessment,
+    TaxonomyProposalRow,
 )
 
 __all__ = [
@@ -37,4 +38,5 @@ __all__ = [
     "Simulation",
     "System",
     "SystemAssessment",
+    "TaxonomyProposalRow",
 ]

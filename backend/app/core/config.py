@@ -74,6 +74,21 @@ class Settings(BaseSettings):
     # made that bound the number of eligible engineers, which is four on the seeded data and
     # capped by nothing. A slower answer is worth less than the template it falls back to.
     openrouter_timeout_seconds: float = 3.5
+    # Extraction and the optional enrichments are *not* inside an API request, so AC-14 does not
+    # govern them and the tight narrative budget above is the wrong number: it is a third of a
+    # 12-second response budget, and a cold call to a large model does not fit in it. Measured
+    # symptom — the first call of a process timed out on the read and the second, on a warm pooled
+    # connection, succeeded. A seed that fails on its first artifact and works on its second is the
+    # worst kind of flaky.
+    #
+    # Generous on purpose. A slow seed is an inconvenience; a seed that abandons artifacts produces a
+    # knowledge graph with holes in it, and holes in the graph move risk numbers.
+    openrouter_batch_timeout_seconds: float = 40.0
+
+    # Which committed extraction cache `AI_PROVIDER=cached` replays. Named after the provider that
+    # built it, so a reader can always tell what produced the graph they are looking at — the cache is
+    # the one artifact here whose provenance must never be ambiguous.
+    extraction_cache_file: str = "watsonx_cache.json"
     # One attempt by default, for the same reason: a second call costs the rest of the budget and
     # buys a wording, while the template is already sitting there. Raise it where latency is not
     # budgeted.
