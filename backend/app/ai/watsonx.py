@@ -40,6 +40,7 @@ from pathlib import Path
 import httpx
 
 from app.ai.deterministic import DeterministicProvider
+from app.ai.extraction import extract_with
 from app.ai.provider import ExtractionContext
 from app.ai.schemas import (
     ArtifactExtraction,
@@ -229,81 +230,20 @@ class WatsonxProvider:
     def extract_artifact_semantics(
         self, artifact: ArtifactInput, context: ExtractionContext
     ) -> ArtifactExtraction:
-        candidates = context.by_system(artifact.system_hint)
-        if not candidates or not artifact.participants:
-            # Nothing to attribute to, or nobody to attribute it to. Spending a model call to
-            # confirm that would be wasteful.
-            return ArtifactExtraction(
-                artifact_id=artifact.artifact_id,
-                system_id=artifact.system_hint,
-                ambiguity=["no capabilities in scope" if not candidates else "no participants"],
-            )
+        """FR-004. The prompt, the closed-world rules and the discard logic live in
+        `app/ai/extraction.py`, shared with every other model-backed provider.
 
-        raw = self._chat(self._system_prompt, self._user_prompt(artifact, context), EXTRACTION_MAX_TOKENS)
-
-        try:
-            payload = self._parse_json(raw)
-        except json.JSONDecodeError as exc:
-            raise AIExtractionError(
-                f"watsonx returned output that is not JSON for {artifact.source_reference}.",
-                {"artifact_id": artifact.artifact_id, "snippet": raw[:200]},
-            ) from exc
-
-        taxonomy = {c.capability_id for c in candidates}
-        participants = {p.engineer_id for p in artifact.participants}
-        claims: list[CapabilityClaim] = []
-        ambiguity = [str(a) for a in payload.get("ambiguity", []) if a]
-
-        for entry in payload.get("claims", []) or []:
-            if not isinstance(entry, dict):
-                continue
-            try:
-                role = EvidenceRole(str(entry.get("evidence_role", "")).strip().upper())
-            except ValueError:
-                ambiguity.append(f"unrecognised evidence_role {entry.get('evidence_role')!r}")
-                continue
-
-            capability_id = str(entry.get("capability_id", "")).strip()
-            engineer_id = str(entry.get("engineer_id", "")).strip()
-            summary = str(entry.get("summary") or "").strip()
-            rationale = str(entry.get("rationale") or "").strip()
-
-            # Cheap local checks first so obvious rubbish never reaches validation. The real gate is
-            # still app/ai/validation.py, which both providers pass through.
-            if capability_id not in taxonomy or engineer_id not in participants:
-                ambiguity.append(
-                    f"discarded claim outside the supplied lists: {capability_id!r}/{engineer_id!r}"
-                )
-                continue
-            if not summary or not rationale:
-                ambiguity.append(f"discarded uncited claim for {capability_id}/{engineer_id}")
-                continue
-
-            claims.append(
-                CapabilityClaim(
-                    capability_id=capability_id,
-                    engineer_id=engineer_id,
-                    evidence_role=role,
-                    # Derived, never taken from the model. PRD section 16.1.
-                    evidence_strength=strength_for_role(role),
-                    summary=summary,
-                    rationale=f"watsonx/{self.model_id}: {rationale}",
-                    extraction_confidence=EvidenceConfidence.MEDIUM,
-                    is_conflicting=self._fallback._looks_conflicting(artifact),
-                )
-            )
-
-        component_id = None
-        if len({c.capability_id for c in claims}) == 1:
-            claimed = next(iter({c.capability_id for c in claims}))
-            component_id = next((c.component_id for c in candidates if c.capability_id == claimed), None)
-
-        return ArtifactExtraction(
-            artifact_id=artifact.artifact_id,
-            system_id=artifact.system_hint,
-            component_id=component_id,
-            claims=claims,
-            ambiguity=ambiguity,
+        This used to be written out here in full. Moving it out is what stops two providers from
+        growing two subtly different definitions of extraction — which would turn the comparison in
+        `scripts/extract_with_provider.py` into a measurement of the parsers rather than the models.
+        Only the transport and the provenance label are specific to watsonx.
+        """
+        return extract_with(
+            artifact,
+            context,
+            chat=lambda system, user, max_tokens: self._chat(system, user, max_tokens),
+            provider_label=f"watsonx/{self.model_id}",
+            is_conflicting=self._fallback._looks_conflicting(artifact),
         )
 
     @staticmethod

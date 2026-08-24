@@ -72,10 +72,11 @@ class AIProvider(Protocol):
 def extraction_provenance(provider: AIProvider) -> str:
     """What actually produced the extraction, which is not always `provider.name`.
 
-    `OpenRouterProvider` delegates extraction to the deterministic provider and spends its model
-    calls on the narratives instead, so reporting its `name` as the origin of a knowledge graph
-    would describe rule-based output as model output — the mistake `CacheBuildRefusedError`
-    refuses to write to disk, and the same mistake when it is only printed.
+    Every provider that extracts with a model now reports its own name, so this is currently the
+    identity function for all of them. It is kept because the failure it guards against is
+    asymmetric: a provider that wraps or delegates extraction and still reports its own name credits
+    a model with output a model did not produce, and it does so in the one line of demo output a
+    reader would trust. `OpenRouterProvider` was exactly that case until it gained real extraction.
 
     Optional by design: a provider that does its own extraction needs no attribute, because its
     name is already the honest answer.
@@ -113,7 +114,43 @@ def get_provider(name: str | None = None) -> AIProvider:
         from app.ai.cache import CachedProvider
 
         return CachedProvider()
+    if requested in {"chain", "chained", "auto"}:
+        return build_chain()
     raise ValueError(
         f"Unknown AI_PROVIDER '{requested}'. Implement the AIProvider protocol in app/ai/ and "
         f"register it here. Do not call a model from outside this package."
     )
+
+
+def build_chain() -> AIProvider:
+    """`AI_PROVIDER=chain`: every configured model, in preference order, with failover.
+
+    watsonx first because the challenge is an IBM one and using the IBM model where it works is the
+    point; OpenRouter second because it is the one that stays up when the watsonx quota is spent.
+    Only providers whose credentials are actually present are included, so the chain describes what
+    can really be called rather than what was hoped for.
+
+    Deliberately **not** the default. `deterministic` remains the default so that a clean clone with
+    no credentials still seeds and still reproduces the demo offline, which is PRD AC-15. Opting in
+    is one line in `backend/.env`.
+    """
+    from app.ai.chain import ChainedProvider
+    from app.ai.deterministic import DeterministicProvider
+
+    providers: list[AIProvider] = []
+    if settings.watsonx_api_key and settings.watsonx_project_id:
+        from app.ai.watsonx import WatsonxProvider
+
+        providers.append(WatsonxProvider())
+    if settings.openrouter_api_key:
+        from app.ai.openrouter import OpenRouterProvider
+
+        providers.append(OpenRouterProvider())
+
+    if not providers:
+        raise ValueError(
+            "AI_PROVIDER=chain found no usable model credentials. Set WATSONX_API_KEY plus "
+            "WATSONX_PROJECT_ID, or OPENROUTER_API_KEY, in backend/.env — or set "
+            "AI_PROVIDER=deterministic to run offline with rule-based extraction."
+        )
+    return ChainedProvider(providers, templates=DeterministicProvider())

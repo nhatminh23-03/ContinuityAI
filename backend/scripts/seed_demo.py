@@ -236,11 +236,25 @@ def seed(verbose: bool = True) -> SeedReport:
 
     if verbose:
         print(report.render())
-        # What produced the graph, not what AI_PROVIDER is set to. Under `openrouter` those are
-        # different things — that provider extracts rule-based and spends its model calls on the
-        # narratives — and this line is the record of where the evidence in the database came
-        # from. Extraction provenance is the one thing here that must not be quietly wrong.
+        # What produced the graph, not what AI_PROVIDER is set to. The two are not always the same
+        # thing, and this line is the record of where the evidence in the database came from.
+        # Extraction provenance is the one thing here that must not be quietly wrong.
         print(f"  extraction       {extraction_provenance(provider)}")
+
+        # Under a chain the configured name is a list of candidates, not an answer: what matters is
+        # which one actually extracted, per artifact. Printed as a tally so a run that started on
+        # watsonx and finished on OpenRouter says exactly that, and so a run that quietly used the
+        # templates cannot look like a model run.
+        provenance = getattr(provider, "provenance", None)
+        if provenance is not None:
+            counted = provenance.extraction_providers()
+            for label, count in sorted(counted.items(), key=lambda kv: -kv[1]):
+                print(f"    {label:<28} {count} artifact(s)")
+            if not provenance.used_a_model_for_extraction():
+                print(
+                    "  WARNING          no artifact was extracted by a model. This graph is "
+                    "rule-derived; do not describe it as model-derived."
+                )
         print(f"  database         {settings.database_url}")
     return report
 

@@ -34,7 +34,6 @@ from __future__ import annotations
 import json
 import logging
 import re
-import sys
 import threading
 import time
 from pathlib import Path
@@ -42,6 +41,7 @@ from pathlib import Path
 import httpx
 
 from app.ai.deterministic import DeterministicProvider
+from app.ai.extraction import extract_with
 from app.ai.provider import ExtractionContext
 from app.ai.schemas import (
     ArtifactExtraction,
@@ -102,9 +102,6 @@ TIMEOUT_PHASE_SHARES = {"pool": 0.05, "connect": 0.25, "write": 0.05, "read": 0.
 # wording is worth.
 MAX_RETRY_AFTER_SECONDS = 2.0
 BACKOFF_BASE_SECONDS = 1.0
-
-# scripts/extract_with_provider.py names its output file after the provider that produced it.
-CACHE_BUILDER_SCRIPT = "extract_with_provider"
 
 _JSON_BLOCK = re.compile(r"\{.*\}", re.DOTALL)
 
@@ -173,25 +170,26 @@ def reset_shared_client() -> None:
 
 
 class CacheBuildRefusedError(AIExtractionError):
-    """Raised rather than writing a cache whose name misdescribes its contents.
+    """Retained for the error type; no longer raised by this provider.
 
-    `AI_PROVIDER=cached` replays a committed extraction cache, and the file it replays is named
-    after the provider that produced it. Under this provider that file would be called
-    `openrouter_cache.json` and would contain string-matched output, so a later reader comparing
-    providers would be comparing the deterministic provider against itself without knowing it.
-    Extraction provenance is the one thing in this repository that must not be quietly wrong.
+    It existed because extraction here delegated to string matching, so a cache named
+    `openrouter_cache.json` would have held rule-based output and a later reader comparing providers
+    would have compared the deterministic provider against itself without knowing it. Extraction
+    provenance is the one thing in this repository that must not be quietly wrong.
+
+    That reason is now gone: this provider extracts with the model, so a cache built under it
+    contains what its name says. Building one is not only permitted, it is the point.
     """
 
 
 class OpenRouterProvider:
     name = "openrouter"
 
-    # What actually built the graph, which is not what `name` says. Extraction here delegates to
-    # the deterministic provider, so anything reporting extraction provenance — the seeding
-    # script's summary, a cache file name — must read this rather than `name`, or it states a
-    # model produced evidence that string matching produced. `CacheBuildRefusedError` above is
-    # the same rule enforced at the point where the mistake would be written to disk.
-    extraction_provider_name = DeterministicProvider.name
+    # This provider now extracts with the model, so the honest answer is its own name. It used to
+    # report `deterministic` here, because extraction delegated to string matching and anything
+    # reporting provenance had to say so. That is no longer true, and reporting the old value would
+    # now understate what built the graph rather than overstate it.
+    extraction_provider_name = name
 
     def __init__(self) -> None:
         # All three, not only the key. `openrouter_base_url` and `openrouter_model` have defaults,
@@ -208,7 +206,6 @@ class OpenRouterProvider:
                 f"AI_PROVIDER=openrouter requires {', '.join(m.upper() for m in missing)} in "
                 f"backend/.env. Never commit real credentials."
             )
-        self._refuse_to_build_an_extraction_cache()
         self.model_id = settings.openrouter_model
         self._fallback = DeterministicProvider()
         self._simulation_prompt = SIMULATION_PROMPT_FILE.read_text()
@@ -217,24 +214,6 @@ class OpenRouterProvider:
         # The process-wide pool, not a new client. Kept as an instance attribute so a test can
         # install its own transport without touching the pool.
         self._client = _shared_client()
-
-    @staticmethod
-    def _refuse_to_build_an_extraction_cache() -> None:
-        """Refuse construction under the cache-building script, loudly and immediately.
-
-        Checked here rather than in `extract_artifact_semantics` because the script catches per
-        artifact and carries on: refusing there would print 640 identical failures and still write
-        a cache file, where refusing at construction stops the run before it starts, with the
-        reason.
-        """
-        if Path(sys.argv[0] or "").stem == CACHE_BUILDER_SCRIPT:
-            raise CacheBuildRefusedError(
-                "AI_PROVIDER=openrouter extracts deterministically and uses the model only for "
-                "narratives, so a cache built under it would be a file named after a model "
-                "holding rule-based output. Build the cache with --provider watsonx, or run "
-                "--provider deterministic if the deterministic graph is what you want.",
-                {"provider": OpenRouterProvider.name},
-            )
 
     # -- transport ----------------------------------------------------------------------
 
@@ -328,13 +307,31 @@ class OpenRouterProvider:
                 raise
             return json.loads(match.group(0))
 
-    # -- extraction, deliberately not model-written --------------------------------------
+    # -- extraction: model-written, closed-world, gated ----------------------------------
 
     def extract_artifact_semantics(
         self, artifact: ArtifactInput, context: ExtractionContext
     ) -> ArtifactExtraction:
-        """Rule-based, always. See the module docstring for why this half is not bought."""
-        return self._fallback.extract_artifact_semantics(artifact, context)
+        """FR-004, for real: the model reads the artifact and returns structured claims.
+
+        This used to delegate to the deterministic provider, which made `openrouter` a
+        narratives-only provider. It is now the extraction path as well, running the same prompt and
+        the same rules as `watsonx` through `app/ai/extraction.py` — so the two are comparable, and
+        so there is exactly one definition of what extraction means.
+
+        **Raises rather than falling back.** The narratives in this file degrade to a template on
+        failure because a lost sentence costs wording. Extraction decides the graph every risk number
+        is computed from, so a silent fallback here would mean an outage quietly produced a different
+        knowledge graph while every number still looked plausible. The caller in
+        `app/ingestion/pipeline.py` stops the run instead.
+        """
+        return extract_with(
+            artifact,
+            context,
+            chat=lambda system, user, max_tokens: self._chat(system, user, max_tokens),
+            provider_label=f"openrouter/{self.model_id}",
+            is_conflicting=self._fallback._looks_conflicting(artifact),
+        )
 
     # -- narratives: model -> gate -> template on any failure ----------------------------
 

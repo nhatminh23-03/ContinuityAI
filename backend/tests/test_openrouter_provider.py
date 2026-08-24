@@ -13,6 +13,7 @@ that exercise the transport itself replace the httpx client instead, which is st
 
 from __future__ import annotations
 
+import json
 from datetime import date
 
 import pytest
@@ -29,9 +30,40 @@ from app.ai.schemas import (
 )
 from app.core.config import settings
 from app.core.errors import AIExtractionError
-from app.schemas.enums import EvidenceSourceType
+from app.evidence.strength import strength_for_role
+from app.schemas.enums import EvidenceRole, EvidenceSourceType
 
 RULES = DeterministicProvider()
+
+
+def _extraction_artifact() -> ArtifactInput:
+    return ArtifactInput(
+        artifact_id="artifact_inc_184",
+        source_type=EvidenceSourceType.INCIDENT,
+        source_reference="INC-184",
+        title="P1 Payment Gateway Provider Failure",
+        body="Incident Recovery was performed without escalation.",
+        artifact_date=date(2026, 5, 14),
+        participants=[
+            ArtifactParticipant(engineer_id="eng_alex_chen", participant_role="RESOLVER")
+        ],
+        system_hint="system_payment_gateway",
+        provenance_source="synthetic_incident_dataset",
+    )
+
+
+def _extraction_context() -> ExtractionContext:
+    return ExtractionContext(
+        capabilities=[
+            TaxonomyCapability(
+                capability_id="cap_incident_recovery",
+                name="Incident Recovery",
+                system_id="system_payment_gateway",
+                component_id="component_gateway_integration",
+            )
+        ],
+        engineer_names={"eng_alex_chen": "Alex Chen"},
+    )
 
 # AC-14: an AI plan or explanation operation answers within 12 seconds.
 AI_OPERATION_BUDGET_SECONDS = 12
@@ -199,66 +231,87 @@ def test_the_provider_is_registered_and_selectable(monkeypatch) -> None:
     assert get_provider("deterministic").name == "deterministic"
 
 
-def test_extraction_is_the_deterministic_one_and_calls_no_model(provider) -> None:
-    """This provider buys narratives, not extraction. Every risk number in the product is
-    computed from the extracted graph, so that half stays rule-based and reproducible."""
-    artifact = ArtifactInput(
-        artifact_id="artifact_inc_184",
-        source_type=EvidenceSourceType.INCIDENT,
-        source_reference="INC-184",
-        title="P1 Payment Gateway Provider Failure",
-        body="Incident Recovery was performed without escalation.",
-        artifact_date=date(2026, 5, 14),
-        participants=[
-            ArtifactParticipant(engineer_id="eng_alex_chen", participant_role="RESOLVER")
-        ],
-        system_hint="system_payment_gateway",
-        provenance_source="synthetic_incident_dataset",
+def test_extraction_is_model_written_and_closed_world(provider) -> None:
+    """FR-004 through this provider, which now extracts with the model rather than delegating.
+
+    Two properties matter more than the happy path, and both are asserted below: the model's reply is
+    the source of the claims, and anything outside the supplied lists is discarded rather than
+    trusted. A model that could name a capability it was not given, or attribute work to someone who
+    was not present, could move a risk number by inventing evidence — so the closed world is enforced
+    in code, not requested in the prompt.
+    """
+    artifact = _extraction_artifact()
+    context = _extraction_context()
+    # The model answers, and it tries to smuggle in two ungrounded claims alongside a good one.
+    reply = json.dumps(
+        {
+            "claims": [
+                {
+                    "capability_id": "cap_incident_recovery",
+                    "engineer_id": "eng_alex_chen",
+                    "evidence_role": "INDEPENDENT_EXECUTION",
+                    "summary": "Alex Chen recovered the payment gateway without escalation.",
+                    "rationale": "'performed without escalation'",
+                },
+                {
+                    "capability_id": "cap_invented_by_the_model",
+                    "engineer_id": "eng_alex_chen",
+                    "evidence_role": "INDEPENDENT_EXECUTION",
+                    "summary": "invented capability",
+                    "rationale": "invented",
+                },
+                {
+                    "capability_id": "cap_incident_recovery",
+                    "engineer_id": "eng_somebody_who_was_not_there",
+                    "evidence_role": "INDEPENDENT_EXECUTION",
+                    "summary": "invented person",
+                    "rationale": "invented",
+                },
+            ],
+            "ambiguity": [],
+        }
     )
-    context = ExtractionContext(
-        capabilities=[
-            TaxonomyCapability(
-                capability_id="cap_incident_recovery",
-                name="Incident Recovery",
-                system_id="system_payment_gateway",
-                component_id="component_gateway_integration",
-            )
-        ],
-        engineer_names={"eng_alex_chen": "Alex Chen"},
-    )
-    fail(provider, AssertionError("the model must not be called for extraction"))
+    provider._chat = lambda system, user, max_tokens, timeout=None: reply
 
     extraction = provider.extract_artifact_semantics(artifact, context)
-    expected = RULES.extract_artifact_semantics(artifact, context)
-    assert [c.model_dump() for c in extraction.claims] == [c.model_dump() for c in expected.claims]
+
+    assert len(extraction.claims) == 1, "ungrounded claims must be discarded, not merged in"
+    claim = extraction.claims[0]
+    assert claim.capability_id == "cap_incident_recovery"
+    assert claim.engineer_id == "eng_alex_chen"
+    # The words came from the model, so provenance names the model and its id.
+    assert claim.rationale.startswith(f"openrouter/{settings.openrouter_model}:")
+    # Strength is derived from the role, never accepted from the model (PRD 16.1).
+    assert claim.evidence_strength == strength_for_role(EvidenceRole.INDEPENDENT_EXECUTION)
+    # Discards are reported rather than swallowed.
+    assert len(extraction.ambiguity) == 2
 
 
-def test_the_provider_refuses_to_build_an_extraction_cache(monkeypatch) -> None:
-    """`--provider openrouter` would write an openrouter_cache.json full of deterministic output,
-    which is the one artifact in this repo that must not be misleading about its own provenance."""
-    monkeypatch.setattr(settings, "openrouter_api_key", "test-key")
-    monkeypatch.setattr(
-        "sys.argv", ["/repo/backend/scripts/extract_with_provider.py", "--provider", "openrouter"]
-    )
-    from app.ai.openrouter import CacheBuildRefusedError, OpenRouterProvider
+def test_extraction_raises_rather_than_falling_back_to_the_template(provider) -> None:
+    """The one place this provider must not degrade quietly.
 
-    with pytest.raises(CacheBuildRefusedError, match="deterministic"):
-        OpenRouterProvider()
+    A narrative that fails costs a wording, so it falls back. Extraction decides the graph every risk
+    number is computed from, so a silent fallback would mean a model outage produced a *different*
+    knowledge graph while every number still looked plausible. It has to be loud.
+    """
+    fail(provider)
+    with pytest.raises(Exception) as raised:
+        provider.extract_artifact_semantics(_extraction_artifact(), _extraction_context())
+    assert not isinstance(raised.value, AssertionError)
 
 
-def test_extraction_provenance_names_what_built_the_graph_not_the_configured_provider(
-    provider,
-) -> None:
-    """The printed counterpart of the refusal above.
+def test_extraction_provenance_now_names_openrouter(provider) -> None:
+    """`scripts/seed_demo.py` reports what built the evidence in the database.
 
-    `scripts/seed_demo.py` reports where the evidence in the database came from, and under this
-    provider that is the rule-based extractor, not a model. Reporting `name` there would state the
-    wrong provenance in the demo output — quietly, and in the one place a reader would trust it.
+    This used to have to report `deterministic`, because extraction delegated to string matching and
+    saying `openrouter` would have credited a model with rule-based output. That is no longer true —
+    the model does the extraction — so the same honesty requirement now points the other way, and
+    reporting `deterministic` would understate what built the graph.
     """
     from app.ai.provider import extraction_provenance
 
     assert provider.name == "openrouter"
-    assert extraction_provenance(provider) == RULES.name == "deterministic"
+    assert extraction_provenance(provider) == "openrouter"
     assert extraction_provenance(RULES) == "deterministic"
 
 
