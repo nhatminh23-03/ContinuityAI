@@ -334,7 +334,7 @@ Before either: skim `RECOMMENDATIONS.md` R-01 and R-20.
 
 ---
 
-## 2026-08-15 (same day, later) — Person A scope closed (Person A)
+## 2026-08-17 — Person A scope closed (Person A)
 
 Backend is finished. Everything on Person A's list in `TEAM_WORKFLOW_PERSON_A_B.md` section 2 is
 built, tested, and verified, and the remaining `RECOMMENDATIONS.md` items that were backend-only are
@@ -490,7 +490,7 @@ no remaining work that does not need a decision from you.
 
 ---
 
-## 2026-08-15 (same day, last session) — Model-backed extraction wired to IBM watsonx (Person A)
+## 2026-08-17 (later) — Model-backed extraction wired to IBM watsonx (Person A)
 
 Short version: the watsonx provider is **built, credential-verified, and measured against the
 rule-based one**. The graph the API serves is still rule-derived, because the watsonx account's token
