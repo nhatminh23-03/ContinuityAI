@@ -107,10 +107,18 @@ provider that returns "STRONG" for a code review is corrected, not believed.
 
 | `AI_PROVIDER` | What it does |
 |---|---|
-| `deterministic` | Offline rule-based extraction, deterministic template narratives. No credential, fully repeatable. **The shipped default.** |
-| `watsonx` | IBM watsonx.ai (`ibm/granite-4-h-small`) reads each artifact and returns structured claims. Narratives stay deterministic — see below |
-| `cached` | Replays committed watsonx output from `data/extraction/`, so a model-derived graph seeds offline |
-| `openrouter` | The mirror image of `watsonx`: extraction stays rule-based, and a model writes the three manager-facing narratives instead — see below |
+| `deterministic` | Offline rule-based extraction, deterministic template narratives. No credential, fully repeatable. **The shipped default**, and — see the measurement below — the most accurate extraction we have |
+| `watsonx` | IBM watsonx.ai (`ibm/granite-4-h-small`) reads each artifact and returns structured claims. Its simulation sentence is model-written; the other two narratives stay deterministic |
+| `openrouter` | An OpenAI-compatible gateway does both: model extraction *and* all three manager-facing narratives, each validated before use |
+| `chain` | Every configured model in preference order — watsonx first, then `openrouter` — with per-call failover, so a spent quota does not stop a run |
+| `cached` | Replays a committed extraction cache, so a model-derived graph seeds offline and instantly. Narratives still go live through the chain when credentials exist |
+
+`chain` is what makes the model path usable rather than theoretical. The two failure policies inside it
+are deliberately different: **extraction hands over between models and then raises**, never silently
+reaching the rule-based extractor, because a quiet fallback would mean an outage produced a different
+knowledge graph while every number still looked plausible. **Narratives hand over and then use the
+template**, because a live request must not fail over a sentence, and the fallback is recorded so
+template prose can never be mistaken for model prose. Never fake the graph, never break the screen.
 
 `app/ingestion/pipeline.py` runs every extraction claim, from every provider including the default,
 through `validate_extraction` unconditionally — that gate is not something only the model-backed
@@ -122,15 +130,22 @@ computed the same way under every provider, which is the property the interface 
 
 ### What runs, precisely
 
-For anyone deciding whether to trust a given response: **extraction is rule-based** under every
-provider except `watsonx` and `cached` — `cached` replays committed `watsonx` output
-(`app/ai/cache.py`: "The graph is model-derived"), so it inherits `watsonx`'s extraction rather than
-running the rule-based matcher. Under `deterministic` and `openrouter`, capability names and aliases
-are matched in the artifact text, scoped to its system, and the source system's participant role is
-mapped onto an evidence role. **The three
-narratives** — the simulation summary, a candidate's strengths and gaps, and a mitigation plan's task
-titles, descriptions, and acceptance criteria — are template-written by default and, under
-`AI_PROVIDER=openrouter`, model-written and validated before use. **Readiness, exposure, continuity
+For anyone deciding whether to trust a given response: **extraction is rule-based under
+`deterministic` only.** `watsonx`, `openrouter` and `chain` all extract with a model, and `cached`
+replays whichever model built its cache. Under `deterministic`, capability names and aliases are matched
+in the artifact text, scoped to its system, and the source system's participant role is mapped onto an
+evidence role. **The three narratives** — the simulation summary, a candidate's strengths and gaps, and
+a mitigation plan's task titles, descriptions, and acceptance criteria — are template-written under
+`deterministic` and model-written, and validated before use, under `openrouter` and `chain`.
+
+Two smaller pieces of model work sit outside those four methods. **Taxonomy proposals** (FR-005): the
+model names operational concepts an artifact describes that the taxonomy has no entry for, held in their
+own table where nothing in the scoring path can read them, so a proposal can never move a risk number —
+promotion into the taxonomy is a human act. **Suggested business criticality** (FR-010): the model rates
+a system from its purpose, components and capabilities, and is given no engineer, no headcount and no
+activity volume, because those inputs would turn "how important is this system" into "how busy is this
+team". A human-confirmed value always wins; on the seeded organisation all five are human-confirmed, and
+the model agrees with three of them. **Readiness, exposure, continuity
 risk, and simulation are always deterministic rules and are never model-decided**, under any
 provider: no `AIProvider` method exists through which a model could return one of those values (see
 "Where the boundary sits, and why", above), so this is a property of the interface shape rather than
@@ -244,37 +259,67 @@ artifact's system, then maps the participant role the source system recorded ont
 cannot read "restarted the workers and traffic recovered" and infer incident recovery without the
 phrase present.
 
-### What the model measurably adds
+### We measured whether a model should do the extraction. It should not.
 
-The watsonx provider was run over the corpus and diffed against the rule-based one
-(`data/extraction/comparison_report.md`). Over the 313 artifacts extracted before the account's token
-quota was spent:
+This was an open question for most of the build. It is now settled by measurement, and the answer is
+the interesting part of this section.
 
-| Measure | Count |
-|---|---|
-| Artifacts where both produced identical output | 291 / 313 |
-| Claims both agree on | 50 |
-| Claims found only by the model | 0 |
-| Claims found only by the rules | 5 |
-| Same `(capability, engineer)` pair, different evidence role | 17 |
+The full corpus — all 640 artifacts — was extracted by `anthropic/claude-sonnet-5`, cached at
+`data/extraction/chain_cache.json`, and the evaluation was run under both extractions with everything
+downstream held identical. Same rules, same aggregation, same simulation. The only variable is who read
+the artifacts.
 
-The disagreements are the interesting part, and they are all in one direction: 14 cases of
-`CONTRIBUTION → INDEPENDENT_EXECUTION` and 3 of `CONTRIBUTION → KNOWLEDGE_CAPTURE`. The model read
-the narrative and concluded the person acted alone, or authored operational guidance, where the rule
-saw only that they changed something. That is precisely the judgement a string match cannot make —
-and precisely the judgement that most needs checking, because promoting a contribution to an
-independent execution is what moves an engineer toward `PRACTICED` and therefore what closes or opens
-a coverage gap.
+| Check | Rule-based extraction | Model extraction |
+|---|---|---|
+| Knowledge reconstruction (readiness) | **56/56 — 100%** | 54/56 — 96.4% |
+| Capability exposure classification | **25/25 — 100%** | 24/25 — 96.0% |
+| Critical gap detection | 2/2 — 100% | 2/2 — 100% |
+| Declared-vs-demonstrated ownership | 1/1 — 100% | 1/1 — 100% |
+| **Counterfactual simulation** | **25/25 — 100%** | **15/25 — 60%** |
+| Backup candidate recommendation | **2/2 — 100%** | 1/2 — 50% |
+| Evidence grounding | 56/56 — 100% | 62/62 — 100% |
 
-**Which is more accurate is an open question, and the harness can answer it.** Seed and evaluate under
-each provider and compare reconstruction against the hidden ground truth. That comparison is not yet
-run because the watsonx account's token quota was exhausted at 49% coverage, and `cached` deliberately
-refuses to run on a partial cache: a graph half derived by a model and half by string matching would be
-neither, and no number in it could be explained by reference to a single method.
+The model extracted *more*: 144 claims against 126, 62 coverage relationships against 56. That looks
+like better recall until it is checked against the labels. It made exactly two readiness errors, both on
+the hero capability, and both **too high**:
 
-So the honest position today: the model-backed path is implemented, credential-verified, rate-limit
-aware, resumable, and measured against the rules on half the corpus — and the graph the API serves is
-still rule-derived. [`RECOMMENDATIONS.md`](RECOMMENDATIONS.md) R-01 tracks finishing it.
+```
+eng_jordan_lee  / cap_incident_recovery   truth EXPOSED    model PRACTICED   (2 buckets out)
+eng_maria_gomez / cap_incident_recovery   truth ASSISTED   model PRACTICED   (1 bucket out)
+```
+
+Jordan's record on gateway recovery is two years of review comments. Maria assisted, with support. The
+model read both as hands-on independent capability.
+
+That is not two cells in a table. Those two promotions give Incident Recovery a second and third
+adequate engineer, so the capability flips `DEGRADED → COVERED` and the product's opening claim — *Alex
+is the only person who can recover the payment gateway* — becomes false. The simulation moves 74 → 91
+with one critical gap instead of 74 → 93 with two. The 60% simulation score is that single error
+propagating through everything built on top of it.
+
+**The direction is what disqualifies it.** A continuity tool that overestimates readiness tells a
+manager they are covered when they are not, and nobody goes looking for a problem the tool says does not
+exist. Being wrong in the reassuring direction is worse than being wrong at all.
+
+So **rule-based extraction stays on the demo path, and that is now a measured decision rather than a
+convenience.** The 100% figures are not the rules being flattered by a synthetic corpus: the model had
+the same corpus, the same prompt, the same validation gate, and scored worse. The PRD's governing
+split — "AI extracts; deterministic logic scores" — was an assumption when it was written. It is now a
+result, with the qualification that on this corpus the safe division of labour is *narrower* than the
+PRD assumed: the model earns its place on the prose and the taxonomy work, not on the graph.
+
+Two things worth keeping from the losing run. Thirteen claims were found only by the model, so extra
+recall in the right places is real; a hybrid that takes the model's recall but requires corroboration
+before any promotion above `ASSISTED` is the obvious next experiment. And the run is reproducible in one
+command each, so nobody has to take the table above on trust:
+
+```bash
+AI_PROVIDER=deterministic python -m scripts.seed_demo && python -m scripts.run_evaluation
+AI_PROVIDER=cached EXTRACTION_CACHE_FILE=chain_cache.json python -m scripts.seed_demo && python -m scripts.run_evaluation
+```
+
+Full write-up: `data/extraction/comparison_report.md`, with the model run's own report alongside it at
+`data/extraction/evaluation_under_model_extraction.md`.
 
 ### Module layout
 

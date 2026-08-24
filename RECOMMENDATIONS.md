@@ -601,3 +601,94 @@ Two friction points on a fresh frontend setup:
 folklore.
 
 **Effort:** 10 minutes · **Owner:** Person B, since it is the frontend setup path.
+
+---
+
+# The AI layer, finished and measured — 2026-08-24
+
+## R-01 — **RESOLVED 2026-08-24, and the answer was not the expected one**
+
+R-01 was the top item on this list for the whole build: "model-backed extraction is built but blocked".
+It is no longer blocked, and the resolution is a measurement rather than a delivery.
+
+The full corpus was extracted by `anthropic/claude-sonnet-5` and evaluated against the hidden ground
+truth alongside the rule-based extractor. **The rules won**: reconstruction 56/56 against 54/56,
+simulation 25/25 against 15/25, candidates 2/2 against 1/2. The model made two readiness errors, both on
+the hero capability and both too generous, which flipped Incident Recovery from `DEGRADED` to `COVERED`
+and broke the demo's opening claim.
+
+So the honest resolution of R-01 is: **the model-backed path is complete, exercised over the whole corpus,
+and deliberately not used for extraction, because it is worse.** It is used for the narratives, the
+taxonomy proposals and the criticality suggestions.
+
+That is a better outcome than the one this item was written expecting. R-01 was framed as a submission
+risk — "a judge can check the claim in ninety seconds". The claim we can now make is stronger than the one
+we were worried about not being able to make: not "we use AI here" but "we tested whether AI belongs here,
+and here is the run that says where it does and does not".
+
+**Effort remaining:** none. The follow-up is OPEN-14, the hybrid.
+
+---
+
+## R-28 — Over-promotion is one-directional, which makes it fixable
+
+The most useful detail in the losing run is that the model did not fail randomly. Every error was in the
+same direction: it read review comments and assisted work as independent execution, never the reverse. It
+was generous about people, consistently.
+
+That is a tractable failure. A hybrid that takes the model's recall — **13 claims it found and the rules
+missed** — while requiring corroboration before any promotion above `ASSISTED` would keep the extra reach
+and discard the specific mistake. One independent-execution claim from one artifact stays `ASSISTED` until
+a second artifact agrees.
+
+Worth doing because the ceiling on rule-based extraction is real and documented (R-01's original framing,
+and the 1-in-120 public-PR match rate). The rules are more accurate here, not more capable.
+
+**Effort:** half a day, plus a re-run of the evaluation to confirm it beats both. **Decision:** B — it
+changes extraction quality, not the contract. **Tracked as** OPEN-14.
+
+---
+
+## R-29 — A continuity tool must be biased toward alarm, and we should say so
+
+Not a defect. A design principle the measurement surfaced, which is currently implicit in the code and
+ought to be explicit in the submission.
+
+Both model experiments erred the same way. Extraction over-promoted readiness; criticality suggestions came
+back higher than the humans in three of five cases. In one case that is bad and in the other it is
+harmless, and the difference is instructive:
+
+- **Over-stating readiness is dangerous.** It says a capability is covered when it is not, and nobody
+  investigates a problem the tool denies. This is the failure that broke the hero scenario.
+- **Over-stating criticality is survivable.** It draws attention to a system that may not need it, and a
+  human corrects it. FR-010 already makes that correction authoritative.
+
+So the asymmetry is not "the model is unreliable" but "errors that reassure are worse than errors that
+alarm". Everything in the evidence model already leans this way — `STALE` evidence does not count toward
+adequate coverage, attestations cap at `MODERATE`, `INSUFFICIENT_EVIDENCE` is a valid output rather than a
+guess. It is a coherent stance and it is never stated in one place.
+
+**Recommendation:** one paragraph in the README's responsible-AI section. It reframes several existing
+decisions as one principle, and it is a good answer to "what happens when your model is wrong?" — we know
+which direction it is wrong in, and we chose the direction that fails safely.
+
+**Effort:** 20 minutes · **Owner:** joint, since it touches the submission narrative.
+
+---
+
+## R-30 — `AI_PROVIDER=chain` must not be the day-to-day setting
+
+Operational trap worth writing down, because the natural instinct is to set the most capable provider and
+leave it.
+
+Seeding makes one model call per artifact. Under `chain` that is 640 live calls per seed — and the test
+suite seeds, so a single `pytest` run would make 640 calls. Slow, and not free.
+
+The right runtime once a cache exists is `AI_PROVIDER=cached` with
+`EXTRACTION_CACHE_FILE=chain_cache.json`: extraction replayed instantly from the committed cache, with
+live model prose over the top. `deterministic` stays the default so a clean clone works with no key.
+
+Documented in `backend/.env.example`. Recorded here because a config comment is easy to miss and the
+symptom — a slow, expensive test run — would take a while to attribute.
+
+**Effort:** none, already documented · **Owner:** whoever configures a machine.

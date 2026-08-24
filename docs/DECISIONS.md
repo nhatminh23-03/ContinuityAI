@@ -935,3 +935,135 @@ produced was the pinned timestamp.
 |---|---|---|---|
 | OPEN-12 | The AC-14 figures under `openrouter` are now predicted rather than measured: the fix is verified against a stub provider that sleeps, not against the live gateway. Re-measure `POST /recommendations/backup-candidates` and `POST /mitigation-plans` with a real key before claiming the numbers | Both | Before the demo is recorded under `openrouter` |
 | OPEN-13 | `docs/BACKEND_GAPS.md` GAP-02 (approved plans cannot be read back), GAP-04 (candidate `evidence_confidence` definition, R-14), and the doc-refresh items GAP-05, GAP-06, GAP-09 are all still open and all still deferrable | Both | Post-MVP |
+
+---
+
+## The AI layer, finished and then measured
+
+### DEC-19 — `AI_PROVIDER=chain`, and two different failure policies inside it
+
+**Date:** 2026-08-24 · **Category:** B · **Owner:** Person A · **No contract change**
+
+Two model providers were configured and neither was reliable alone: watsonx has a capped token quota
+that can be spent mid-run, and any hosted gateway can rate-limit or time out. `AI_PROVIDER=watsonx`
+therefore meant "work until the quota runs out, then stop", and `openrouter` meant "never use the IBM
+model this challenge is about". `chain` tries every configured model in preference order — watsonx
+first, `openrouter` second — with per-call failover.
+
+**A defect found on the way is worth recording, because the plan would have silently failed without
+it.** `OpenRouterProvider.extract_artifact_semantics` delegated to the deterministic provider. Chaining
+watsonx to OpenRouter would therefore have produced rule-based extraction under a model's name — the
+exact misdescription `CacheBuildRefusedError` was written to prevent, reached from the other direction.
+OpenRouter now extracts with the model, and the ~70 lines of prompt building and closed-world checking
+moved into `app/ai/extraction.py` so both providers share one definition. Two definitions would have
+turned the provider comparison into a measurement of two hand-written parsers rather than two models.
+
+**The failure policies are deliberately not uniform**, and the split matters more than the chaining.
+Extraction hands over between models and then **raises**, never reaching the templates: extraction
+decides the graph every risk number is computed from, so a quiet fallback would mean an outage produced
+a different graph while every number still looked plausible and nothing announced it. Narratives hand
+over and then **use the template**, because a live request must not fail over a sentence. Never fake the
+graph, never break the screen.
+
+A provider that fails permanently is retired for the rest of the run. Measured: watsonx's spent quota
+was reported 640 times, once per artifact, roughly doubling wall-clock time. Retrying a permanent failure
+is not resilience. Quota and auth failures retire; timeouts, 429s and 503s do not. The last provider is
+never retired, because "everything is retired" is a worse error than whatever actually went wrong.
+
+`deterministic` remains the default, so a clean clone with no credentials still reproduces the demo
+offline (AC-15).
+
+### DEC-20 — FR-005 proposals are a different kind of object, not a weaker kind of claim
+
+**Date:** 2026-08-24 · **Category:** B · **Owner:** Person A · **No contract change**
+
+FR-005 asks the model to propose components and capabilities and flag low-confidence concepts for
+review. It was the one deliberate non-implementation left (GAP-06) because it appears to contradict the
+closed world: the model may only choose from the capability list it is given, and FR-005 asks it to name
+things that are not on it.
+
+The contradiction dissolves once a proposal stops being a weaker claim. A `TaxonomyProposal` cannot carry
+evidence, cannot be attributed to an engineer, has no readiness and no strength, and lives in its own
+table that nothing under `app/continuity/`, `app/evidence/`, `app/simulation/` or `app/graph/` reads — a
+test asserts that rather than leaving it to review. So a hallucinated capability here costs a manager ten
+seconds of reading; in the graph it would silently move a risk index.
+
+**Low-confidence proposals are kept, not filtered.** Filtering them would satisfy the closed world and
+defeat the requirement, which asks for them to be *flagged for review*. A half-recognised concept is
+frequently the interesting one. What is filtered is anything already in the taxonomy by name or alias —
+"using existing metadata first"; a rewording is not a discovery, and the near-miss is recorded as
+ambiguity — and anything unnamed or unjustified, on the same rule every claim obeys.
+
+### DEC-21 — FR-010 suggests criticality and is never allowed to win
+
+**Date:** 2026-08-24 · **Category:** B · **Owner:** Person A · **No contract change**
+
+"AI **may** suggest system criticality; a human-confirmed value is **authoritative**." Both halves are
+implemented in `app/ai/criticality.py`, and the second is the one worth being strict about: a suggestion
+that can overwrite a human's answer is not a suggestion. A human-confirmed value wins outright *even when
+the model disagrees*, and the disagreement is surfaced as a question rather than acted on. Only an
+unconfirmed system takes the model's value, and it is labelled `AI_SUGGESTED`.
+
+The model is given the system's purpose, components and capabilities, and deliberately **no engineer, no
+headcount and no activity volume**. Those inputs would turn "how important is this system" into "how busy
+is this team", which is the inference this product exists to argue against. A test asserts their absence,
+because adding them would look helpful.
+
+Measured against the five human-confirmed values: the model agrees with three, and all three
+disagreements are `HIGH → CRITICAL`. It is systematically more alarmist than the humans — worth knowing
+before anyone describes its judgement as equivalent to theirs.
+
+### DEC-22 — Rule-based extraction stays on the demo path, because it measurably wins
+
+**Date:** 2026-08-24 · **Category:** A — this one changes what we claim · **Owner:** Person A ·
+**No contract change, because the losing option was not adopted**
+
+The open question since the build began: is a model better than string matching at reading these
+artifacts? The full corpus was extracted by `anthropic/claude-sonnet-5` (640/640, cached and committed),
+and the evaluation run under both with everything downstream identical.
+
+| Check | Rules | Model |
+|---|---|---|
+| Knowledge reconstruction | **56/56** | 54/56 |
+| Exposure classification | **25/25** | 24/25 |
+| Critical gap detection | 2/2 | 2/2 |
+| Ownership mismatch | 1/1 | 1/1 |
+| Counterfactual simulation | **25/25** | **15/25** |
+| Backup candidates | **2/2** | 1/2 |
+| Evidence grounding | 56/56 | 62/62 |
+
+The model extracted more — 144 claims against 126 — which reads as better recall until it is checked
+against the labels. It made two readiness errors, both on the hero capability, both **too high**: Jordan
+`EXPOSED` read as `PRACTICED`, Maria `ASSISTED` read as `PRACTICED`. Jordan's record on gateway recovery
+is two years of review comments; Maria assisted with support.
+
+Those two promotions give Incident Recovery two extra adequate engineers, so it flips `DEGRADED →
+COVERED` and *"Alex is the only person who can recover the payment gateway"* — the product's opening
+claim — becomes false. The simulation becomes 74 → 91 with one critical gap instead of 74 → 93 with two.
+The 60% simulation score is that single error propagating.
+
+**The direction disqualifies it.** A continuity tool that overestimates readiness tells a manager they
+are covered when they are not, and nobody goes looking for a problem the tool says does not exist. Being
+wrong in the reassuring direction is worse than being wrong at all.
+
+**What was rejected.** Shipping the model's extraction because it makes a better sentence in the
+submission — it would have cost the hero scenario, moved every frozen fixture, and made the product worse
+on the only benchmark we have. Also rejected: quietly dropping the model work. It earns its place on the
+narratives, the taxonomy proposals and the criticality suggestions, and the losing experiment is itself
+the strongest evidence for the PRD's "AI extracts; deterministic logic scores" split — which was an
+assumption when written and is now a result, with the qualification that the safe division is *narrower*
+than the PRD assumed.
+
+Thirteen claims were found only by the model, so its extra recall is real. A hybrid taking that recall but
+requiring corroboration before any promotion above `ASSISTED` is the obvious next experiment, and is
+logged as OPEN-14.
+
+**Documents affected:** `README.md` — the "open question" section is replaced by the result, and the
+provider table now describes which providers extract with a model.
+
+### Open items after this build
+
+| ID | Item | Owner | Resolve by |
+|---|---|---|---|
+| OPEN-14 | Hybrid extraction: take the model's recall, require corroboration before any promotion above `ASSISTED`. The measured failure is one-directional over-promotion, which is exactly the shape a corroboration rule addresses | Person A | Post-MVP |
+| OPEN-15 | OpenRouter returns `HTTP 402 "would exceed your available credits given your current in-flight requests"` under concurrency — six workers failed 127 of 640 artifacts, one worker completed all 127. The provider treats it as a plain failure; it should back off and serialise instead | Person A | Post-MVP |

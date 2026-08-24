@@ -1104,3 +1104,99 @@ capabilities, live: no primary offered as its own backup, and every candidate pr
 Worth saying plainly: this is a class of bug the backend suite structurally could not catch, because it
 only appears when two correct endpoints are used in order. **If you hit another dead-end button, send
 the screenshot — that is the fastest path to these.**
+
+---
+
+## 2026-08-24 (later) — The AI layer is finished, and the model lost the bake-off (Person A)
+
+Every AI requirement in the PRD is now built. Then we measured the central one, and the result changes
+what we should say in the submission — so read the second half of this even if you skip the first.
+
+### All five AI requirements are now implemented
+
+| FR | Requirement | State |
+|---|---|---|
+| FR-004 | AI converts artifacts into structured evidence | Built and **measured** — see below |
+| FR-017 | AI explains why a candidate is suitable | Live model prose, gated |
+| FR-018 | AI creates the mitigation plan | Live model prose, gated |
+| FR-005 | AI proposes components/capabilities, flags low-confidence concepts | **New.** Was the last deliberate gap (GAP-06) |
+| FR-010 | AI may suggest system criticality | **New.** Human-confirmed always wins |
+
+`AI_PROVIDER=chain` runs every configured model in order — watsonx, then OpenRouter — with per-call
+failover, so a spent quota no longer stops a run. Your OpenRouter key is live and working; watsonx is
+still quota-blocked, so in practice OpenRouter does the work.
+
+**Nothing on the wire changed.** No endpoint, DTO, enum or fixture moved. All 12 fixtures still match
+live output, and every frozen number holds.
+
+### The measurement, which is the actual news
+
+The open question since we started: is a model better than string matching at reading these artifacts? I
+extracted the **whole corpus** with `anthropic/claude-sonnet-5` — 640/640, cached and committed — and ran
+the evaluation under both, with everything downstream identical.
+
+| Check | Rules | Model |
+|---|---|---|
+| Knowledge reconstruction | **56/56** | 54/56 |
+| Exposure classification | **25/25** | 24/25 |
+| Counterfactual simulation | **25/25** | **15/25** |
+| Backup candidates | **2/2** | 1/2 |
+| Critical gaps / ownership / grounding | 100% | 100% |
+
+The model found *more* — 144 claims against 126 — and that is the trap. It made two readiness errors,
+both on Incident Recovery, both **too high**: Jordan `EXPOSED` read as `PRACTICED`, Maria `ASSISTED` read
+as `PRACTICED`. Jordan's record there is two years of review comments.
+
+Those two promotions give Incident Recovery two more adequate engineers, so it flips `DEGRADED → COVERED`
+and **"Alex is the only person who can recover the payment gateway" stops being true.** The simulation
+becomes 74 → 91 with one critical gap instead of 74 → 93 with two. The 60% simulation score is that one
+error propagating.
+
+The direction is what settles it: a continuity tool that overestimates readiness tells a manager they are
+covered when they are not, and nobody goes looking for a problem the tool says does not exist.
+
+**So rule-based extraction stays, and it is now a measured decision.** Worth saying plainly because it
+inverts the intuition: our 100% scores are not the rules being flattered by a synthetic corpus. The model
+had the same corpus, the same prompt, the same validation gate, and did worse.
+
+### What this means for your half
+
+**Say this, and it is all true:** a language model reads the incident and review record and writes the
+manager-facing explanations, behind a validation gate that rejects invented capabilities, invented people
+and probability language, with the deterministic template as the fallback. It proposes taxonomy concepts
+the organisation has no name for yet, and suggests system criticality that a human can override. The risk
+analysis itself is deterministic and reproducible **by design** — and we can now show the experiment that
+proves that is the right design rather than asserting it.
+
+**Do not say** the model builds the knowledge graph. It does not, and the reason it does not is a better
+story than the claim would have been.
+
+If a judge asks "how do you stop the model inventing risk scores?", the answer is: there is no interface
+through which it could return one, and here is the run where letting it read the evidence made the product
+measurably worse. That is a much stronger answer than a description of a guardrail.
+
+Numbers you can quote: **13 claims the model found and the rules missed** (its recall is genuinely better
+in places), **3 of 5** agreement on criticality with all disagreements one direction — the model is more
+alarmist than the humans — and **640/640** artifacts extracted with full provenance recorded per claim.
+
+### Two operational notes
+
+**OpenRouter 402s are about concurrency, not balance.** `"would exceed your available credits given your
+current in-flight requests"` — six workers failed 127 of 640 artifacts; one worker completed all 127. If
+you ever run extraction, use `--workers 1`.
+
+**Do not set `AI_PROVIDER=chain` in `.env` for day-to-day work.** Seeding makes one model call per
+artifact, so every test run would make 640 live calls. The right runtime is
+`AI_PROVIDER=cached` with `EXTRACTION_CACHE_FILE=chain_cache.json` — extraction replayed instantly from
+the committed cache, live model prose over the top. `deterministic` remains the default so a clean clone
+still works with no key at all.
+
+### Verified
+
+309 backend tests, 29 frontend tests, all seven evaluation checks at 100% under the default provider,
+`refresh_fixtures --check` green, `verify_golden_path` inside AC-14. Frozen numbers unchanged: 72/HIGH,
+74/HIGH with 0/2/3, 74 → 93 HIGH → CRITICAL with 2/1/2, Payments 74, Identity 68, Maria HIGH, Jordan
+MEDIUM.
+
+Full write-up in `data/extraction/comparison_report.md`; decisions DEC-19 to DEC-22 in
+`docs/DECISIONS.md`. The README's "open question" section is now the answer.
