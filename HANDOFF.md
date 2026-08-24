@@ -1049,3 +1049,58 @@ One more thing you will want to know: **`frontend/.env.local` did not exist**, a
 defaults to mock mode. So it would have rendered perfectly while never once calling the backend, which
 is the other failure that looks like success. `cp .env.local.example .env.local` is the step; I have
 done it locally, and the file is gitignored so it is not in the commit.
+
+### Bug you found on the plan screen — fixed
+
+`VALIDATION_ERROR` on step 4 of the Refund Engine flow. This was mine, in the backend, and your
+screenshot was enough to find it.
+
+**What happened.** `_excluded_engineers` in `app/recommendation/service.py` excluded the primary
+engineer from the candidate list *only if their readiness was adequate*:
+
+```python
+if primary is not None and is_adequate(primary.readiness):   # the bug
+    excluded.add(primary.engineer_id)
+```
+
+`CapabilityDetail.primary_engineer` is `facts.primary`, documented as the strongest coverage "adequate
+or not", and it is what you send as `primary_engineer_id` — the knowledge source. So on any capability
+whose strongest holder sits below `PRACTICED`, that person was returned as a candidate to back up
+themselves. Selecting them sent source == backup, and `MitigationPlanService` correctly refuses that,
+which is the `VALIDATION_ERROR` you saw.
+
+The guard failed precisely where it mattered most. No adequate holder means a critical gap, which is
+exactly when someone goes looking for a backup. You were on Refund Reversal — `CRITICAL_GAP`, strongest
+coverage Priya Nair at `ASSISTED` — so the flow broke every time Priya was picked.
+
+**Three capabilities were affected, not one.** I only learned that by writing the test first and
+reverting the fix to watch it fail: `cap_refund_reversal` (Priya), `cap_session_recovery` (Sofia
+Ruiz), and `cap_permission_audit` (Grace Liu). All three produced the same error. The Payment Gateway
+demo path never hit it because Alex is `VALIDATED` and was excluded either way — which is why every
+suite was green and why my own live walkthrough missed it. I tested the happy path; you clicked
+somewhere else.
+
+**The fix** is to exclude the primary unconditionally. There was a defensible thought behind the old
+guard — someone at `ASSISTED` is not really a holder, so why not develop them? — but that is a
+different action from the one this endpoint serves. A plan transfers knowledge *from* a source *to* a
+backup, and a plan where those are the same person means nothing. Where the primary was the only
+person with evidence, the capability now offers one fewer candidate, which is the honest answer.
+
+**Nothing you render changes.** No DTO, endpoint, or fixture moved; `backup-candidates.json` is for
+Incident Recovery, where Alex was already excluded. All seven evaluation checks still 100%,
+`refresh_fixtures --check` green, every frozen number unchanged.
+
+**Two tests now cover it**, written as invariants rather than pinned to Refund Reversal, because the
+bug was a general rule with one visible symptom and the next dataset will put a different capability
+in that state:
+
+- no capability offers its own primary as a backup candidate
+- **every candidate the API offers can actually produce a plan**
+
+The second is the one I would keep. Both endpoints were individually correct — the mismatch only
+existed in the sequence the interface walks, and nothing tested that sequence. Swept across all 25
+capabilities, live: no primary offered as its own backup, and every candidate produces a plan.
+
+Worth saying plainly: this is a class of bug the backend suite structurally could not catch, because it
+only appears when two correct endpoints are used in order. **If you hit another dead-end button, send
+the screenshot — that is the fastest path to these.**

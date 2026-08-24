@@ -190,10 +190,29 @@ class BackupCandidateService:
         """Whoever currently holds the capability, and whoever was simulated away.
 
         Offering the person you are trying to build a backup for would be worse than useless.
+
+        The primary is excluded **unconditionally**, and the `is_adequate` guard that used to sit
+        here was a bug. `CapabilityDetail.primary_engineer` is `facts.primary`, which is documented
+        as the strongest coverage "adequate or not", and it is the value the frontend sends as
+        `primary_engineer_id` — the knowledge source — when it asks for a plan. So on any capability
+        whose strongest holder is below PRACTICED, that person was returned as a candidate to back
+        up themselves, and selecting them produced `VALIDATION_ERROR` from
+        `MitigationPlanService`, which rejects a plan whose source and backup are the same person.
+
+        The guard failed precisely where it mattered most: a capability with no adequate holder is a
+        critical gap, which is exactly when a manager goes looking for a backup. `cap_refund_reversal`
+        is the live example — CRITICAL_GAP, strongest coverage Priya Nair at ASSISTED — and it broke
+        the plan screen every time she was picked.
+
+        There is a defensible thought behind the old guard: someone at ASSISTED is not really a
+        holder, so why not develop them? Because that is a different action from the one this endpoint
+        serves. A plan here transfers knowledge *from* a source *to* a backup, and a plan whose source
+        and backup are one person means nothing. If the only person with any evidence is the primary,
+        the honest answer is fewer candidates — or none, which the response already has a message for.
         """
         excluded: set[str] = set()
         primary = target.primary
-        if primary is not None and is_adequate(primary.readiness):
+        if primary is not None:
             excluded.add(primary.engineer_id)
         if simulation_id:
             simulation = SimulationRepository(self.session).get(simulation_id)

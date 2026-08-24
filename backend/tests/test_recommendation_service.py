@@ -105,3 +105,84 @@ def test_the_returned_candidates_still_match_the_contract_fixture(client) -> Non
     assert body["capability"] == expected["capability"]
     assert body["disclaimer"] == expected["disclaimer"]
     assert body["candidates"] == expected["candidates"]
+
+
+# ---------------------------------------------------------------------------------------
+# The primary is never offered as its own backup
+# ---------------------------------------------------------------------------------------
+
+
+def test_no_capability_offers_its_own_primary_engineer_as_a_backup(client, session) -> None:
+    """Found in the browser, on the plan screen, as `VALIDATION_ERROR`.
+
+    `CapabilityDetail.primary_engineer` is `facts.primary`, documented as the strongest coverage
+    "adequate or not", and it is what the frontend sends as the plan's knowledge source. The
+    exclusion here was guarded by `is_adequate`, so on any capability whose strongest holder was
+    below PRACTICED that person came back as a candidate to back up themselves — and
+    `MitigationPlanService` rejects a plan whose source and backup are the same person.
+
+    The guard failed exactly where it mattered: no adequate holder means a critical gap, which is
+    when a manager actually goes looking for a backup. `cap_refund_reversal` was the live case,
+    with Priya Nair at ASSISTED.
+
+    Swept across every capability rather than pinned to that one, because the bug was a general
+    rule with a specific symptom, and the next dataset will put a different capability in that state.
+    """
+    capability_ids = [c.capability_id for c in CapabilityRepository(session).list_all()]
+    assert capability_ids, "no capabilities seeded, so this test proves nothing"
+
+    offenders = []
+    for capability_id in capability_ids:
+        detail = client.get(f"/api/v1/capabilities/{capability_id}").json()
+        primary = (detail.get("primary_engineer") or {}).get("engineer_id")
+        if not primary:
+            continue
+        candidates = client.post(
+            "/api/v1/recommendations/backup-candidates",
+            json={"capability_id": capability_id, "limit": 3},
+        ).json()
+        offered = [c["engineer_id"] for c in candidates.get("candidates", [])]
+        if primary in offered:
+            offenders.append((capability_id, primary))
+
+    assert not offenders, f"primary offered as its own backup: {offenders}"
+
+
+def test_every_candidate_the_api_offers_can_actually_produce_a_plan(client, session) -> None:
+    """The invariant behind the bug above, stated as the user experiences it.
+
+    A candidate that cannot be turned into a plan is a dead end the interface has no way to predict,
+    so it renders a button and the button fails. Walking the two calls in the order the UI walks them
+    is the only way this class of mismatch shows up — each endpoint is individually correct.
+    """
+    capability_ids = [c.capability_id for c in CapabilityRepository(session).list_all()]
+    failures = []
+    for capability_id in capability_ids:
+        detail = client.get(f"/api/v1/capabilities/{capability_id}").json()
+        primary = (detail.get("primary_engineer") or {}).get("engineer_id")
+        if not primary:
+            continue
+        candidates = client.post(
+            "/api/v1/recommendations/backup-candidates",
+            json={"capability_id": capability_id, "limit": 3},
+        ).json()
+        for candidate in candidates.get("candidates", []):
+            response = client.post(
+                "/api/v1/mitigation-plans",
+                json={
+                    "capability_id": capability_id,
+                    "primary_engineer_id": primary,
+                    "selected_backup_engineer_id": candidate["engineer_id"],
+                },
+            )
+            if response.status_code not in (200, 201):
+                failures.append(
+                    (
+                        capability_id,
+                        candidate["engineer_id"],
+                        response.status_code,
+                        response.json().get("error", {}).get("code"),
+                    )
+                )
+
+    assert not failures, f"candidates the API offers but refuses to plan for: {failures}"
