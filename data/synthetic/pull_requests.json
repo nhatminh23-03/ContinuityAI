@@ -1772,33 +1772,5 @@
       }
     ],
     "file_paths": []
-  },
-  {
-    "reference": "PR-622",
-    "title": "Reduce build time in the release pipeline (Payment Gateway)",
-    "body": "Jordan Lee made a routine maintenance change with no operational significance.",
-    "date": "2026-06-05",
-    "system_id": "system_payment_gateway",
-    "participants": [
-      {
-        "engineer_id": "eng_jordan_lee",
-        "participant_role": "AUTHOR"
-      }
-    ],
-    "file_paths": []
-  },
-  {
-    "reference": "PR-623",
-    "title": "Update service README (Billing Integration)",
-    "body": "Omar Haddad made a routine maintenance change with no operational significance.",
-    "date": "2026-05-15",
-    "system_id": "system_billing_integration",
-    "participants": [
-      {
-        "engineer_id": "eng_omar_haddad",
-        "participant_role": "AUTHOR"
-      }
-    ],
-    "file_paths": []
   }
 ]

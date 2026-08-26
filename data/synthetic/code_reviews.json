@@ -1502,17 +1502,51 @@
     "file_paths": []
   },
   {
-    "reference": "REV-805",
-    "title": "Fix flaky test in CI (Authorization)",
-    "body": "Maria Gomez made a routine maintenance change with no operational significance.",
-    "date": "2025-09-09",
-    "system_id": "system_authorization",
+    "reference": "REV-9001",
+    "title": "Review: Token Rotation scheduling change",
+    "body": "Grace Liu reviewed a change to Token Rotation scheduling and left detailed comments on naming and test coverage. She did not run the rotation herself.",
+    "date": "2026-06-02",
+    "system_id": "system_authentication",
     "participants": [
       {
-        "engineer_id": "eng_maria_gomez",
-        "participant_role": "AUTHOR"
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "REVIEWER"
       }
     ],
-    "file_paths": []
+    "file_paths": [
+      "services/identity/token_rotation.py"
+    ]
+  },
+  {
+    "reference": "REV-9002",
+    "title": "Review: Token Rotation retry handling",
+    "body": "Grace Liu reviewed retry handling around Token Rotation, asked three clarifying questions, and approved. No execution is recorded against her.",
+    "date": "2026-05-19",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "REVIEWER"
+      }
+    ],
+    "file_paths": [
+      "services/identity/token_rotation.py"
+    ]
+  },
+  {
+    "reference": "REV-9003",
+    "title": "Review: Token Rotation metrics",
+    "body": "Grace Liu reviewed the metric names emitted during Token Rotation and suggested two renames. Review only.",
+    "date": "2026-04-27",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "REVIEWER"
+      }
+    ],
+    "file_paths": [
+      "services/identity/token_rotation.py"
+    ]
   }
 ]

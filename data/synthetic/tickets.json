@@ -28,34 +28,6 @@
     "file_paths": []
   },
   {
-    "reference": "TCK-1002",
-    "title": "Bump dependency versions (Authentication)",
-    "body": "Sarah Whitfield made a routine maintenance change with no operational significance.",
-    "date": "2025-11-28",
-    "system_id": "system_authentication",
-    "participants": [
-      {
-        "engineer_id": "eng_manager_sarah",
-        "participant_role": "AUTHOR"
-      }
-    ],
-    "file_paths": []
-  },
-  {
-    "reference": "TCK-1003",
-    "title": "Tidy log formatting (Refund Engine)",
-    "body": "Sofia Ruiz made a routine maintenance change with no operational significance.",
-    "date": "2025-11-08",
-    "system_id": "system_refund_engine",
-    "participants": [
-      {
-        "engineer_id": "eng_sofia_ruiz",
-        "participant_role": "AUTHOR"
-      }
-    ],
-    "file_paths": []
-  },
-  {
     "reference": "TCK-900",
     "title": "Invoice Generation: scheduled work in Invoice Sync",
     "body": "Priya Nair was assigned work on Invoice Generation in Invoice Sync and completed it.",

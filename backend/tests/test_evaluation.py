@@ -143,3 +143,99 @@ def test_the_hero_scenario_is_unaffected_by_the_conflicting_record(client) -> No
     platforms = {p["platform_id"]: p for p in client.get("/api/v1/platforms").json()["platforms"]}
     assert platforms["platform_payments"]["highest_system_risk_index"] == 74
     assert platforms["platform_identity"]["highest_system_risk_index"] == 68
+
+
+# ---------------------------------------------------------------------------------------
+# R-02 — the adversarial artifacts, and whether the check that guards them has teeth
+# ---------------------------------------------------------------------------------------
+
+
+def test_the_adversarial_traps_are_in_the_corpus_and_all_declined(report) -> None:
+    """R-02. The answer to "100% only proves the pipeline agrees with its own generator".
+
+    Seven artifacts written to fool the rules — activity mistaken for capability, attribution read out
+    of prose instead of the participant record, seniority language mistaken for evidence. Declining
+    them is a different kind of claim from reconstructing a label, because each is a specific way a
+    plausible implementation gets this wrong while still scoring perfectly on cooperative data.
+    """
+    check = next(c for c in report.checks if c.name.startswith("Adversarial artifacts"))
+    assert check.total >= 7, "the trap set should not silently shrink"
+    assert check.rate == 1.0, check.failures
+    # All three trap families must be exercised, not just the easy one.
+    note = " ".join(check.notes)
+    for trap in ("volume_without_execution", "attribution_by_name", "authority_language"):
+        assert trap in note, f"{trap} was not exercised"
+
+
+def test_volume_of_review_activity_does_not_become_capability(client) -> None:
+    """"Artifact, not activity" is a stated PRD principle, and this is what tests it.
+
+    Grace has eight review and comment records on Token Rotation and no execution. A system that
+    counted activity would promote her; readiness must stay EXPOSED.
+    """
+    body = client.get("/api/v1/capabilities/cap_token_rotation").json()
+    readiness = {c["engineer_id"]: c["readiness"] for c in body["engineer_coverage"]}
+    assert readiness["eng_grace_liu"] == "EXPOSED", (
+        f"Grace read as {readiness['eng_grace_liu']} on the strength of review volume alone"
+    )
+    # And the capability is still assessed on real coverage, not on the noise around it.
+    assert body["exposure"] == "DEGRADED"
+
+
+def test_a_name_in_the_prose_does_not_create_coverage(client) -> None:
+    """INC-9001 says Tom Becker did the work single-handedly. The participant record says otherwise.
+
+    Tom is a Payments engineer with no Identity coverage, so attribution by narrative would hand him a
+    capability in a platform he has never worked in. This is the exact mistake the measured model
+    extraction made, so it is worth a test rather than an assumption.
+    """
+    body = client.get("/api/v1/capabilities/cap_token_rotation").json()
+    covered = {c["engineer_id"] for c in body["engineer_coverage"]}
+    assert "eng_tom_becker" not in covered, "coverage was created from a name in prose"
+
+
+def test_the_adversarial_check_fails_when_a_trap_actually_works(session) -> None:
+    """The check must be able to fail, or its passing means nothing.
+
+    Verified by lowering a ceiling below what the corpus legitimately produces, rather than by
+    corrupting the database: Grace really is EXPOSED on Token Rotation, so a ceiling of NONE is a
+    breach the check has to report. If this test ever passes silently, the check has stopped looking.
+    """
+    from app.evaluation.evaluator import _adversarial
+    from app.evaluation.ground_truth import GroundTruth
+
+    rigged = GroundTruth(
+        adversarial_artifacts=[
+            {
+                "reference": "REV-9001",
+                "trap": "volume_without_execution",
+                "ceiling": {
+                    "engineer_id": "eng_grace_liu",
+                    "capability_id": "cap_token_rotation",
+                    "readiness": "NONE",
+                },
+            }
+        ]
+    )
+    check = _adversarial(session, rigged)
+    assert check.passed == 0 and check.total == 1
+    assert any("above the NONE ceiling" in f for f in check.failures), check.failures
+
+
+def test_a_trap_missing_from_the_corpus_fails_rather_than_passes(session) -> None:
+    """The blind spot R-26 was about, closed here before it can open.
+
+    If a trap's artifact is absent, nothing was tested — and a check that returns green in that state
+    would go quiet the moment someone regenerated the corpus without the traps. Absence is a failure.
+    """
+    from app.evaluation.evaluator import _adversarial
+    from app.evaluation.ground_truth import GroundTruth
+
+    rigged = GroundTruth(
+        adversarial_artifacts=[
+            {"reference": "REV-DOES-NOT-EXIST", "trap": "volume_without_execution"}
+        ]
+    )
+    check = _adversarial(session, rigged)
+    assert check.passed == 0
+    assert any("not in the corpus" in f for f in check.failures), check.failures

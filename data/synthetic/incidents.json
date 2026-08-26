@@ -866,5 +866,19 @@
       }
     ],
     "file_paths": []
+  },
+  {
+    "reference": "INC-9001",
+    "title": "P3 Authentication \u2014 Token Rotation stall",
+    "body": "Scheduled Token Rotation stalled overnight. Tom Becker is described in the write-up as having driven the fix and completed the rotation single-handedly, but the on-call record lists only Grace Liu, who commented on the thread. The narrative and the participant record disagree.",
+    "date": "2026-03-11",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "COMMENTER"
+      }
+    ],
+    "file_paths": []
   }
 ]

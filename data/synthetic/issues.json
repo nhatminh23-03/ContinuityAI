@@ -1414,6 +1414,48 @@
     "file_paths": []
   },
   {
+    "reference": "ISS-9001",
+    "title": "Discussion: Token Rotation cadence",
+    "body": "Grace Liu commented at length on how often Token Rotation should run and what the failure handling ought to look like. A design discussion, not an execution.",
+    "date": "2026-06-20",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "COMMENTER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-9002",
+    "title": "Discussion: Token Rotation rollout sequencing",
+    "body": "Grace Liu wrote the longest comment on the thread, proposing a sequencing plan for Token Rotation across environments. No rotation was performed.",
+    "date": "2026-07-08",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "COMMENTER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
+    "reference": "ISS-9003",
+    "title": "Discussion: who owns Token Rotation",
+    "body": "Grace Liu is described on this thread as the most senior engineer in the area, the acknowledged expert on Token Rotation, and its de facto owner. No incident, change, or runbook is cited anywhere in the discussion.",
+    "date": "2026-07-22",
+    "system_id": "system_authentication",
+    "participants": [
+      {
+        "engineer_id": "eng_grace_liu",
+        "participant_role": "COMMENTER"
+      }
+    ],
+    "file_paths": []
+  },
+  {
     "reference": "ISS-901",
     "title": "Add a missing type annotation (Billing Integration)",
     "body": "Jordan Lee made a routine maintenance change with no operational significance.",
@@ -1450,34 +1492,6 @@
     "participants": [
       {
         "engineer_id": "eng_alex_chen",
-        "participant_role": "AUTHOR"
-      }
-    ],
-    "file_paths": []
-  },
-  {
-    "reference": "ISS-904",
-    "title": "Delete a deprecated feature flag (Refund Engine)",
-    "body": "Lena Novak made a routine maintenance change with no operational significance.",
-    "date": "2026-03-15",
-    "system_id": "system_refund_engine",
-    "participants": [
-      {
-        "engineer_id": "eng_lena_novak",
-        "participant_role": "AUTHOR"
-      }
-    ],
-    "file_paths": []
-  },
-  {
-    "reference": "ISS-905",
-    "title": "Remove unused configuration flag (Payment Gateway)",
-    "body": "Priya Nair made a routine maintenance change with no operational significance.",
-    "date": "2026-03-19",
-    "system_id": "system_payment_gateway",
-    "participants": [
-      {
-        "engineer_id": "eng_priya_nair",
         "participant_role": "AUTHOR"
       }
     ],

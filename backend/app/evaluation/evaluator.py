@@ -68,6 +68,7 @@ def evaluate(session: Session, truth: GroundTruth) -> EvaluationReport:
             _simulation(session, truth),
             _candidates(session, truth),
             _grounding(session),
+            _adversarial(session, truth),
         ]
     )
 
@@ -267,4 +268,89 @@ def _grounding(session: Session) -> CheckResult:
     if not result.total:
         result.total = 1
         result.notes.append("no coverage rows found")
+    return result
+
+
+def _adversarial(session: Session, truth: GroundTruth) -> CheckResult:
+    """Did the rules decline the artifacts written to fool them? RECOMMENDATIONS.md R-02.
+
+    The other seven checks measure whether the pipeline reconstructs labels from evidence designed to
+    be classifiable. The fair objection is that a perfect score there might only show the pipeline
+    agreeing with its own generator. This check exists to answer that objection with a different kind
+    of evidence: a corpus that contains deliberate traps, and a requirement that each one is refused.
+
+    **Declining a trap is a stronger claim than reconstructing a label**, because each trap is a
+    specific way a plausible implementation gets this wrong — counting activity as capability, reading
+    attribution out of prose instead of the participant record, treating a claim of seniority as a
+    record of execution. A system can score 100% on cooperative data and still fail every one.
+
+    Two constraint shapes, both expressed in the hidden ground truth so the traps in
+    `data/synthetic/` do not carry their own answers:
+
+    * `ceiling` — this pair must not read *above* the stated readiness. Stated as a ceiling rather
+      than an equality because the trap can only do damage by promoting; a level below the ceiling
+      would be a different bug and is caught by the reconstruction check.
+    * `no_coverage` — this pair must have no coverage row at all. Used where being fooled would
+      invent a capability for someone with no relationship to it.
+
+    A trap whose artifact is missing from the corpus fails rather than passes. Otherwise the check
+    would quietly go green the moment someone regenerated the corpus without the traps in it, which
+    is exactly the blind spot R-26 was about.
+    """
+    result = CheckResult("Adversarial artifacts declined (traps the rules must refuse)")
+    if not truth.adversarial_artifacts:
+        result.total = result.passed = 1
+        result.notes.append("no adversarial artifacts defined")
+        return result
+
+    from app.models import Artifact
+
+    references = {row.source_reference for row in session.query(Artifact).all()}
+    coverage = {
+        (row.engineer_id, row.capability_id): row.readiness
+        for row in session.query(Coverage).all()
+    }
+    declined_traps: set[str] = set()
+
+    for entry in truth.adversarial_artifacts:
+        reference = entry["reference"]
+        trap = entry.get("trap", "unspecified")
+
+        result.total += 1
+        if reference not in references:
+            result.failures.append(
+                f"{reference}: the trap is not in the corpus, so nothing was tested. Regenerate "
+                f"with backend/scripts/generate_synthetic_data.py."
+            )
+            continue
+
+        breaches: list[str] = []
+
+        ceiling = entry.get("ceiling")
+        if ceiling:
+            pair = (ceiling["engineer_id"], ceiling["capability_id"])
+            actual = coverage.get(pair, ReadinessLevel.NONE.value)
+            if readiness_rank(actual) > readiness_rank(ceiling["readiness"]):
+                breaches.append(
+                    f"{pair[0]} / {pair[1]} rose to {actual}, above the {ceiling['readiness']} "
+                    f"ceiling — the trap worked"
+                )
+
+        no_coverage = entry.get("no_coverage")
+        if no_coverage:
+            pair = (no_coverage["engineer_id"], no_coverage["capability_id"])
+            if pair in coverage:
+                breaches.append(
+                    f"{pair[0]} gained {coverage[pair]} on {pair[1]} from prose alone — attribution "
+                    f"followed the narrative instead of the participant record"
+                )
+
+        if breaches:
+            result.failures.extend(f"{reference} ({trap}): {b}" for b in breaches)
+        else:
+            result.passed += 1
+            declined_traps.add(trap)
+
+    if declined_traps:
+        result.notes.append(f"traps declined: {', '.join(sorted(declined_traps))}")
     return result
