@@ -554,9 +554,17 @@ Neither regeneration command is needed for normal work: both corpora are committ
 ### Checks
 
 ```bash
-cd backend && .venv/bin/python -m pytest -q                 # 269 tests, ~3 seconds
-cd ../frontend && npm run typecheck && npm run build
+cd backend && .venv/bin/python -m pytest -q                 # 316 tests, ~5 seconds
+cd ../frontend && npm run build && npm run typecheck        # build first — see below
 ```
+
+**Run `npm run build` before `npm run typecheck` on a fresh clone.** Next 16 generates the
+`LayoutProps` global into `.next/types` during a build, so a standalone `tsc --noEmit` has nothing to
+resolve until a build has run once and fails with `TS2304 Cannot find name 'LayoutProps'`. It is not a
+real error and it is not something you broke. `npm run build` runs its own TypeScript pass regardless.
+
+If `npm install` fails with `errno -13` on a root-owned npm cache — unrelated to this project — use
+`npm install --cache /tmp/continuityai-npm-cache`, which needs no `sudo`.
 
 ### Clean-clone walkthrough
 
@@ -574,6 +582,13 @@ the machine.
 
 The seeded organisation, the hidden ground truth, and both artifact corpora are committed, so the
 demo reproduces byte for byte from a fresh clone with no network access.
+
+**There are no database migrations.** `seed_demo` drops and recreates every table, which is correct
+while the dataset is generated and the schema is still moving, and it is why a clean clone needs no
+migration step. The consequence worth knowing: a schema change requires a reseed, and a reseed discards
+any simulations and plans created through the API. Alembic is marked optional in
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) §5.2 and was deliberately not added
+([`RECOMMENDATIONS.md`](RECOMMENDATIONS.md) R-15).
 
 ## Demo
 
@@ -594,6 +609,35 @@ productivity, value, ranking, promotion, bonus, or layoff output, and ingests no
 working hours, location, or sentiment data. The Continuity Risk Index is a severity index for
 comparison — not a probability of failure. Absence of evidence is reported as absence of evidence,
 never as inability. Staffing decisions remain human decisions.
+
+### Where the burden of proof sits
+
+Both times we measured a model against this system, it erred in the same direction. Extraction
+over-promoted readiness. Suggested criticality came back higher than the humans in three of five cases.
+Finding that twice made a principle visible that was already in the code and had never been written down
+anywhere — so this is a pattern we found in our own decisions when we tested the model, not foresight.
+
+Three rules, and the second is what keeps the first from becoming alarmism:
+
+**Claiming coverage requires evidence; claiming exposure does not.** Stale evidence does not count toward
+adequate coverage. Attestations are capped at moderate strength, so no quantity of them manufactures a
+validated expert. Readiness only rises on demonstrated execution. The burden of proof sits on the
+reassuring answer, because over-stating readiness tells a manager they are covered when they are not — and
+nobody goes looking for a problem the tool says does not exist.
+
+**Not knowing is its own answer, not a bad score.** `INSUFFICIENT_EVIDENCE` is a distinct state with no
+risk index and no risk class, and it is ranked *below* a real coverage problem rather than above it. Thin
+data is a data problem and should not outrank a gap the evidence actually supports. The system says "I
+don't know" instead of "this is dangerous", which is the difference between being careful and crying wolf.
+
+**The asymmetry is about systems, never people.** A gap is a statement about the record: *no qualifying
+independent evidence was found*, never *cannot do this*. That is enforced rather than intended — the
+validation gate rejects inability language at runtime, and every prompt file repeats the rule.
+
+Over-stating criticality is survivable for the same reason over-stating readiness is not: it draws
+attention to a system that may not need it, and a human corrects it, with the human-confirmed value
+authoritative by design. So when a model here is wrong, we know which direction it fails in, and the
+architecture already puts the burden of proof on exactly that direction.
 
 ## Repository layout
 

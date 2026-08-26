@@ -414,7 +414,9 @@ simulation URL, the storage is already there and it is a one-endpoint Category C
 |---|---|
 | `docs/ContinuityAI_PRD_v1.0.md` — untracked stale pre-audit PRD | User removed it |
 | `frontend/.env.local.example` referenced by the README but absent, and `frontend/.gitignore` `.env*` would have excluded it | Created, with a `!` negation added |
-| Working on branch `yaza_work`, which `TEAM_WORKFLOW_PERSON_A_B.md` section 7 forbids | Still outstanding — move to short-lived `feature/*` branches |
+| Working on branch `yaza_work`, which `TEAM_WORKFLOW_PERSON_A_B.md` section 7 forbids | **Resolved.** Work moved to `feature/backend-engines`, then `feature/frontend-screens` |
+| `verify_golden_path` judged AI operations against the 800 ms read budget regardless of provider, reporting a breach AC-14 does not claim | **Resolved** — the budget table is provider-aware (OPEN-12) |
+| No database migrations (R-15). `seed_demo` drops and recreates every table, so a schema change needs a reseed and discards simulations and plans | Documented in the README setup section rather than fixed; correct for a demo |
 | `README.md` claimed Python 3.9 will not work and 3.11 is required | Corrected; 3.10 is verified working |
 | `data/generated/` (evaluation output) | Gitignored |
 
@@ -649,30 +651,48 @@ changes extraction quality, not the contract. **Tracked as** OPEN-14.
 
 ---
 
-## R-29 — A continuity tool must be biased toward alarm, and we should say so
+## R-29 — Where the burden of proof sits — **AMENDED, then RESOLVED 2026-08-26**
 
-Not a defect. A design principle the measurement surfaced, which is currently implicit in the code and
-ought to be explicit in the submission.
+**This item was originally written as "a continuity tool must be biased toward alarm". That framing was
+wrong and is corrected below.** It is left visible rather than rewritten silently, because the correction
+is the useful part: checking whether the claim held in the code showed the code was doing something more
+careful than the recommendation described.
 
-Both model experiments erred the same way. Extraction over-promoted readiness; criticality suggestions came
-back higher than the humans in three of five cases. In one case that is bad and in the other it is
-harmless, and the difference is instructive:
+`app/continuity/aggregation.py` ranks `INSUFFICIENT_EVIDENCE` **below** `DEGRADED`, with the comment "it is
+a data problem, and it should not outrank a coverage problem the evidence does support". A capability with
+no usable evidence gets `continuity_risk_index=None` — no number at all, rather than a high one. **A tool
+biased toward alarm treats missing data as danger. This one treats missing data as missing data.** Shipping
+the original wording would have invited a fair criticism ("so your numbers are inflated?") and would have
+had a future contributor implement the wrong thing.
 
-- **Over-stating readiness is dangerous.** It says a capability is covered when it is not, and nobody
-  investigates a problem the tool denies. This is the failure that broke the hero scenario.
-- **Over-stating criticality is survivable.** It draws attention to a system that may not need it, and a
-  human corrects it. FR-010 already makes that correction authoritative.
+The accurate principle is three rules, and the second is what stops the first from being alarmism:
 
-So the asymmetry is not "the model is unreliable" but "errors that reassure are worse than errors that
-alarm". Everything in the evidence model already leans this way — `STALE` evidence does not count toward
-adequate coverage, attestations cap at `MODERATE`, `INSUFFICIENT_EVIDENCE` is a valid output rather than a
-guess. It is a coherent stance and it is never stated in one place.
+1. **Claiming coverage requires evidence; claiming exposure does not.** `is_adequate` excludes stale
+   evidence, attestations cap at `MODERATE` so no quantity manufactures a `VALIDATED` expert, and readiness
+   only rises on demonstrated execution. The burden of proof sits on the reassuring answer.
+2. **Not knowing is its own answer, not a bad score.** `INSUFFICIENT_EVIDENCE` is a distinct state ranked
+   below a real coverage problem, carrying no index and no class. The tool says "I don't know" rather than
+   "this is dangerous".
+3. **The asymmetry is about systems, never people.** A gap is a statement about the record.
+   `app/ai/language_policy.py`: "evidence not found is a statement about the record; 'cannot' is a
+   statement about the person." Four prompt files repeat it, and the validation gate rejects inability
+   language at runtime.
 
-**Recommendation:** one paragraph in the README's responsible-AI section. It reframes several existing
-decisions as one principle, and it is a good answer to "what happens when your model is wrong?" — we know
-which direction it is wrong in, and we chose the direction that fails safely.
+Rule 2 is what stops rule 1 from being alarmism; rule 3 is what stops the whole thing from being
+surveillance. Stated as one line about alarm, both are lost.
 
-**Effort:** 20 minutes · **Owner:** joint, since it touches the submission narrative.
+**Why it is worth saying at all.** Both model experiments erred in the same direction — extraction
+over-promoted readiness, criticality came back higher than the humans in three of five cases — and the two
+have very different costs. Over-stating readiness says a capability is covered when it is not, and nobody
+investigates a problem the tool denies. Over-stating criticality draws attention to a system that may not
+need it, and a human corrects it; FR-010 already makes that correction authoritative. So the answer to
+"what happens when your model is wrong?" is: we measured which direction it is wrong in, and the
+architecture already puts the burden of proof on exactly that direction.
+
+**Resolved** by a paragraph in the README's responsible-use section. It deliberately does not claim this
+was designed in from the start — it was not stated anywhere, and the measurement is what made it visible.
+"We found this pattern in our own decisions when we tested the model" is both true and more credible than
+implying foresight.
 
 ---
 
