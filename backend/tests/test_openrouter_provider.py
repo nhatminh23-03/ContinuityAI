@@ -587,15 +587,74 @@ def test_a_reply_without_a_message_is_an_extraction_error(provider) -> None:
         provider._chat("system", "user", 100)
 
 
-def test_a_rate_limited_call_is_retried_and_then_gives_up(provider, monkeypatch) -> None:
-    monkeypatch.setattr(settings, "openrouter_max_retries", 1)
+def test_backpressure_is_waited_out_rather_than_treated_as_a_failure(provider, monkeypatch) -> None:
+    """A refused request is not a failed one, and the two deserve different budgets.
+
+    `openrouter_max_retries` stays at 0 because a *failed* narrative is not worth a second call — the
+    template is already there. Backpressure never ran, so retrying costs nothing and usually works.
+    """
+    from app.ai.openrouter import BACKPRESSURE_ATTEMPTS
+
+    monkeypatch.setattr(settings, "openrouter_max_retries", 0)
     monkeypatch.setattr("app.ai.openrouter.time.sleep", lambda seconds: None)
     client = FakeClient(FakeResponse(429, {"error": "slow down"}, headers={"retry-after": "1"}))
     provider._client = client
 
     with pytest.raises(AIExtractionError):
         provider._chat("system", "user", 100)
-    assert len(client.calls) == 2, "one retry, then the deterministic template takes over"
+    assert len(client.calls) == BACKPRESSURE_ATTEMPTS + 1, (
+        "backpressure should be waited out several times before the template takes over, and must "
+        "not be governed by openrouter_max_retries"
+    )
+
+
+def test_a_concurrency_402_is_backpressure_and_not_an_empty_wallet(provider, monkeypatch) -> None:
+    """OPEN-15. The 402 that cost a fifth of a 640-artifact run.
+
+    OpenRouter answers *payment required* when concurrent requests would exceed the available balance.
+    It reads like "you are out of money" and means "not all at once". Treating it as terminal abandoned
+    127 artifacts that the same run at one worker completed — and pointed the person debugging at a
+    billing problem that did not exist.
+    """
+    from app.ai.openrouter import BACKPRESSURE_ATTEMPTS
+
+    monkeypatch.setattr(settings, "openrouter_max_retries", 0)
+    monkeypatch.setattr("app.ai.openrouter.time.sleep", lambda seconds: None)
+    client = FakeClient(
+        FakeResponse(
+            402,
+            {
+                "error": {
+                    "message": "This request would exceed your available credits given your "
+                    "current in-flight requests. Retry after in-flight requests settle.",
+                    "code": 402,
+                }
+            },
+        )
+    )
+    provider._client = client
+
+    with pytest.raises(AIExtractionError):
+        provider._chat("system", "user", 100)
+    assert len(client.calls) == BACKPRESSURE_ATTEMPTS + 1, "the concurrency 402 was not waited out"
+
+
+def test_a_genuinely_exhausted_balance_fails_fast(provider, monkeypatch) -> None:
+    """The other half of the 402, and the reason the body is inspected rather than the status alone.
+
+    A real empty balance will not recover by waiting, so sleeping three times on the way to the same
+    answer wastes the caller's budget and buries the actual cause.
+    """
+    monkeypatch.setattr(settings, "openrouter_max_retries", 0)
+    monkeypatch.setattr("app.ai.openrouter.time.sleep", lambda seconds: None)
+    client = FakeClient(
+        FakeResponse(402, {"error": {"message": "Insufficient credits. Add more to continue."}})
+    )
+    provider._client = client
+
+    with pytest.raises(AIExtractionError):
+        provider._chat("system", "user", 100)
+    assert len(client.calls) == 1, "an exhausted balance should not be retried"
 
 
 def test_the_per_call_timeout_is_a_total_and_not_a_ceiling_per_phase(provider) -> None:

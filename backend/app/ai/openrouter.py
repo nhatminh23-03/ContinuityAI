@@ -103,6 +103,42 @@ TIMEOUT_PHASE_SHARES = {"pool": 0.05, "connect": 0.25, "write": 0.05, "read": 0.
 MAX_RETRY_AFTER_SECONDS = 2.0
 BACKOFF_BASE_SECONDS = 1.0
 
+# How many times to wait out backpressure before giving up. Separate from `openrouter_max_retries`
+# because these are different situations: a retry re-runs work that failed, whereas this waits for a
+# request that was never accepted. See the comment in `_chat`.
+BACKPRESSURE_ATTEMPTS = 3
+
+
+def _is_backpressure(response: httpx.Response) -> bool:
+    """Was the request refused for going too fast, rather than for being wrong?
+
+    A 429 is the honest version. The 402 is the one worth naming: OpenRouter returns *payment
+    required* when concurrent requests would exceed the available balance, which reads like "you are
+    out of money" and actually means "not all at once". A run that treats it as terminal abandons work
+    it could have completed by waiting — and reports a billing problem that does not exist, which is a
+    genuinely misleading place to send someone debugging.
+
+    Matched on the body text rather than the status alone, so a real exhausted balance still fails
+    fast instead of sleeping three times on its way to the same answer.
+    """
+    if response.status_code == 429:
+        return True
+    if response.status_code != 402:
+        return False
+    return "in-flight" in response.text.lower() or "in flight" in response.text.lower()
+
+
+def _backpressure_delay(response: httpx.Response, attempt: int) -> float:
+    """Honour `Retry-After` when it is given, otherwise back off a little further each time.
+
+    Bounded either way: a narrative sits inside a request budget with a template behind it, so a
+    gateway asking for a minute is asking for longer than the wording is worth.
+    """
+    retry_after = response.headers.get("retry-after")
+    if retry_after and retry_after.replace(".", "", 1).isdigit():
+        return min(float(retry_after), MAX_RETRY_AFTER_SECONDS)
+    return min(BACKOFF_BASE_SECONDS * attempt, MAX_RETRY_AFTER_SECONDS)
+
 _JSON_BLOCK = re.compile(r"\{.*\}", re.DOTALL)
 
 
@@ -241,9 +277,22 @@ class OpenRouterProvider:
             "Accept": "application/json",
         }
 
+        # Backpressure gets its own attempt budget, independent of `openrouter_max_retries`.
+        #
+        # `openrouter_max_retries` defaults to 0 because a *failed* narrative is not worth a second
+        # call — the template is already sitting there. Backpressure is a different thing: the request
+        # was never attempted, and the reason it was refused is our own concurrency. Waiting briefly
+        # and retrying is nearly always correct, and cheap, because nothing was generated.
+        #
+        # Measured on a 640-artifact run at six workers: 127 artifacts abandoned, every one with
+        # HTTP 402 "would exceed your available credits given your current in-flight requests". The
+        # same run at one worker completed all 127. So the failure was self-inflicted and recoverable,
+        # and treating it as terminal threw away a fifth of the corpus. OPEN-15.
         retries = max(settings.openrouter_max_retries, 0)
+        backpressure_budget = BACKPRESSURE_ATTEMPTS
         last_error: str | None = None
-        for attempt in range(retries + 1):
+        attempt = 0
+        while True:
             attempts_left = attempt < retries
             try:
                 response = self._client.post(
@@ -260,23 +309,21 @@ class OpenRouterProvider:
 
                 last_error = f"HTTP {response.status_code}: {response.text[:200]}"
 
-                if response.status_code == 429 and attempts_left:
-                    retry_after = response.headers.get("retry-after")
-                    delay = (
-                        float(retry_after)
-                        if retry_after and retry_after.isdigit()
-                        else BACKOFF_BASE_SECONDS
-                    )
-                    time.sleep(min(delay, MAX_RETRY_AFTER_SECONDS))
+                if _is_backpressure(response) and backpressure_budget > 0:
+                    backpressure_budget -= 1
+                    time.sleep(_backpressure_delay(response, BACKPRESSURE_ATTEMPTS - backpressure_budget))
                     continue
 
             # Only when another attempt is actually coming. Sleeping before giving up would spend
             # the caller's budget on nothing.
             if attempts_left:
                 time.sleep(BACKOFF_BASE_SECONDS * (attempt + 1))
+                attempt += 1
+                continue
+            break
 
         raise AIExtractionError(
-            f"openrouter chat call failed after {retries + 1} attempt(s): {last_error}",
+            f"openrouter chat call failed after {attempt + 1} attempt(s): {last_error}",
             {"model_id": self.model_id, "last_error": last_error},
         )
 

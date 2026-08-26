@@ -692,3 +692,110 @@ Documented in `backend/.env.example`. Recorded here because a config comment is 
 symptom — a slow, expensive test run — would take a while to attribute.
 
 **Effort:** none, already documented · **Owner:** whoever configures a machine.
+
+---
+
+# Implemented from this list — 2026-08-26
+
+## R-02 — Adversarial artifacts added, and an eighth check — **RESOLVED 2026-08-26**
+
+R-02 asked for deliberately misleading artifacts so the evaluation could show the rules declining to be
+fooled, on the grounds that 100% on cooperative data invites the criticism that the harness is
+self-consistent rather than accurate. Done: seven traps in the corpus and a new check requiring every
+one to be refused. All eight checks now pass.
+
+Three trap families, each a specific way a plausible implementation gets this wrong:
+
+| Trap | What it tests |
+|---|---|
+| `volume_without_execution` | Eight review and comment records, no execution. "Artifact, not activity" is a stated PRD principle and nothing tested it |
+| `attribution_by_name` | The body names one engineer as having done the work; the participant record names another. Attribution must follow the record |
+| `authority_language` | "Most senior", "the acknowledged expert", "de facto owner", citing no incident, change or runbook |
+
+**Declining a trap is a stronger claim than reconstructing a label**, which is why this is worth more
+than the seven checks it joins. The `attribution_by_name` trap is the one to quote: it is precisely the
+mistake the measured model extraction made (R-01), so the corpus now contains a permanent test for it.
+
+Two design points worth keeping. The constraints live in the hidden ground truth rather than the corpus,
+so the traps are visible and what they must fail to do is not. And **a trap missing from the corpus fails
+rather than passes** — a check that went green when its artifact was absent would go quiet the moment
+someone regenerated without the traps, which is the R-26 blind spot exactly.
+
+Writing the check first caught an error in my own constraint before it was committed: the first draft
+asserted an engineer stay at `NONE` when he had genuinely commented, so the rules were right and the
+constraint was wrong.
+
+---
+
+## OPEN-15 — The concurrency 402 is now waited out — **RESOLVED 2026-08-26**
+
+OpenRouter answers **HTTP 402 payment required** when concurrent requests would exceed the available
+balance. The message reads like an empty wallet and means "not all at once". Treating it as terminal
+abandoned **127 of 640 artifacts** on a six-worker run; the same run at one worker completed all 127.
+
+Backpressure now gets its own attempt budget, deliberately separate from `openrouter_max_retries`. The
+distinction is the point: a *failed* narrative is not worth a second call, because the template is
+already there — but backpressure means the request was never attempted, and the reason it was refused is
+our own concurrency. Waiting costs nothing because nothing was generated.
+
+The 402 body is inspected rather than the status alone, so a genuinely exhausted balance still fails
+fast instead of sleeping three times on its way to the same answer. Tests cover both halves.
+
+---
+
+## OPEN-12 — AC-14 measured live, and it found a real breach — **RESOLVED 2026-08-26**
+
+The latency fix from DEC-18 was verified against a stub that sleeps. Measured against the live gateway
+it found two things the stub could not.
+
+**A script bug that reported a breach AC-14 does not claim.** `verify_golden_path` applied an 800 ms
+budget to the candidate and plan endpoints regardless of provider. AC-14 gives AI plan and explanation
+operations 12 seconds, so under a model provider those numbers were being judged against the wrong
+clause. The budget table is now provider-aware.
+
+**A real breach the stub had hidden.** `POST /mitigation-plans` came back at **12.6 s against 12**. The
+DEC-18 fix applied the wall-clock deadline to the candidate narratives only, because the plan is a single
+call — and `narrate_in_parallel` deliberately takes a direct path for one item, which left the plan with
+nothing but the transport timeout that does not bound anything. `with_deadline` now covers it.
+
+Live, with the deadline in place:
+
+| Endpoint | Before | Now | AC-14 |
+|---|---|---|---|
+| `POST /simulations` | 3.8 s | 3.0 s | 12 s ✓ |
+| `POST /recommendations/backup-candidates` | 16.9 s worst | 6.7 s | 12 s ✓ |
+| `POST /mitigation-plans` | 12.6 s | 8.0 s | 12 s ✓ |
+| Six reads | — | 3–52 ms | 800 ms ✓ |
+
+---
+
+## R-31 — Under `openrouter` the mitigation plan usually falls back to the template
+
+Found while closing OPEN-12, and worth stating rather than leaving as a pleasant-looking 8.0 s.
+
+That 8.0 s is exactly `NARRATIVE_DEADLINE_SECONDS`, which means the plan generation **hit the deadline
+and used the deterministic template**. A 1600-token plan does not finish inside the budget on this model.
+Raising the deadline to 10.5 s does not fix it — measured, the call simply times out later, and it made
+the candidate narratives time out too by giving them longer to wait before giving up. So 8 s is the
+better setting and the fallback is the designed outcome, not a defect.
+
+The consequence to be honest about: **FR-018's plan prose is deterministic in practice under
+`openrouter`, even though the model path exists and works.** The plan is also the one narrative where
+that matters least — it is the artifact a manager approves and someone then executes, so the validated
+template is arguably the right answer anyway, which is the position `watsonx.py` took originally.
+
+Three ways to make it genuinely model-written if wanted: a faster model, a lower `PLAN_MAX_TOKENS`, or
+streaming so partial output can be assembled inside the budget. **Lowering the token cap is the
+tempting one and the worst**: truncated output fails JSON parsing and falls back *silently*, so it would
+buy latency by turning the model off while looking like success — the same trap DEC-18 rejected.
+
+**Effort:** an hour to try a faster model and re-measure · **Owner:** Person A · **Decision:** B
+
+---
+
+## R-22 — Not implemented, and why
+
+Attestation `occurred_on` remains open. It is a change to the challenge request shape, which makes it a
+Category C decision, and the challenge endpoint is the one Person B has only just acknowledged. Adding a
+field to it unilaterally in the same week seemed like the wrong order of operations for a 30-minute
+improvement. It stays a good idea; it needs the conversation first.

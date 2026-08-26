@@ -35,6 +35,7 @@ from __future__ import annotations
 import logging
 import time
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
+from concurrent.futures import TimeoutError as FuturesTimeout
 from typing import Callable, Sequence, TypeVar
 
 logger = logging.getLogger(__name__)
@@ -127,3 +128,46 @@ def _narrate_one(
     except Exception as exc:  # noqa: BLE001 — same reason as above
         logger.warning("narrative failed (%s); using the deterministic template", exc)
         return fallback(item)
+
+
+def with_deadline(
+    work: Callable[[], Result],
+    fallback: Callable[[], Result],
+    deadline_seconds: float,
+) -> Result:
+    """One call, bounded by a real wall-clock deadline.
+
+    The single-narrative counterpart to `narrate_in_parallel`. Needed because a lone call cannot be
+    bounded by running it alongside others: `narrate_in_parallel` deliberately takes a direct path for
+    one item, which leaves the transport's own timeouts as the only limit — and those do not bound
+    anything, for the reason described at the top of this module.
+
+    Measured, which is why this exists: with the deadline applied to the candidate narratives only,
+    `POST /mitigation-plans` came back at **12.6 seconds** against AC-14's 12, live under
+    `AI_PROVIDER=openrouter`. One call, comfortably past a nominal 7-second budget, exactly as the
+    read-timeout hole predicts. A per-call budget the transport ignores is not a budget wherever it is
+    applied, so the plan needs the same treatment the candidates got.
+
+    Same limitation, stated again because it matters: missing the deadline does not cancel the HTTP
+    call. The thread finishes unobserved and its answer is discarded, bounded by the phase timeouts.
+    """
+    if deadline_seconds <= 0:
+        return fallback()
+
+    pool = ThreadPoolExecutor(max_workers=1)
+    try:
+        future = pool.submit(work)
+        try:
+            return future.result(timeout=deadline_seconds)
+        except FuturesTimeout:
+            logger.warning(
+                "narrative missed the %.1fs budget; using the deterministic template",
+                deadline_seconds,
+            )
+            return fallback()
+        except Exception as exc:  # noqa: BLE001 — the template is the answer to any failure
+            logger.warning("narrative failed (%s); using the deterministic template", exc)
+            return fallback()
+    finally:
+        # Never wait. Blocking here would hand back the latency the deadline just saved.
+        pool.shutdown(wait=False, cancel_futures=True)
