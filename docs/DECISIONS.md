@@ -1208,6 +1208,28 @@ links. And `InfoHint`'s own Escape handler closed the tooltip while the drawer b
 the same layering fault this decision fixes for the challenge pane; it now listens in the capture
 phase and stops the event.
 
+**A follow-up on the mapping-correction mode, and a finding for Person A.** Restructuring the form
+exposed that this mode could not succeed at all. `challenge/service.py::_correct_mapping` moves the
+chosen record *into* the capability named in the URL and rejects any record already filed there,
+but the form populated its dropdown from that same capability's evidence — so every option it
+offered was one the server would refuse. It also asked the manager to type a target capability id
+by hand, and `target_capability_id` appears exactly once in the backend, in the request schema:
+nothing reads it. The form now offers the records filed under the *other* capabilities of the same
+system, which are the ones that can actually move, each labelled with where it currently sits; the
+free-text field is gone; and the request sends the URL capability as the target so the payload
+describes what actually happens. Verified without submitting: all 32 offered records satisfy both
+server checks — none is already filed under the target, none comes from another system.
+
+**OPEN-16** is raised rather than fixed here, because the field is Person A's: either
+`target_capability_id` should be honoured, or it should leave the request schema, since a declared
+field that nothing reads invites exactly the interface this one produced.
+
 **Documents affected:** `docs/UI_REVIEW.md` — the mitigation-plan "usable as-is" grid endorsement
 is annotated as superseded. No endpoint, field, enum value, or domain semantic changes; frozen
 figures unaffected.
+
+### Open items after this build
+
+| ID | Item | Owner | Resolve by |
+|---|---|---|---|
+| OPEN-16 | `ChallengeRequest.target_capability_id` is declared in `backend/app/schemas/challenge.py` and read nowhere — `_correct_mapping` uses the capability from the URL as the destination. Either honour the field or drop it; a declared field that nothing reads produced a form asking managers to type an id that was discarded | Person A | Next contract touch |

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
   AssessmentSnapshot,
   ChallengeRequest,
@@ -15,6 +15,7 @@ import { ApiError } from '@/lib/api/client';
 import { ExposurePill, RiskClassChip, RiskIndex } from '@/components/status';
 import { ReadinessLadder } from '@/components/people';
 import { approverCopy, CHALLENGE_COPY, EVIDENCE_ROLE_COPY, ruleCopy } from '@/lib/copy';
+import { capabilitiesFromGraph } from '@/features/systems/capabilities';
 
 /**
  * The challenge workflow (DEC-10). The governing rule is structural: this
@@ -36,7 +37,7 @@ const CHALLENGE_TYPES: { value: ChallengeType; label: string; hint: string }[] =
   {
     value: 'CORRECT_CAPABILITY_MAPPING',
     label: 'Correct a mapping',
-    hint: 'Move an evidence record to the capability it belongs to. Both capabilities recompute.',
+    hint: 'Pull a record that belongs here but was filed under another capability of the same system. Both capabilities recompute.',
   },
 ];
 
@@ -116,7 +117,6 @@ export function ChallengeForm({
   const [sourceReference, setSourceReference] = useState('');
   const [evidenceRole, setEvidenceRole] = useState<EvidenceRole>('INDEPENDENT_EXECUTION');
   const [evidenceId, setEvidenceId] = useState('');
-  const [targetCapabilityId, setTargetCapabilityId] = useState('');
   const [comment, setComment] = useState('');
 
   // EvidenceResponse carries no engineer roster — its records hold an id and no
@@ -151,6 +151,48 @@ export function ChallengeForm({
   }, [capabilityQuery.data, evidenceResponse, seedEngineerId, seedEngineerName]);
 
 
+  /**
+   * The server moves the chosen record INTO the capability this drawer is open
+   * on (`challenge/service.py::_correct_mapping`), and rejects any record
+   * already filed here. The dropdown was populated from this capability's own
+   * evidence, so every option it offered was one the server would refuse. The
+   * records that can actually move are the ones filed under the *other*
+   * capabilities of the same system — a cross-system move is refused outright —
+   * so those are fetched, and only once this mode is selected.
+   */
+  const mappingMode = challengeType === 'CORRECT_CAPABILITY_MAPPING';
+  const systemId = capabilityQuery.data?.system_id;
+
+  const graphQuery = useQuery({
+    queryKey: queryKeys.systemGraph(systemId ?? ''),
+    queryFn: () => api.getSystemGraph(systemId!),
+    enabled: mappingMode && Boolean(systemId),
+  });
+
+  const siblings = (
+    graphQuery.data ? capabilitiesFromGraph(graphQuery.data) : []
+  ).filter((row) => row.id !== capabilityId);
+
+  const siblingEvidence = useQueries({
+    queries: siblings.map((row) => ({
+      queryKey: queryKeys.capabilityEvidence(row.id),
+      queryFn: () => api.getCapabilityEvidence(row.id),
+      enabled: mappingMode,
+    })),
+  });
+
+  const movable = siblings.flatMap((row, index) =>
+    (siblingEvidence[index]?.data?.evidence ?? []).map((record) => ({
+      record,
+      capabilityName: row.name,
+    })),
+  );
+  const movableLoading =
+    mappingMode &&
+    (capabilityQuery.isPending ||
+      graphQuery.isPending ||
+      siblingEvidence.some((result) => result.isPending));
+
   const mutation = useMutation({
     mutationFn: (body: ChallengeRequest) => api.challengeAssessment(capabilityId, body),
     onSuccess: () => {
@@ -172,7 +214,16 @@ export function ChallengeForm({
         : {}),
       ...(challengeType === 'MANAGER_ATTESTATION' ? { evidence_role: evidenceRole } : {}),
       ...(challengeType === 'CORRECT_CAPABILITY_MAPPING'
-        ? { evidence_id: evidenceId, target_capability_id: targetCapabilityId.trim() }
+        ? {
+            evidence_id: evidenceId,
+            // The service ignores this field entirely — it appears once in the
+            // backend, in the request schema, and nothing reads it — and moves
+            // the record into the capability from the URL. Sending that id
+            // keeps the request a truthful description of what happens, and
+            // makes it correct if the field is ever wired up. Raised for
+            // Person A rather than changed here.
+            target_capability_id: capabilityId,
+          }
         : {}),
     };
     mutation.mutate(body);
@@ -185,7 +236,7 @@ export function ChallengeForm({
       ? engineerId && sourceReference.trim()
       : challengeType === 'MANAGER_ATTESTATION'
         ? Boolean(engineerId)
-        : evidenceId && targetCapabilityId.trim());
+        : Boolean(evidenceId));
 
   const inputClass =
     'w-full rounded-lg border border-slate-900/10 bg-white/80 px-2.5 py-1.5 text-sm text-slate-800';
@@ -272,33 +323,32 @@ export function ChallengeForm({
               ) : null}
 
               {challengeType === 'CORRECT_CAPABILITY_MAPPING' ? (
-                <>
-                  <label className={labelClass}>
-                    Evidence record to move
+                <label className={labelClass}>
+                  Record to move here
+                  {movableLoading ? (
+                    <div className="mt-1 h-9 skeleton rounded-lg" />
+                  ) : movable.length === 0 ? (
+                    <p className="mt-1 text-xs font-normal text-slate-500">
+                      Every record in this system is already filed under this capability, so
+                      there is nothing to move. A record can only be re-filed within one system.
+                    </p>
+                  ) : (
                     <select
                       value={evidenceId}
                       onChange={(event) => setEvidenceId(event.target.value)}
                       className={`mt-1 ${inputClass}`}
                     >
                       <option value="">Select…</option>
-                      {(evidenceResponse?.evidence ?? []).map((record) => (
+                      {movable.map(({ record, capabilityName }) => (
                         <option key={record.evidence_id} value={record.evidence_id}>
                           {record.source_reference}
-                          {record.source_title ? ` — ${record.source_title}` : ''}
+                          {record.source_title ? ` — ${record.source_title}` : ''} (now under{' '}
+                          {capabilityName})
                         </option>
                       ))}
                     </select>
-                  </label>
-                  <label className={labelClass}>
-                    Target capability id
-                    <input
-                      value={targetCapabilityId}
-                      onChange={(event) => setTargetCapabilityId(event.target.value)}
-                      className={`mt-1 ${inputClass}`}
-                      placeholder="cap_retry_logic"
-                    />
-                  </label>
-                </>
+                  )}
+                </label>
               ) : null}
 
               <label className={labelClass}>

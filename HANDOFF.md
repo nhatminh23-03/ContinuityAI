@@ -1361,3 +1361,48 @@ type a target capability id by hand into a free-text field with a `cap_retry_log
 should be a select over the system's capabilities, which the graph payload already carries — the
 only remaining change that needs a new query rather than a relabel. And `chain_cache.json` still
 needs regenerating so `AI_PROVIDER=cached` works, which is Person A's artifact.
+
+---
+
+## 2026-08-29 (later) — Mapping-correction rebuilt around what the server does (Person B)
+
+### Completed
+
+The follow-up was "replace the free-text capability id with a dropdown". Reading
+`backend/app/challenge/service.py` first showed the field was not the problem: the whole mode could
+not succeed.
+
+- `_correct_mapping` moves the record **into** the URL capability and rejects any record already
+  filed there — but the dropdown was populated from that capability's own evidence, so every option
+  was one the server would refuse.
+- `target_capability_id` is declared in `schemas/challenge.py` and **read nowhere** in the backend.
+
+Rebuilt: the dropdown offers records filed under the *other* capabilities of the same system, each
+labelled with where it currently sits; the free-text field is gone; the mode hint now states the
+real direction; the request sends the URL capability as the target so the payload is truthful.
+
+### Decisions made
+
+DEC-24 extended with the above. **OPEN-16** raised for Person A: honour `target_capability_id` or
+drop it from the schema.
+
+### Files changed
+
+`frontend/features/challenge/ChallengeForm.tsx`, `docs/DECISIONS.md`, `BUILD_WITH_BOB.md`.
+
+### Things a fresh session will trip over
+
+- **Read the service before trusting a form's field list.** Two of this form's three controls were
+  wired to behaviour the backend does not have.
+- Acceptance was proved **by construction, not by submitting** — all 32 offered records checked
+  against both server rules. Do not POST to `/capabilities/{id}/challenge` against the demo
+  database; an earlier session did and destroyed the frozen Incident Recovery 72.
+
+### In progress / blocked
+
+Nothing in progress. OPEN-16 is Person A's.
+
+### Recommended next task
+
+`chain_cache.json` still needs regenerating so `AI_PROVIDER=cached` works — Person A's artifact, and
+the configuration their own `.env.example` recommends for daily work.

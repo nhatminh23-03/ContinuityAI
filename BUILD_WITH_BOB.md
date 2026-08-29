@@ -1915,3 +1915,51 @@ safe for anything that writes.
 by hand into a free-text field with a `cap_retry_logic` placeholder. It should be a select over the
 system's capabilities, which the graph payload already carries. Left out as the only change here
 that would need a new query rather than a relabel.
+
+---
+
+### 2026-08-29 (later) — The mapping-correction mode, which could not have worked
+
+**What was built.** The remaining follow-up was to replace a free-text "Target capability id" field
+with a dropdown. Reading the backend before building it showed the field was not the problem.
+
+`challenge/service.py::_correct_mapping` moves the selected evidence record *into* the capability
+named in the request URL, and raises `ValidationError` for any record already filed there. It also
+refuses a move between systems. The form, meanwhile, populated its "Evidence record to move"
+dropdown from `evidenceResponse.evidence` — that same capability's records. Every option it offered
+was one the server would reject, confirmed against the live API: all seven records returned for
+Incident Recovery carry `capability_id: cap_incident_recovery`.
+
+And `target_capability_id` is read nowhere. It appears exactly once in the whole backend, in
+`schemas/challenge.py`, and neither the service nor any test nor any document references it. Adding
+a dropdown for it would have been a better control for a field that is discarded, on a form that
+could not succeed.
+
+So the mode was rebuilt around what the server actually does. The dropdown now offers the records
+filed under the *other* capabilities of the same system — the ones that can move — each labelled
+with where it currently sits, as in "INC-338 — P1 Payment Gateway — Provider Failover failure (now
+under Provider Failover)". The free-text field is gone. The mode's hint described the wrong
+direction and now reads "Pull a record that belongs here but was filed under another capability of
+the same system." The request sends the URL capability as `target_capability_id`, so the payload
+describes what actually happens and stays correct if the field is ever honoured.
+
+The sibling queries are gated on the mode being selected, so nothing extra is fetched unless a
+manager chooses it, and they reuse the same query keys as the evidence drawer.
+
+**Files changed.** `frontend/features/challenge/ChallengeForm.tsx`, `docs/DECISIONS.md` (DEC-24
+extended, OPEN-16 raised).
+
+**How it was validated.** `npx tsc --noEmit` clean, `npm test` 31 passed, `npm run build` succeeds,
+`npm run lint` unchanged at 7 pre-existing problems.
+
+Live: selecting "Correct a mapping" renders one select with 32 records drawn from Provider Failover,
+Certificate Management, Retry Logic and Monitoring, and no free-text input remains.
+
+**Verified without submitting.** The earlier session destroyed a frozen value by driving this same
+form with a synthetic click sequence, so acceptance was proved by construction instead: every one of
+the 32 offered records was checked against both server rules — none is already filed under the
+target capability, and none belongs to another system. Nothing was POSTed.
+
+**Open questions.** `target_capability_id` is Person A's to settle — honour it or remove it
+(OPEN-16). A declared field that nothing reads is what produced a form asking managers to type an
+id that was thrown away.
