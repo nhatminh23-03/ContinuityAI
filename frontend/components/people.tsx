@@ -4,6 +4,7 @@
  */
 
 import type { ReadinessLevel } from '@/types/api';
+import { READINESS_COPY } from '@/lib/copy';
 
 const LADDER_STEPS: Record<ReadinessLevel, number> = {
   NONE: 0,
@@ -11,14 +12,6 @@ const LADDER_STEPS: Record<ReadinessLevel, number> = {
   ASSISTED: 2,
   PRACTICED: 3,
   VALIDATED: 5,
-};
-
-const READINESS_LABEL: Record<ReadinessLevel, string> = {
-  NONE: 'None',
-  EXPOSED: 'Exposed',
-  ASSISTED: 'Assisted',
-  PRACTICED: 'Practiced',
-  VALIDATED: 'Validated',
 };
 
 const BAR_HEIGHTS = [4, 6, 8, 10, 12];
@@ -29,7 +22,7 @@ export function ReadinessLadder({ level }: { level: ReadinessLevel }) {
     <span
       className="inline-flex items-center gap-2"
       role="img"
-      aria-label={`Readiness: ${READINESS_LABEL[level]}`}
+      aria-label={`Evidence shows: ${READINESS_COPY[level]}`}
     >
       <span className="flex items-end gap-[2px]" aria-hidden>
         {BAR_HEIGHTS.map((height, index) => (
@@ -45,7 +38,7 @@ export function ReadinessLadder({ level }: { level: ReadinessLevel }) {
           />
         ))}
       </span>
-      <span className="text-xs font-medium text-slate-700">{READINESS_LABEL[level]}</span>
+      <span className="text-xs font-medium text-slate-700">{READINESS_COPY[level]}</span>
     </span>
   );
 }

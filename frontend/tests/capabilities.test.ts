@@ -27,8 +27,15 @@ describe('capabilitiesFromGraph', () => {
 
 describe('coverageSummary', () => {
   it('counts DEMONSTRATES edges into the capability by readiness label', () => {
+    // The words come from READINESS_SHORT_COPY, not from lowercasing the enum:
+    // "exposed" reads as the capability's risk state rather than as what one
+    // engineer has done, and the same word already means both elsewhere.
+    // "reviewed" rather than "observed" because DOMAIN_MODEL 5.3 defines the
+    // level as observed, reviewed, discussed OR lightly interacted with — and
+    // the records behind it here are a code review and an issue comment, which
+    // the server's own summary describes as "reviewed or discussed".
     expect(coverageSummary(graph.edges, 'cap_incident_recovery')).toBe(
-      '1 validated · 1 assisted · 1 exposed',
+      '1 proven · 1 assisted · 1 reviewed',
     );
   });
 

@@ -1067,3 +1067,147 @@ provider table now describes which providers extract with a model.
 |---|---|---|---|
 | OPEN-14 | Hybrid extraction: take the model's recall, require corroboration before any promotion above `ASSISTED`. The measured failure is one-directional over-promotion, which is exactly the shape a corroboration rule addresses | Person A | Post-MVP |
 | OPEN-15 | OpenRouter returns `HTTP 402 "would exceed your available credits given your current in-flight requests"` under concurrency — six workers failed 127 of 640 artifacts, one worker completed all 127. The provider treats it as a plain failure; it should back off and serialise instead | Person A | Post-MVP |
+
+---
+
+## Implementation decision — the interface's vocabulary
+
+### DEC-23 — User-facing wording is named for what a reader needs to know, not for the field it renders
+
+**Date:** 2026-08-27 · **Category:** B · **Owner:** Person B · **No contract change**
+
+Every screen rendered its DTO faithfully, and the result was an interface that spoke the data
+model's language rather than the manager's. Reviewed against the running application, not the
+specification: a reader who had studied the PRD still could not tell what the product wanted them
+to do.
+
+**The word `exposure` names three unrelated things in this contract.** `CapabilityExposure` is the
+organisation's exposure to losing a capability. `ReadinessLevel.EXPOSED` is an engineer who has
+only *observed* the work — the lowest rung but one. `EvidenceRole.EXPOSURE` is one artifact showing
+presence. The first is a risk state, the second is close to its opposite, and the system detail
+screen showed all three at once — "1 exposed" in a capability's coverage tally sat inches from a
+capability marked as an exposure risk. No reader can be expected to disambiguate that, and the
+enum values are frozen. Display copy is frontend-owned, so each of the three is now named for what
+it describes and the word itself is retired from the interface.
+
+Two labels were also **wrong**, not merely opaque. `DEGRADED` was shown as "Degraded" and, in a
+first pass at this change, as "Weak backup"; `DOMAIN_MODEL.md` §5.4 and the rules at its lines
+950-975 define it as `practiced_or_validated_engineer_count == 1` with no backup — the sole-expert
+state. "Weak backup" asserts a backup exists. `CRITICAL_GAP` is `count == 0`: nobody has
+demonstrated the capability independently at all, so calling it a missing *backup* understated it.
+They now read "Backup at risk" and "No proven coverage".
+
+The full map lives in `frontend/lib/copy.ts`, which is now the single home for user-facing wording;
+labels that had been inlined in components were consolidated there as they were touched. Each
+string was checked against PRD §22.3 — a gap states the absence of evidence, never a person's
+inability — which is why readiness reads "No evidence" rather than "None", and "Has observed"
+rather than "Exposed".
+
+**Two decisions inside this one are worth their own line.** The candidate card briefly said "Shared
+capability" instead of "Technical overlap"; it was reverted, because the API's own disclaimer
+renders verbatim at the foot of that same screen and calls it technical overlap. One concept with
+two names on one page is the problem this change exists to remove, so the jargon stays and an
+explanation is attached to it instead. And the sidebar drops from four entries to three: a
+simulation is always run against a system already on screen, so the Simulations entry offered a
+second, context-free way to start one. `/simulations` still resolves. This supersedes the
+four-entry decision in `docs/UI_REVIEW.md`, annotated there.
+
+**Recorded rather than treated as styling** because the labels now deliberately diverge from the
+specification's own terms. A later contributor comparing the interface to the PRD will find
+"Backup at risk" where the contract says `DEGRADED`, and the correct reading is that the contract
+governs the wire and this file governs the words.
+
+**Documents affected:** `docs/UI_REVIEW.md` (sidebar entry annotated as superseded). No endpoint,
+field, enum value, or domain semantic changes; the frozen figures are untouched.
+
+---
+
+## Implementation decision — the three surfaces the first legibility pass did not restructure
+
+### DEC-24 — Challenge becomes a pane, the plan becomes a sequence, and the hierarchy is stated
+
+**Date:** 2026-08-29 · **Category:** B · **Owner:** Person B · **No contract change**
+
+The first legibility pass (DEC-23) changed wording everywhere and layout on two screens. It left
+three things, all of which turned out to be hiding defects rather than merely being untidy.
+
+**Challenge was two dialogs deep, and that is why nobody had audited it.** It opened as a second
+`aria-modal` drawer stacked pixel-for-pixel on the first, at a `z-[60]` that did nothing because
+the parent's `z-50` already established the stacking context. Both drawers registered an Escape
+handler on `window`, so a single press closed both — and since the recompute result lives only in
+the mutation, backing out of the form threw away the answer it had just produced. The form is now
+a second *pane* of the same drawer, toggled with the `hidden` attribute so a half-typed challenge
+survives a step back to check a date, and Escape retreats one level. Two leaks that the earlier
+"no raw enums remain" audit missed were found inside it once it was reachable to inspect: the
+engineer dropdown rendered `eng_alex_chen` because `EvidenceResponse` carries no engineer names
+and the id was used as its own label, and the role dropdown rendered `EXPOSURE` — the exact word
+DEC-23 claimed to have retired. Names now come from the capability's `engineer_coverage`, which
+does carry them and is usually already in cache.
+
+**The plan rendered an ordered sequence as a two-column grid.** CI-23 makes array position
+load-bearing, and the generated content depends on it: task 3 requires performing the recovery
+unaided, which only means anything after the shadowing in task 2. It is now a single-column `<ol>`
+with a step count. This reverses `docs/UI_REVIEW.md`'s "usable as-is" endorsement of the 2×2 grid,
+annotated there — that endorsement judged a static mockup's composition, before the real generated
+tasks existed to read.
+
+**The hierarchy is now stated where it is used** rather than left to be inferred: platform cards
+carry their system count and a note that platforms hold no score of their own (the large `74 / 100`
+on a platform card is one of its systems' numbers, and the identical 74 appears twelve rows below
+as that system's); the capability list is grouped by the component that requires each capability,
+so the panel and the graph beside it stop describing differently shaped data; and the capability
+detail route carries the only breadcrumb in the product that shows all four levels at once.
+
+**That route had no inbound link and never had.** It was built, specified and reviewed, and
+nothing anywhere in the frontend navigated to it. `CoverageCard` now links to it. It had also
+never received the DEC-23 wording pass, for the same reason its other defects went unnoticed: a
+screen nobody can reach is a screen nobody audits.
+
+**Four defects fixed alongside, all in the surfaces above.** The acceptance-criteria editor
+normalised its own value on every keystroke, so a trailing space was deleted before the next
+character arrived and a newline was filtered away — no multi-word criterion could be typed, while
+the helper text told the reader to press Enter. `savePlan` wrote `{ plan }` unconditionally over
+`{ plan, approval }`, so revisiting an approved plan redisplayed it as a draft with a live Approve
+button that then failed; with GAP-02 leaving that store as the only record, it was silent data
+loss, and it now has a regression test. The plan-creating POST ran through `useQuery` with retry
+enabled, which could create a second plan for one request. Rendering tasks out of an effect painted
+one frame of an empty grid on every load.
+
+**Corrections this change forced on DEC-23's own wording.** An adversarial review of the diff
+found that three labels introduced by the previous pass were inaccurate rather than merely terse,
+and all three are corrected here.
+
+`CRITICAL_GAP` rendered as "No proven coverage" is true of a capability and false of a system.
+`ENGINEERING_RULES.md` line 250 defines a system's exposure as the worst of its capabilities', so
+Refund Engine reports `CRITICAL_GAP` while four of its five capabilities are covered — and the
+dashboard was stating, without qualification, that a system with proven coverage has none. The old
+label "Critical gap" survived this because a state name asserts nothing; a sentence does.
+`ExposurePill` now takes a `scope`, and system rows read "Worst: no proven coverage".
+
+`DEGRADED` rendered as "Backup at risk" asserts that a backup exists. `exposure.py` reaches that
+state by two routes — one proven engineer on an important capability, or *no* proven engineer on a
+medium or low one — so the assertion is false on the second. It now reads "No resilient backup",
+which holds on both. The hint beside it claimed the rule was "more than one engineer has
+demonstrated this"; importance is part of the rule, and the hint now says so.
+
+`EXPOSED` and the `EXPOSURE` evidence role rendered as "Has observed" and "Was present for it".
+`DOMAIN_MODEL.md` 5.3 and 5.10 define both as observing, **reviewing, discussing** or lightly
+interacting, and the records behind them here are a code review and an issue comment — the
+server's own summary says "reviewed or discussed". The copy kept only the narrowest member of the
+list, and now matches the server's phrasing.
+
+The graph caption was also wrong again, in the state the previous fix did not check: focusing a
+capability adds an outermost ring of evidence records and a second kind of dashed line
+(`SUPPORTED_BY`, evidence to engineer) alongside `DECLARED_OWNER`. Verified against
+`features/graph/layout.ts` and a live focused payload.
+
+**Two regressions the same review caught in this change.** Putting an `InfoHint` inside
+`ConfidenceLabel` placed a `<button>` inside the dashboard row's `<a>` — invalid, and clicking the
+hint navigated to the system instead of explaining the term; the hint is now opt-in and off inside
+links. And `InfoHint`'s own Escape handler closed the tooltip while the drawer beneath closed too,
+the same layering fault this decision fixes for the challenge pane; it now listens in the capture
+phase and stops the event.
+
+**Documents affected:** `docs/UI_REVIEW.md` — the mitigation-plan "usable as-is" grid endorsement
+is annotated as superseded. No endpoint, field, enum value, or domain semantic changes; frozen
+figures unaffected.

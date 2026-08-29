@@ -58,3 +58,33 @@ describe('planStore', () => {
     expect(loadPlan(memoryStorage())).toBeNull();
   });
 });
+
+describe('savePlan after an approval', () => {
+  it('does not erase the approval already recorded for the same plan', () => {
+    const storage = memoryStorage();
+    savePlan(plan, storage);
+    saveApproval(approval, plan.tasks, storage);
+
+    // PlanView calls savePlan whenever the create query resolves, which happens
+    // again every time the screen is revisited. Before this guard that call
+    // wrote `{ plan }` over `{ plan, approval }` and the approval was gone —
+    // and with GAP-02 there is no endpoint to read it back from.
+    savePlan(plan, storage);
+
+    const stored = loadPlan(storage);
+    expect(stored?.approval).toEqual(approval);
+    expect(stored?.plan.status).toBe('APPROVED');
+  });
+
+  it('still overwrites when a different plan is created', () => {
+    const storage = memoryStorage();
+    savePlan(plan, storage);
+    saveApproval(approval, plan.tasks, storage);
+
+    savePlan({ ...plan, plan_id: 'plan_002', status: 'DRAFT' }, storage);
+
+    const stored = loadPlan(storage);
+    expect(stored?.plan.plan_id).toBe('plan_002');
+    expect(stored?.approval).toBeUndefined();
+  });
+});

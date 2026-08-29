@@ -1729,3 +1729,189 @@ link builder.
 route sits at stage three, not because the manager visited them. The rail describes the position of
 the screen rather than the history of the session; the body copy states what is missing, so the two
 do not conflict in practice. Worth revisiting only if the rail is ever given a resume behaviour.
+
+---
+
+### 2026-08-27 — Making the interface legible: an action-first home and one vocabulary
+
+**What was built.** The application matched the specification and every screen rendered its DTO
+faithfully, which was the problem: it spoke the data model's language rather than the manager's.
+Reviewed against the running application rather than the documents, by a reader who had studied the
+PRD and still could not tell what the product wanted them to do. Five changes.
+
+*One vocabulary, in one file.* `frontend/lib/copy.ts` becomes the single home for user-facing
+wording; labels previously inlined in components were consolidated there as those components were
+touched. Coverage states, readiness levels, drift, evidence role, strength, freshness, provenance
+sources, the primary action, and seven explanatory hints now live together, where the whole
+vocabulary can be reviewed at once and one concept cannot acquire two names on two screens.
+
+The word `exposure` named three unrelated things: the capability's risk state, the `EXPOSED`
+readiness rung (an engineer who has only observed the work — close to the opposite), and the
+`EXPOSURE` evidence role. The system detail screen showed all three simultaneously. The enum values
+are frozen and display copy is frontend-owned, so each is now named for what it describes and the
+word is retired from the interface. A final audit confirms it appears in no rendered string.
+
+Two labels were wrong rather than merely opaque. `DOMAIN_MODEL.md` §5.4 and its rules define
+`DEGRADED` as one qualified engineer with no backup — the sole-expert state — so both the original
+"Degraded" and a first attempt at "Weak backup" misdescribed it, the latter by asserting a backup
+exists. `CRITICAL_GAP` is nobody qualified at all, which "No proven backup" understated. They read
+"Backup at risk" and "No proven coverage". The correction was caught by the interface contradicting
+itself on screen: the lead card showed "Weak backup" directly above the reason "No second engineer
+has demonstrated it".
+
+*An action-first home.* `FirstRunStrip` states what the product is for in three clauses, dismissible
+and remembered per browser. `StartHereCard` names the single riskiest capability in sentences, with
+the engineer who holds it — the product's actual subject, previously three clicks below its own home
+screen — and links straight into the flow. Every value it shows is received: the system chosen by
+the server's risk index, the capability by the server's coverage state, the reasons rendered from
+the server's rule codes. Selection reuses `sortSystemsByRisk` and `defaultCapabilityId` rather than
+introducing a second ordering.
+
+*Scale on the headline figures.* A bare 74 reads as a percentage or a probability, which is the one
+thing the continuity risk index is not. The headline size now carries "/ 100"; the compact size in
+lists does not, where the scale is already established.
+
+*Readable content above the diagram.* On the system page the coverage card and the knowledge graph
+swapped places. Coverage answers the question in words; the graph is texture supporting the answer,
+and a first-time reader previously met an unlabelled hairball first. The graph gained a caption.
+
+*Three navigation entries, not four.* A simulation is always run against a system already on screen,
+so the Simulations entry offered a second, context-free way to begin one — a dropdown of system
+names, chosen blind. `/simulations` still resolves for anyone holding the link.
+
+**Files created.** `frontend/components/InfoHint.tsx`, `frontend/features/dashboard/FirstRunStrip.tsx`,
+`frontend/features/dashboard/StartHereCard.tsx`, `frontend/vitest.config.ts`.
+
+**Files changed.** `frontend/lib/copy.ts` and fourteen component and page files, plus
+`frontend/features/systems/capabilities.ts`, `frontend/tests/capabilities.test.ts`,
+`docs/DECISIONS.md` (DEC-23) and `docs/UI_REVIEW.md` (sidebar entry annotated as superseded).
+No new dependency. `backend/` and `data/` untouched.
+
+**Which requirement this implements.** None directly. This is a legibility change to the interface
+built in the Phase 5-7 screen work. No endpoint, field, enum value, or domain semantic changes, and
+nothing is computed in the frontend that was not computed there before.
+
+**Two defects found and fixed while verifying.**
+
+`InfoHint` closed on the gesture most likely to follow a hover. Hovering opened the tooltip and the
+click then toggled it shut, so pointing at a term and clicking it — the natural way to read an
+explanation — made it vanish. The click now opens rather than toggles; closing is left to
+mouseleave, blur, Escape, and a pointer down outside, which covers touch and keyboard too.
+
+`vitest` does not read `tsconfig.json`, so the `@/` alias never resolved in tests. No test had
+noticed, because the tested modules imported only *types* under the alias and a type-only import is
+erased before anything resolves it. The first runtime import under `@/` in `capabilities.ts` failed
+to load its entire suite — four tests silently disappeared from the run rather than failing.
+`vitest.config.ts` declares the alias so test and application files write imports the same way.
+
+**How it was validated.** `npx tsc --noEmit` clean. `npm test` 29 passed across 6 files. `npm run build`
+succeeds. `npm run lint` reports the same 7 pre-existing problems as before this change; the
+introduction strip was rewritten onto `useSyncExternalStore` specifically so it would not add an
+eighth instance of a rule the codebase already breaks four times — reading dismissal state from
+storage is exactly the external-store case that hook exists for.
+
+One test did assert on display copy, contrary to an earlier grep of mine that reported none: it
+checked the lowercased enum output of `coverageSummary`, which my search for capitalised labels
+missed. The assertion was updated to the new compact wording, with the reason recorded beside it.
+
+Walked end to end in the browser at 1440×900 against the live backend on the teammate's branch.
+Dashboard leads with the strip and the card naming Incident Recovery and Alex Chen from live data;
+dismissal survives a reload; the card's link opens the what-if overlay showing 74 / 100 → 93 / 100,
+HIGH → CRITICAL unchanged; candidates, plan and approval all render with the new labels; the
+evidence drawer reads "Did it independently · Strong signal · Recent" over "Incident record ·
+INC-184" in place of the enum and dataset names. `/simulations` returns 200 although unlisted. A
+scan of the rendered text on the system page finds none of "exposed", "Degraded", "Critical gap",
+"Simulate unavailability", the raw evidence enums, or the `synthetic_` source prefixes.
+
+**Open questions.** The two counts in the metric strip render through `RiskIndex` with its scale
+suffix suppressed, which works but means a component named for the index also draws plain tallies.
+Worth separating if a third kind of number appears.
+
+---
+
+### 2026-08-29 — The three unfinished surfaces, and what was hiding in them
+
+**What was built.** The previous pass left three items open: Challenge was buried two levels deep,
+the four-level hierarchy was never explained, and the plan, challenge and capability screens had
+their wording changed but not their layout. Each turned out to be concealing defects rather than
+merely being untidy — a screen nobody can reach is a screen nobody audits.
+
+*Challenge is a pane, not a second dialog.* It opened as a stacked `aria-modal` drawer landing
+pixel-for-pixel on the first, at a `z-[60]` that did nothing because the parent's `z-50` already
+established the stacking context. Both registered an Escape handler on `window`, so one press
+closed both — and the recompute result lives only in the mutation, so backing out of the form threw
+away the answer it had just produced, verified live before the fix. `ChallengeDrawer` became
+`ChallengeForm` with its overlay chrome removed, and `EvidenceDrawer` renders the two as panes
+toggled by the `hidden` attribute, so a half-typed challenge survives a step back to check a date.
+Missing-evidence rows gained an "Add evidence for <name>" button that opens the form with that
+person already chosen.
+
+Two wording leaks were found inside it once it was reachable to inspect, both of which the previous
+pass's "no raw enums remain" audit had missed because it scanned rendered text and this text never
+rendered: the engineer dropdown showed `eng_alex_chen`, and the role dropdown showed `EXPOSURE` —
+the exact word that pass claimed to have retired. Names now come from the capability's
+`engineer_coverage`, which carries them and is usually already in cache.
+
+*The hierarchy is stated where it is used.* Platform cards carry their system count and a hint that
+platforms hold no score of their own — the large `74 / 100` on a card is one of its systems'
+numbers, and the same 74 appears twelve rows below as that system's. The dashboard's platform grid
+gained a heading stating containment. The capability list is grouped by the component that requires
+each capability, so the panel and the graph beside it stop describing differently shaped data. The
+capability detail route carries the only breadcrumb in the product showing all four levels.
+
+*The plan renders as a sequence.* CI-23 makes array position load-bearing and the generated content
+depends on it — task 3 requires performing the recovery unaided, which only means anything after
+the shadowing in task 2. A single-column `<ol>` with a real step count replaces the 2×2 grid,
+reversing `docs/UI_REVIEW.md`'s "usable as-is" endorsement, annotated there.
+
+*The capability route had no inbound link and never had.* `CoverageCard` now links to it, and it
+received the wording pass it had missed for the same reason its other defects went unnoticed.
+
+**Defects fixed alongside, all inside these surfaces.** The acceptance-criteria editor normalised
+its own value on every keystroke, so a trailing space was deleted before the next character arrived
+and a newline was filtered away — no multi-word criterion could be typed, while the helper text
+told the reader to press Enter. `savePlan` wrote `{ plan }` over `{ plan, approval }`, so revisiting
+an approved plan redisplayed it as a draft with a live Approve button that then failed; with GAP-02
+leaving that store as the only record, it was silent data loss. The plan-creating POST ran through
+`useQuery` with retry enabled. Tasks were rendered out of an effect, painting one frame of an empty
+grid on every load.
+
+**Files created.** `frontend/features/challenge/ChallengeForm.tsx` (renamed from `ChallengeDrawer.tsx`).
+
+**Files changed.** `frontend/lib/copy.ts` and seventeen component and page files,
+`frontend/features/mitigation/planStore.ts`, `frontend/tests/planStore.test.ts`,
+`frontend/tests/capabilities.test.ts`, `docs/DECISIONS.md` (DEC-24), `docs/UI_REVIEW.md`.
+No new dependency. `backend/` and `data/` untouched.
+
+**How it was validated.** `npx tsc --noEmit` clean, `npm test` 31 passed across 6 files (two new
+regression tests for the approval-loss bug, mutation-tested by removing the guard and confirming the
+right test fails), `npm run build` succeeds, `npm run lint` reports the same 7 pre-existing problems.
+
+Live against the running backend: one dialog at all times where there were two; a single Escape
+returns to the evidence pane and a second closes the drawer; a typed draft survives the round trip;
+the engineer dropdown reads Maria Gomez / Alex Chen / Jordan Lee and the role dropdown "Was
+present for it" → now "Reviewed or discussed it"; the criteria editor keeps a trailing space and a
+newline; the plan renders as a numbered column; `/capabilities/cap_incident_recovery` shows
+`Payments Platform › Payment Gateway › Gateway Integration › Incident Recovery` and 72 / 100. The
+frozen figures hold: Payment Gateway 74, Identity 68, Incident Recovery 72, simulation 74 → 93,
+HIGH → CRITICAL.
+
+**An adversarial review of the diff found eight confirmed defects, three of them mine from the
+previous pass and two of them regressions introduced by this one.** All are fixed and re-verified;
+the reasoning is in DEC-24. The two regressions are worth naming here: an `InfoHint` placed inside
+`ConfidenceLabel` put a `<button>` inside the dashboard row's `<a>`, so clicking the hint navigated
+to the system instead of explaining the term — measured live, five such buttons on the dashboard,
+now zero; and `InfoHint`'s Escape handler dismissed its tooltip while the drawer beneath closed on
+the same press, which is the same layering fault this session set out to fix for the challenge.
+
+**A mistake to record.** While testing the challenge form I submitted a real challenge against the
+running backend. It recomputed Incident Recovery from `DEGRADED` to `COVERED` and destroyed the
+frozen 72, which the backend log confirmed as a single
+`POST /api/v1/capabilities/cap_incident_recovery/challenge`. The database was reseeded and every
+frozen value re-checked. Driving forms with synthetic click sequences against a live backend is not
+safe for anything that writes.
+
+**Open questions.** The mapping-challenge form still asks the manager to type a target capability id
+by hand into a free-text field with a `cap_retry_logic` placeholder. It should be a select over the
+system's capabilities, which the graph payload already carries. Left out as the only change here
+that would need a new query rather than a relabel.

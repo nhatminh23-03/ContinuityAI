@@ -13,7 +13,7 @@ export function AssessmentCard({ response }: { response: EvidenceResponse }) {
       <div className="flex flex-wrap items-center gap-3">
         <h3 className="text-sm font-semibold text-slate-900">Assessment</h3>
         <ExposurePill exposure={assessment.exposure} />
-        <ConfidenceLabel confidence={assessment.evidence_confidence} />
+        <ConfidenceLabel confidence={assessment.evidence_confidence} hint />
       </div>
       {assessment.rules_triggered?.length ? (
         <ul className="mt-3 space-y-1">

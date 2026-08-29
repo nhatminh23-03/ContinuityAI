@@ -1,4 +1,10 @@
 import type { EvidenceRecord, EvidenceSourceType } from '@/types/api';
+import {
+  EVIDENCE_ROLE_COPY,
+  EVIDENCE_STRENGTH_COPY,
+  FRESHNESS_COPY,
+  provenanceSourceCopy,
+} from '@/lib/copy';
 
 /**
  * One typed evidence record — the product's differentiator made visible:
@@ -61,9 +67,9 @@ export function EvidenceCard({ record }: { record: EvidenceRecord }) {
         <span className="text-sm font-semibold text-slate-900">{record.source_reference}</span>
         <span className="text-xs text-slate-500">{record.artifact_date}</span>
         <span className="ml-auto flex flex-wrap gap-1.5">
-          <Badge>{record.evidence_role.replaceAll('_', ' ')}</Badge>
-          <Badge>{record.evidence_strength}</Badge>
-          <Badge>{record.freshness}</Badge>
+          <Badge>{EVIDENCE_ROLE_COPY[record.evidence_role]}</Badge>
+          <Badge>{EVIDENCE_STRENGTH_COPY[record.evidence_strength]}</Badge>
+          <Badge>{FRESHNESS_COPY[record.freshness]}</Badge>
         </span>
       </header>
       {record.source_title ? (
@@ -73,7 +79,7 @@ export function EvidenceCard({ record }: { record: EvidenceRecord }) {
         {record.summary}
       </p>
       <footer className="mt-2 text-[11px] text-slate-500">
-        {record.provenance.source} · {record.provenance.record_id}
+        {provenanceSourceCopy(record.provenance.source)} · {record.provenance.record_id}
         {record.provenance.source_url ? (
           <>
             {' · '}

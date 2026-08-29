@@ -26,8 +26,8 @@ function StateBlock({ label, state }: { label: string; state: SimulationState })
         <RiskClassChip riskClass={state.continuity_risk_class} />
       </div>
       <div className="mt-3 text-xs text-slate-600 tabular-nums">
-        {state.critical_gap_count} critical · {state.degraded_capability_count} degraded ·{' '}
-        {state.covered_capability_count} covered
+        {state.critical_gap_count} with no proven coverage · {state.degraded_capability_count} with
+        no resilient backup · {state.covered_capability_count} covered
       </div>
     </div>
   );
@@ -115,7 +115,7 @@ export function SimulationOverlay({
         <header className="border-b border-slate-900/5 px-6 py-4">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-medium text-slate-900">
-              Simulated scenario — {engineerName ?? '…'} unavailable
+              What if {engineerName ?? '…'} were unavailable?
             </h2>
             <button
               type="button"
@@ -169,11 +169,11 @@ export function SimulationOverlay({
                 className="motion-stagger grid grid-cols-[1fr_auto_1fr] items-center gap-3"
                 style={{ '--stagger': '110ms' } as CSSProperties}
               >
-                <StateBlock label="Current" state={result.before} />
+                <StateBlock label="Today" state={result.before} />
                 <span aria-hidden className="text-2xl text-slate-400">
                   →
                 </span>
-                <StateBlock label="Simulated" state={result.after} />
+                <StateBlock label="If unavailable" state={result.after} />
               </div>
               <div className="mt-2 text-center text-xs font-medium text-slate-600">
                 {result.before.continuity_risk_class} → {result.after.continuity_risk_class}

@@ -98,7 +98,8 @@ export function CandidatesView({
         Backup candidates for {capabilityQuery.data?.name ?? '…'}
       </h1>
       <p className="mt-1 max-w-2xl text-[15px] text-slate-600">
-        Technical candidates from demonstrated capability overlap. The manager chooses.
+        Engineers who have already demonstrated related work. Ordered by shared capability
+        only — not by availability, workload or performance. You choose.
       </p>
 
       {candidatesQuery.isPending ? (

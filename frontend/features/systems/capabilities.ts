@@ -1,4 +1,5 @@
-import type { CapabilityExposure, GraphEdge, GraphResponse } from '@/types/api';
+import type { CapabilityExposure, GraphEdge, GraphResponse, ReadinessLevel } from '@/types/api';
+import { READINESS_SHORT_COPY } from '@/lib/copy';
 
 /**
  * Pure projections of the graph payload for the System Detail panels.
@@ -36,8 +37,10 @@ export function coverageSummary(edges: GraphEdge[], capabilityId: string): strin
     const readiness = typeof edge.metadata?.readiness === 'string' ? edge.metadata.readiness : 'NONE';
     counts.set(readiness, (counts.get(readiness) ?? 0) + 1);
   }
+  // Lowercasing the enum leaked "exposed" into the interface, where it reads as
+  // the capability's risk state rather than what one engineer has done.
   const parts = READINESS_ORDER.filter((level) => counts.has(level)).map(
-    (level) => `${counts.get(level)} ${level.toLowerCase()}`,
+    (level) => `${counts.get(level)} ${READINESS_SHORT_COPY[level as ReadinessLevel]}`,
   );
   return parts.length > 0 ? parts.join(' · ') : 'No demonstrated coverage';
 }

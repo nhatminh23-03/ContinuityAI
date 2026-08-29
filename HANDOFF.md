@@ -1200,3 +1200,164 @@ MEDIUM.
 
 Full write-up in `data/extraction/comparison_report.md`; decisions DEC-19 to DEC-22 in
 `docs/DECISIONS.md`. The README's "open question" section is now the answer.
+
+---
+
+## 2026-08-27 — The interface made legible for a first-time reader (Person B)
+
+### Completed
+
+Branch switched to `feature/ai-layer-and-evaluation`, which is the *same commit* as
+`feature/frontend-screens` — Person A built on top of Person B's work and pushed to both refs. There
+was nothing to merge.
+
+The application matched the specification and every screen rendered its DTO faithfully, and that was
+the defect: the interface spoke the data model's language, not the manager's. Reviewed against the
+running application by a reader who had studied the PRD and still could not tell what to do with it.
+
+1. **One vocabulary, in `frontend/lib/copy.ts`.** Coverage states, readiness, drift, evidence role,
+   strength, freshness, provenance sources, the primary action and seven hint texts now live in one
+   file. `exposure` had named three unrelated things — the capability's risk state, the `EXPOSED`
+   readiness rung (an engineer who has only *observed*), and the `EXPOSURE` evidence role — all
+   three visible on the system page at once. The word is retired from the interface; the enums are
+   untouched.
+2. **Two labels were wrong, not just opaque.** `DEGRADED` is the sole-expert state per
+   `DOMAIN_MODEL.md` §5.4, so "Weak backup" asserted a backup that does not exist; `CRITICAL_GAP` is
+   nobody qualified at all, which "No proven backup" understated. Now "Backup at risk" and "No
+   proven coverage".
+3. **Action-first dashboard.** A dismissible three-step strip, then `StartHereCard` naming the
+   riskiest capability and the engineer who holds it, linking into the flow. All values received;
+   selection reuses `sortSystemsByRisk` and `defaultCapabilityId`.
+4. **Coverage now sits above the graph** on the system page, and headline figures carry "/ 100".
+5. **Sidebar is three entries** (Home, Systems, Plans). `/simulations` still resolves, unlisted.
+
+### Decisions made
+
+**DEC-23** (`docs/DECISIONS.md`), Category B, no acknowledgement needed: user-facing wording is
+named for what a reader needs to know rather than for the field it renders. Recorded because the
+labels now deliberately diverge from the specification's terms — the contract governs the wire,
+`lib/copy.ts` governs the words. Supersedes the four-entry sidebar decision, annotated in
+`docs/UI_REVIEW.md`.
+
+One sub-decision worth knowing: the candidate card briefly read "Shared capability" and was
+**reverted** to "Technical overlap", because the API's disclaimer renders verbatim at the foot of the
+same screen using that term. One concept with two names on one page is the problem being solved.
+
+### Files changed
+
+Created `frontend/components/InfoHint.tsx`, `frontend/features/dashboard/{FirstRunStrip,StartHereCard}.tsx`,
+`frontend/vitest.config.ts`. Modified `frontend/lib/copy.ts`, fourteen component and page files,
+`frontend/features/systems/capabilities.ts`, `frontend/tests/capabilities.test.ts`,
+`docs/DECISIONS.md`, `docs/UI_REVIEW.md`, `BUILD_WITH_BOB.md`. No new dependency. `backend/` and
+`data/` untouched.
+
+### Things a fresh session will trip over
+
+- **`vitest` does not read `tsconfig.json`.** The `@/` alias only ever appeared in tested modules as
+  a *type* import, which is erased before resolution, so nobody noticed. The first runtime `@/`
+  import made a whole suite fail to load — four tests vanished from the count rather than failing.
+  `frontend/vitest.config.ts` now declares the alias. Watch the test *count*, not just the pass/fail
+  line.
+- **The pane's synthetic clicks do not reach React's delegated handlers.** Driving the UI in the
+  browser tool needs a full `pointerdown/mousedown/pointerup/mouseup/click` sequence, and hover
+  needs `mouseover` (not `mouseenter`, which does not bubble). A `left_click` that appears to do
+  nothing is usually this, not a bug — but check before assuming, because one real bug was found
+  this way: `InfoHint` closed on click because hover had already opened it.
+- **The frontend runs on :3001, not :3000.** Another project of the user's ("Yehub") owns :3000.
+  Person A's `6bba6e3` made the CORS origin list configurable, which is why 3001 works;
+  `.claude/launch.json` is set to it.
+- **`AI_PROVIDER` is `deterministic`.** `cached` cannot seed on this branch: `chain_cache.json`
+  covers 640 artifacts but is missing exactly the 7 adversarial ones added in `f439f37`
+  (`REV-9001..3`, `INC-9001`, `ISS-9001..3`), so it predates the corpus it ships with. Fix is
+  `python -m scripts.extract_with_provider --provider chain`. Not done here — `data/` is read-only
+  under Person B's constraints and the cache is Person A's artifact.
+- The full backend suite must run with `AI_PROVIDER=deterministic`; under a model provider two tests
+  fail by design and the run costs money and four minutes.
+
+### In progress / blocked
+
+Nothing in progress. Nothing blocked.
+
+### Recommended next task
+
+Regenerate `chain_cache.json` so `AI_PROVIDER=cached` works — it is the configuration the branch's
+own `.env.example` recommends for daily work, and it is currently broken on a clean clone. After
+that, a second legibility pass on the three screens this one did not restructure: the plan screen,
+the challenge drawer, and the capability detail page. Their wording is updated but their layout was
+not reconsidered.
+
+---
+
+## 2026-08-29 — The three unfinished surfaces closed (Person B)
+
+### Completed
+
+The previous session left three items open. Each was concealing defects, which is the finding worth
+carrying forward: **a screen nobody can reach is a screen nobody audits**, and the earlier "no raw
+enums remain" sweep passed only because it scanned rendered text.
+
+1. **Challenge is a pane of the evidence drawer, not a second dialog.** Two stacked `aria-modal`
+   drawers landed pixel-for-pixel on each other, and both registered a `window` Escape handler, so
+   one press closed both and discarded the recompute result. Now one dialog, two panes toggled by
+   the `hidden` attribute; Escape retreats one level; drafts survive a step back. Missing-evidence
+   rows open it with that engineer pre-selected.
+2. **The four-level hierarchy is stated in place.** Platform cards carry a system count and a hint
+   that platforms hold no score of their own; the dashboard's platform grid has a heading stating
+   containment; the capability list is grouped by component; the capability detail route carries the
+   only breadcrumb showing all four levels.
+3. **The plan renders as an ordered sequence**, not a 2×2 grid of apparent peers. Reverses
+   `docs/UI_REVIEW.md`'s endorsement, annotated there.
+4. **`/capabilities/[id]` had no inbound link and never had.** `CoverageCard` now links to it.
+
+### Decisions made
+
+**DEC-24** (`docs/DECISIONS.md`), Category B. Records the three changes above, the four defects
+fixed alongside them, and — added after an adversarial review of the diff — corrections to three
+labels DEC-23 introduced that turned out to be inaccurate rather than merely terse.
+
+The label corrections matter and are easy to undo by accident:
+- `CRITICAL_GAP` as "No proven coverage" is true of a **capability** and false of a **system**,
+  because `ENGINEERING_RULES.md:250` makes a system's exposure the worst of its capabilities'.
+  `ExposurePill` now takes `scope`; system rows read "Worst: no proven coverage".
+- `DEGRADED` as "Backup at risk" asserts a backup exists. `exposure.py` reaches it with **zero**
+  proven engineers when the capability is MEDIUM or LOW. It now reads "No resilient backup".
+- `EXPOSED` / `EXPOSURE` as "Has observed" / "Was present for it" kept only the narrowest sense;
+  `DOMAIN_MODEL.md` 5.3 and 5.10 include reviewing and discussing, and the server's own summaries
+  say "reviewed or discussed". Now matched to that.
+
+### Files changed
+
+Renamed `frontend/features/challenge/ChallengeDrawer.tsx` → `ChallengeForm.tsx`. Modified
+`frontend/lib/copy.ts`, seventeen component and page files,
+`frontend/features/mitigation/planStore.ts`, `frontend/tests/{planStore,capabilities}.test.ts`,
+`docs/DECISIONS.md`, `docs/UI_REVIEW.md`, `BUILD_WITH_BOB.md`. No new dependency. `backend/` and
+`data/` untouched.
+
+### Things a fresh session will trip over
+
+- **Do not drive forms with synthetic click sequences against the live backend.** Testing the
+  challenge form this session submitted a real challenge, which recomputed Incident Recovery from
+  `DEGRADED` to `COVERED` and destroyed the frozen 72. Recovered by reseeding
+  (`AI_PROVIDER=deterministic PYTHONPATH=. .venv/bin/python -m scripts.seed_demo`, ~3s) and
+  re-checking every frozen value. The backend log at the scratchpad path is where to look:
+  `grep POST backend.log`.
+- **The wording audit must cover screens that are hard to reach.** Both leaks found inside the
+  challenge form had survived a sweep that only inspected rendered text.
+- **`ExposurePill` needs `scope="system"` wherever it is fed a system's exposure.** There is
+  currently exactly one such call site (`SystemsTable`). A new one that forgets it will state
+  something false.
+- The other traps from the previous entry still apply: frontend on **:3001** (another project owns
+  :3000), `AI_PROVIDER=deterministic` required for the backend suite, `cached` still broken because
+  `chain_cache.json` predates the seven adversarial artifacts.
+
+### In progress / blocked
+
+Nothing in progress. Nothing blocked.
+
+### Recommended next task
+
+Two small things this session deliberately left. The mapping-challenge form asks the manager to
+type a target capability id by hand into a free-text field with a `cap_retry_logic` placeholder; it
+should be a select over the system's capabilities, which the graph payload already carries — the
+only remaining change that needs a new query rather than a relabel. And `chain_cache.json` still
+needs regenerating so `AI_PROVIDER=cached` works, which is Person A's artifact.

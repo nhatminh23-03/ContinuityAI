@@ -6,6 +6,7 @@ import type { PlatformSummary, SystemSummary } from '@/types/api';
 import { api, queryKeys } from '@/lib/api/endpoints';
 import { ConfidenceLabel, DriftLabel, ExposurePill, RiskClassChip, RiskIndex } from '@/components/status';
 import { sortSystemsByRisk } from './sort';
+import { ACTION_COPY, CRITICALITY_COPY } from '@/lib/copy';
 
 /**
  * All systems across every platform, sorted by risk descending — the
@@ -37,7 +38,7 @@ export function SystemsTable({ platforms }: { platforms: PlatformSummary[] }) {
 
   return (
     <div className="frosted-card mt-6 p-6">
-      <h2 className="text-lg font-medium text-slate-900">Systems by continuity risk</h2>
+      <h2 className="text-lg font-medium text-slate-900">Systems, most at risk first</h2>
       {failedCount > 0 ? (
         <p className="mt-2 text-xs text-slate-600">
           {failedCount === results.length
@@ -58,11 +59,11 @@ export function SystemsTable({ platforms }: { platforms: PlatformSummary[] }) {
                     {system.name}
                   </div>
                   <div className="text-xs text-slate-500">
-                    {platformNames.get(system.platform_id) ?? system.platform_id} · Criticality{' '}
-                    {system.business_criticality}
+                    {platformNames.get(system.platform_id) ?? system.platform_id} ·{' '}
+                    {CRITICALITY_COPY[system.business_criticality]} importance
                   </div>
                 </div>
-                <ExposurePill exposure={system.exposure} />
+                <ExposurePill exposure={system.exposure} scope="system" />
                 <div className="hidden w-32 shrink-0 flex-col gap-0.5 lg:flex">
                   <ConfidenceLabel confidence={system.evidence_confidence} />
                   <DriftLabel status={system.drift_status} />
@@ -76,7 +77,7 @@ export function SystemsTable({ platforms }: { platforms: PlatformSummary[] }) {
                 href={`/systems/${system.system_id}?simulate=1`}
                 className="shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-white/50 hover:text-slate-900"
               >
-                Simulate
+                {ACTION_COPY.simulateShort}
               </Link>
             </div>
           </li>

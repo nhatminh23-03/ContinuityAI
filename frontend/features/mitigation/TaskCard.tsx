@@ -20,22 +20,38 @@ const TYPE_LABEL: Record<MitigationTask['type'], string> = {
 
 export function TaskCard({
   index,
+  total,
   task,
   editable,
   onChange,
 }: {
   index: number;
+  total: number;
   task: MitigationTask;
   editable: boolean;
   onChange?: (task: MitigationTask) => void;
 }) {
   const [editing, setEditing] = useState(false);
+  // The textarea holds raw text while it is being typed. Normalising `value` on
+  // every keystroke meant a trailing space was stripped before the next
+  // character arrived — so no multi-word criterion could be typed — and a
+  // newline was filtered away, making the "one per line" instruction below the
+  // field describe the one key that did nothing. Only the lifted value is
+  // normalised, so what reaches the approve payload is unchanged.
+  const [criteriaDraft, setCriteriaDraft] = useState<string | null>(null);
+  const criteria = task.acceptance_criteria ?? [];
 
   return (
-    <div className="frosted-card flex flex-col p-5">
+    <li className="frosted-card flex flex-col p-5">
       <div className="flex items-center gap-3">
-        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/70 text-xs font-semibold text-slate-700 ring-1 ring-white/60">
+        <span
+          aria-hidden
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/70 text-xs font-semibold text-slate-700 ring-1 ring-white/60"
+        >
           {index + 1}
+        </span>
+        <span className="sr-only">
+          Step {index + 1} of {total}.
         </span>
         <span className="glass-chip rounded-full bg-white/40 px-2.5 py-0.5 text-[11px] font-semibold text-slate-600">
           {TYPE_LABEL[task.type]}
@@ -43,7 +59,12 @@ export function TaskCard({
         {editable ? (
           <button
             type="button"
-            onClick={() => setEditing((value) => !value)}
+            onClick={() =>
+              setEditing((value) => {
+                if (value) setCriteriaDraft(null);
+                return !value;
+              })
+            }
             className="ml-auto text-xs font-medium text-slate-500 underline decoration-slate-300 underline-offset-2 hover:text-slate-900"
           >
             {editing ? 'Done' : 'Edit'}
@@ -67,16 +88,17 @@ export function TaskCard({
             className="w-full rounded-lg border border-slate-900/10 bg-white/80 px-2.5 py-1.5 text-sm text-slate-700"
           />
           <textarea
-            value={task.acceptance_criteria.join('\n')}
-            onChange={(event) =>
+            value={criteriaDraft ?? criteria.join('\n')}
+            onChange={(event) => {
+              setCriteriaDraft(event.target.value);
               onChange({
                 ...task,
                 acceptance_criteria: event.target.value
                   .split('\n')
                   .map((line) => line.trim())
                   .filter(Boolean),
-              })
-            }
+              });
+            }}
             aria-label="Acceptance criteria, one per line"
             rows={3}
             className="w-full rounded-lg border border-slate-900/10 bg-white/80 px-2.5 py-1.5 text-xs text-slate-600"
@@ -87,14 +109,14 @@ export function TaskCard({
         <>
           <h3 className="mt-3 text-sm font-semibold text-slate-900">{task.title}</h3>
           <p className="mt-1.5 text-sm leading-relaxed text-slate-700">{task.description}</p>
-          {task.acceptance_criteria.length > 0 ? (
+          {criteria.length > 0 ? (
             <div className="mt-3">
               <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                 Acceptance criteria
               </div>
               <ul className="mt-1.5 space-y-1">
-                {task.acceptance_criteria.map((criterion) => (
-                  <li key={criterion} className="flex items-start gap-2 text-xs text-slate-600">
+                {criteria.map((criterion, criterionIndex) => (
+                  <li key={criterionIndex} className="flex items-start gap-2 text-xs text-slate-600">
                     <span aria-hidden className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-slate-400" />
                     {criterion}
                   </li>
@@ -117,6 +139,6 @@ export function TaskCard({
           ))}
         </div>
       ) : null}
-    </div>
+    </li>
   );
 }

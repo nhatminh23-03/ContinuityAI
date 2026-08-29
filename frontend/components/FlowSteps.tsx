@@ -103,7 +103,7 @@ export type FlowStage = (typeof STAGE_ORDER)[number];
 
 const STAGE_LABEL: Record<FlowStage, string> = {
   system: 'System',
-  simulate: 'Simulate',
+  simulate: 'What if',
   candidates: 'Choose backup',
   plan: 'Plan & approve',
 };

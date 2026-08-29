@@ -196,6 +196,14 @@ headline (correct concept — never a percentage); the "Not considered in this c
 the tagline **"A human approves every plan."** (keep that line); plan header with the person
 context.
 
+> **The grid is superseded, 2026-08-29 (DEC-24).** The tasks are an ordered sequence and CI-23
+> makes array position load-bearing, but a two-column grid presents them as peers doable in any
+> order. The generated content settles it: task 3 requires performing the recovery *unaided*,
+> which is only meaningful after the shadowing in task 2, and task 4 folds back "the gaps found
+> during the exercise", which is only meaningful after task 3. They now render as a single-column
+> `<ol>` with a real step count. The endorsement above was of a static mockup's composition, made
+> before anyone reasoned about task dependency.
+
 **Must change:**
 
 1. **The roles are inverted (C.0-class defect):** the mockup reads as though Maria is departing
@@ -296,4 +304,10 @@ context.
 2. **Sidebar keeps the four entries, reinterpreted:** Dashboard; Systems anchors the dashboard
    systems list; Simulations opens the sandbox launcher (pick engineer + system); Plans shows the
    current session's plan or a designed empty state.
+
+   > **Superseded 2026-08-27 (DEC-23).** The sidebar now carries three entries — Home, Systems,
+   > Plans. A simulation is always run against a system the reader is already looking at, so the
+   > Simulations entry offered a second, context-free way to begin one: a dropdown of system names,
+   > chosen blind, duplicating the button on the system page. `/simulations` still resolves for
+   > anyone holding the link; it is no longer advertised as a place to start.
 3. **Engineer rows show name + role** (from graph `metadata.role`), monochrome; team is omitted.

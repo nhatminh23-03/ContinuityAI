@@ -3,10 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+/**
+ * Three destinations, not four. A simulation is always run against a system the
+ * manager is already looking at, so a top-level entry offered a second,
+ * context-free way to start one — a dropdown of system names, chosen blind.
+ * `/simulations` still resolves for anyone holding the link; it is simply not
+ * advertised as a place to begin. Supersedes the four-entry decision in
+ * docs/UI_REVIEW.md.
+ */
 const NAV_ITEMS = [
   {
     href: "/",
-    label: "Dashboard",
+    label: "Home",
     icon: (
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5">
         <rect x="3" y="3" width="6" height="6" rx="1" />
@@ -25,17 +33,6 @@ const NAV_ITEMS = [
         <rect x="12" y="12" width="5" height="5" rx="1" />
         <path d="M8 5.5h4.5v6.5" />
         <path d="M5.5 8v4.5H12" />
-      </svg>
-    ),
-  },
-  {
-    href: "/simulations",
-    label: "Simulations",
-    icon: (
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5">
-        <circle cx="10" cy="10" r="7" />
-        <circle cx="10" cy="10" r="1.5" fill="currentColor" stroke="none" />
-        <path d="M10 3v3M14.9 12.5l-2.6-1.5" />
       </svg>
     ),
   },

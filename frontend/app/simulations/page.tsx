@@ -29,8 +29,8 @@ export default function SimulationsPage() {
     <div className="mx-auto max-w-3xl py-6">
       <h1 className="text-4xl font-medium tracking-tight text-slate-900">Simulations</h1>
       <p className="mt-2 text-[15px] text-slate-600">
-        Model an engineer&apos;s unavailability and see which capability coverage would be lost.
-        Nothing changes in your real data.
+        Pick a system, then see which capabilities would lose proven coverage if one engineer
+        were unavailable. Nothing changes in your real data.
       </p>
 
       <div className="frosted-card mt-8 p-6">

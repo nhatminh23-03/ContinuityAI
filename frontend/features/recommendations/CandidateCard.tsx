@@ -1,5 +1,7 @@
 import type { BackupCandidate } from '@/types/api';
 import { EngineerBadge } from '@/components/people';
+import { InfoHint } from '@/components/InfoHint';
+import { HINT_COPY } from '@/lib/copy';
 
 /**
  * One technical candidate: monochrome initials (never a photograph),
@@ -22,8 +24,13 @@ export function CandidateCard({
       <div className="flex items-start justify-between gap-3">
         <EngineerBadge name={candidate.name} role={role} />
         <div className="text-right">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+          <div className="inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            {/* The server's disclaimer at the foot of this screen renders verbatim
+                and calls this "technical overlap", so the label keeps that name
+                rather than putting two words for one concept on one page. The
+                hint carries the plain-English meaning instead. */}
             Technical overlap
+            <InfoHint label="technical overlap" text={HINT_COPY.technicalOverlap} />
           </div>
           <div className="text-lg font-medium text-slate-900">{candidate.technical_overlap}</div>
         </div>
@@ -64,7 +71,7 @@ export function CandidateCard({
       ) : null}
 
       <div className="mt-4 text-xs text-slate-600">
-        Confidence in demonstrated coverage of this capability:{' '}
+        Evidence behind this engineer&apos;s demonstrated coverage:{' '}
         <span className="font-semibold text-slate-700">{candidate.evidence_confidence}</span>
       </div>
 

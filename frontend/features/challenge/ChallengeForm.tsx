@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
   AssessmentSnapshot,
   ChallengeRequest,
@@ -10,11 +10,11 @@ import type {
   EvidenceRole,
   SystemSnapshot,
 } from '@/types/api';
-import { api } from '@/lib/api/endpoints';
+import { api, queryKeys } from '@/lib/api/endpoints';
 import { ApiError } from '@/lib/api/client';
 import { ExposurePill, RiskClassChip, RiskIndex } from '@/components/status';
 import { ReadinessLadder } from '@/components/people';
-import { ruleCopy } from '@/lib/copy';
+import { approverCopy, CHALLENGE_COPY, EVIDENCE_ROLE_COPY, ruleCopy } from '@/lib/copy';
 
 /**
  * The challenge workflow (DEC-10). The governing rule is structural: this
@@ -95,51 +95,61 @@ function SystemLine({ label, snapshot }: { label: string; snapshot: SystemSnapsh
   );
 }
 
-export function ChallengeDrawer({
+export function ChallengeForm({
   capabilityId,
-  capabilityName,
   evidenceResponse,
-  onClose,
+  seedEngineerId,
+  seedEngineerName,
+  onBack,
 }: {
   capabilityId: string;
-  capabilityName?: string;
   evidenceResponse?: EvidenceResponse;
-  onClose: () => void;
+  /** The engineer the drawer is scoped to, or the missing-evidence row clicked. */
+  seedEngineerId?: string;
+  seedEngineerName?: string;
+  onBack: () => void;
 }) {
-  const panelRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
   const [challengeType, setChallengeType] = useState<ChallengeType>('MANAGER_ATTESTATION');
-  const [engineerId, setEngineerId] = useState('');
+  const [engineerId, setEngineerId] = useState(seedEngineerId ?? '');
   const [sourceReference, setSourceReference] = useState('');
   const [evidenceRole, setEvidenceRole] = useState<EvidenceRole>('INDEPENDENT_EXECUTION');
   const [evidenceId, setEvidenceId] = useState('');
   const [targetCapabilityId, setTargetCapabilityId] = useState('');
   const [comment, setComment] = useState('');
 
+  // EvidenceResponse carries no engineer roster — its records hold an id and no
+  // name, and only missing_evidence carries one — so the id was being used as
+  // its own label and the engineers who actually have evidence, the ones most
+  // likely to be challenged, appeared as database keys. The capability's
+  // engineer_coverage does carry names, and CoverageCard has usually already
+  // fetched it under this exact key, so this is a cache read rather than a
+  // round trip. An engineer named nowhere still keeps the id rather than
+  // disappearing from the list.
+  const capabilityQuery = useQuery({
+    queryKey: queryKeys.capability(capabilityId),
+    queryFn: () => api.getCapability(capabilityId),
+  });
+
   const engineers = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const record of evidenceResponse?.evidence ?? []) {
-      map.set(record.engineer_id, record.engineer_id);
+    const names = new Map<string, string>();
+    for (const coverage of capabilityQuery.data?.engineer_coverage ?? []) {
+      names.set(coverage.engineer_id, coverage.name);
     }
     for (const missing of evidenceResponse?.missing_evidence ?? []) {
-      map.set(missing.engineer_id, missing.engineer_name);
+      names.set(missing.engineer_id, missing.engineer_name);
     }
-    return [...map.entries()].map(([id, name]) => ({ id, name }));
-  }, [evidenceResponse]);
+    if (seedEngineerId && seedEngineerName) names.set(seedEngineerId, seedEngineerName);
 
-  useEffect(() => {
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    panelRef.current?.focus();
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      previouslyFocused?.focus?.();
-    };
-  }, [onClose]);
+    const map = new Map<string, string>();
+    for (const record of evidenceResponse?.evidence ?? []) {
+      map.set(record.engineer_id, names.get(record.engineer_id) ?? record.engineer_id);
+    }
+    for (const [id, name] of names) map.set(id, name);
+    return [...map.entries()].map(([id, name]) => ({ id, name }));
+  }, [capabilityQuery.data, evidenceResponse, seedEngineerId, seedEngineerName]);
+
 
   const mutation = useMutation({
     mutationFn: (body: ChallengeRequest) => api.challengeAssessment(capabilityId, body),
@@ -153,14 +163,16 @@ export function ChallengeDrawer({
     const body: ChallengeRequest = {
       challenge_type: challengeType,
       submitted_by: 'eng_manager_sarah',
-      comment,
+      comment: comment.trim(),
       ...(challengeType !== 'CORRECT_CAPABILITY_MAPPING' && engineerId
         ? { engineer_id: engineerId }
         : {}),
-      ...(challengeType === 'LINK_EVIDENCE' ? { source_reference: sourceReference } : {}),
+      ...(challengeType === 'LINK_EVIDENCE'
+        ? { source_reference: sourceReference.trim() }
+        : {}),
       ...(challengeType === 'MANAGER_ATTESTATION' ? { evidence_role: evidenceRole } : {}),
       ...(challengeType === 'CORRECT_CAPABILITY_MAPPING'
-        ? { evidence_id: evidenceId, target_capability_id: targetCapabilityId }
+        ? { evidence_id: evidenceId, target_capability_id: targetCapabilityId.trim() }
         : {}),
     };
     mutation.mutate(body);
@@ -180,40 +192,11 @@ export function ChallengeDrawer({
   const labelClass = 'block text-xs font-medium text-slate-600';
 
   return (
-    <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label="Challenge assessment">
-      <button type="button" aria-label="Close" onClick={onClose} className="motion-fade absolute inset-0 bg-slate-900/40" />
-      <div
-        ref={panelRef}
-        tabIndex={-1}
-        className="glass-panel motion-drawer absolute inset-y-3 right-3 flex w-[520px] max-w-[calc(100vw-24px)] flex-col rounded-3xl outline-none"
-      >
-        <header className="flex items-center justify-between gap-3 border-b border-slate-900/5 px-6 py-4">
-          <div>
-            <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-              Challenge assessment
-            </div>
-            <div className="text-lg font-medium text-slate-900">
-              {capabilityName ?? capabilityId}
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="flex h-8 w-8 items-center justify-center rounded-full text-slate-500 hover:bg-white/60 hover:text-slate-900"
-          >
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4" aria-hidden>
-              <path d="m4 4 8 8m0-8-8 8" strokeLinecap="round" />
-            </svg>
-          </button>
-        </header>
-
-        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-4">
+    <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-4">
           {!result ? (
             <>
               <p className="text-xs leading-relaxed text-slate-600">
-                A manager changes evidence, never a score. The assessment recomputes from what you
-                add or correct.
+                {CHALLENGE_COPY.intro}
               </p>
 
               <div className="space-y-2">
@@ -281,7 +264,7 @@ export function ChallengeDrawer({
                   >
                     {ROLES.map((role) => (
                       <option key={role} value={role}>
-                        {role.replaceAll('_', ' ')}
+                        {EVIDENCE_ROLE_COPY[role]}
                       </option>
                     ))}
                   </select>
@@ -300,7 +283,8 @@ export function ChallengeDrawer({
                       <option value="">Select…</option>
                       {(evidenceResponse?.evidence ?? []).map((record) => (
                         <option key={record.evidence_id} value={record.evidence_id}>
-                          {record.source_reference} — {record.evidence_id}
+                          {record.source_reference}
+                          {record.source_title ? ` — ${record.source_title}` : ''}
                         </option>
                       ))}
                     </select>
@@ -329,7 +313,7 @@ export function ChallengeDrawer({
               </label>
 
               <p className="text-[11px] text-slate-500">
-                Submitting as eng_manager_sarah. Previous and new assessments are both kept.
+                Submitting as {approverCopy('eng_manager_sarah')}. Previous and new assessments are both kept.
               </p>
 
               {mutation.isError ? (
@@ -351,12 +335,12 @@ export function ChallengeDrawer({
                   : 'Evidence recorded. Nothing recomputed.'}
                 {result.evidence_created ? (
                   <span className="mt-1 block text-xs text-slate-500">
-                    Created: {result.evidence_created}
+                    A new evidence record was created ({result.evidence_created}).
                   </span>
                 ) : null}
                 {result.evidence_moved ? (
                   <span className="mt-1 block text-xs text-slate-500">
-                    Moved: {result.evidence_moved}
+                    An evidence record was moved ({result.evidence_moved}).
                   </span>
                 ) : null}
               </p>
@@ -370,27 +354,28 @@ export function ChallengeDrawer({
               </div>
             </>
           )}
-        </div>
 
-        <footer className="flex items-center justify-end gap-3 border-t border-slate-900/5 px-6 py-4">
+      {/* The actions sit at the end of the scroll flow rather than in a pinned
+          footer, so the submit control and the error notice above it are always
+          adjacent — a fixed footer put them a scroll apart. */}
+      <div className="flex items-center justify-end gap-3 border-t border-slate-900/5 pt-4">
+        <button
+          type="button"
+          onClick={onBack}
+          className="motion-press rounded-xl px-4 py-2 text-sm font-medium text-slate-600 hover:bg-white/50"
+        >
+          {CHALLENGE_COPY.back}
+        </button>
+        {!result ? (
           <button
             type="button"
-            onClick={onClose}
-            className="rounded-xl px-4 py-2 text-sm font-medium text-slate-600 hover:bg-white/50"
+            disabled={!canSubmit || mutation.isPending}
+            onClick={submit}
+            className="motion-press rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
           >
-            {result ? 'Done' : 'Cancel'}
+            {mutation.isPending ? 'Submitting…' : 'Submit challenge'}
           </button>
-          {!result ? (
-            <button
-              type="button"
-              disabled={!canSubmit || mutation.isPending}
-              onClick={submit}
-              className="motion-press rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
-            >
-              {mutation.isPending ? 'Submitting…' : 'Submit challenge'}
-            </button>
-          ) : null}
-        </footer>
+        ) : null}
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api, queryKeys } from '@/lib/api/endpoints';
 import { ApiError } from '@/lib/api/client';
 import { FlowSteps, goldenPathSteps } from '@/components/FlowSteps';
+import { ACTION_COPY, GRAPH_COPY } from '@/lib/copy';
 import { MetricStrip } from './MetricStrip';
 import { OwnershipCard } from './OwnershipCard';
 import { CapabilityPanel } from './CapabilityPanel';
@@ -136,7 +137,7 @@ export function SystemDetailView({
           }
           className="motion-press rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
         >
-          Simulate unavailability
+          {ACTION_COPY.simulate}
         </button>
       </div>
 
@@ -153,28 +154,11 @@ export function SystemDetailView({
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Coverage leads. It answers the question in words — who has done this,
+            and how recently — while the graph is texture that supports the
+            answer rather than delivering it. Reversed from the original order,
+            where a first-time reader met an unlabelled hairball first. */}
         <div className="space-y-6 lg:col-span-2">
-          <SystemGraph
-            graph={(focusParam && focusedGraphQuery.data) || graph}
-            focusId={focusParam}
-            onCapabilityClick={(id) =>
-              router.replace(
-                focusParam === id
-                  ? `/systems/${systemId}?capability=${id}`
-                  : `/systems/${systemId}?capability=${id}&focus=${id}`,
-                { scroll: false },
-              )
-            }
-            onEvidenceClick={() =>
-              selectedCapabilityId &&
-              router.replace(
-                `/systems/${systemId}?capability=${selectedCapabilityId}${
-                  focusParam ? `&focus=${focusParam}` : ''
-                }&evidence=1`,
-                { scroll: false },
-              )
-            }
-          />
           {selectedCapabilityId ? (
             <CoverageCard
               capabilityId={selectedCapabilityId}
@@ -186,11 +170,46 @@ export function SystemDetailView({
               }
             />
           ) : null}
+          <div>
+            {/* The graph draws four kinds of edge and only DEMONSTRATES is
+                evidence. Verified against the live payload: 26 edges, of which
+                17 are evidence and 9 are containment, requirement or declared
+                ownership. The previous caption called all 26 evidence. */}
+            <div className="mb-2 px-1">
+              <h2 className="text-sm font-semibold text-slate-900">Knowledge map</h2>
+              <p className="mt-0.5 max-w-2xl text-xs leading-relaxed text-slate-500">
+                {GRAPH_COPY.knowledgeMap}{' '}
+                <span className="text-slate-400">{GRAPH_COPY.knowledgeMapHint}</span>
+              </p>
+            </div>
+            <SystemGraph
+              graph={(focusParam && focusedGraphQuery.data) || graph}
+              focusId={focusParam}
+              onCapabilityClick={(id) =>
+                router.replace(
+                  focusParam === id
+                    ? `/systems/${systemId}?capability=${id}`
+                    : `/systems/${systemId}?capability=${id}&focus=${id}`,
+                  { scroll: false },
+                )
+              }
+              onEvidenceClick={() =>
+                selectedCapabilityId &&
+                router.replace(
+                  `/systems/${systemId}?capability=${selectedCapabilityId}${
+                    focusParam ? `&focus=${focusParam}` : ''
+                  }&evidence=1`,
+                  { scroll: false },
+                )
+              }
+            />
+          </div>
         </div>
         <div className="space-y-6">
           <OwnershipCard ownership={system.declared_ownership} />
           <CapabilityPanel
             capabilities={capabilities}
+            components={system.components}
             edges={graph.edges}
             selectedId={selectedCapabilityId}
             onSelect={(id) =>

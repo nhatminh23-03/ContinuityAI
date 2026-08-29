@@ -1,6 +1,7 @@
 import type { CapabilityImpact } from '@/types/api';
 import { ExposurePill } from '@/components/status';
 import { ReadinessLadder } from '@/components/people';
+import { CRITICALITY_COPY } from '@/lib/copy';
 
 /**
  * One capability's before → after transition, with the best remaining
@@ -12,7 +13,9 @@ export function ImpactRow({ impact }: { impact: CapabilityImpact }) {
     <li className="flex flex-wrap items-center gap-x-4 gap-y-2 py-3">
       <div className="min-w-0 flex-1">
         <div className="truncate text-sm font-medium text-slate-900">{impact.name}</div>
-        <div className="text-xs text-slate-500">Criticality {impact.operational_criticality}</div>
+        <div className="text-xs text-slate-500">
+          {CRITICALITY_COPY[impact.operational_criticality]} importance
+        </div>
       </div>
       <div className="flex items-center gap-2">
         <ExposurePill exposure={impact.before} />

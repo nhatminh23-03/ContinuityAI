@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { EngineerBadge } from '@/components/people';
+import { approverCopy, formatApprovedAt, PLAN_COPY, READINESS_COPY } from '@/lib/copy';
 import { PlanStatusChip } from '@/features/mitigation/PlanView';
 import { TaskCard } from '@/features/mitigation/TaskCard';
 import { loadPlan, type StoredPlan } from '@/features/mitigation/planStore';
@@ -82,21 +83,28 @@ export default function PlansPage() {
             <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
               Target readiness
             </div>
-            <div className="mt-2 text-sm font-medium text-slate-900">{plan.target_readiness}</div>
+            <div className="mt-2 text-sm font-medium text-slate-900">{READINESS_COPY[plan.target_readiness]}</div>
           </div>
         </div>
         {approval ? (
           <p className="mt-4 rounded-xl bg-white/50 px-3 py-2 text-xs text-slate-600">
-            Approved by {approval.approved_by} · {approval.approved_at}
+            Approved by {approverCopy(approval.approved_by)} · {formatApprovedAt(approval.approved_at)}
           </p>
         ) : null}
       </div>
 
-      <div className="motion-stagger mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <p className="mt-6 text-xs text-slate-600">{PLAN_COPY.ordered}</p>
+      <ol className="motion-stagger mt-3 space-y-4">
         {plan.tasks.map((task, index) => (
-          <TaskCard key={task.task_id} index={index} task={task} editable={false} />
+          <TaskCard
+            key={task.task_id}
+            index={index}
+            total={plan.tasks.length}
+            task={task}
+            editable={false}
+          />
         ))}
-      </div>
+      </ol>
     </div>
   );
 }

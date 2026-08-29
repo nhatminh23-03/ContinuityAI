@@ -5,8 +5,16 @@ import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { api, queryKeys } from '@/lib/api/endpoints';
 import { ApiError } from '@/lib/api/client';
-import { ConfidenceLabel, ExposurePill, RiskClassChip, RiskIndex } from '@/components/status';
+import {
+  ConfidenceLabel,
+  ExposurePill,
+  MetricLabel,
+  RiskClassChip,
+  RiskIndex,
+} from '@/components/status';
+import { ACTION_COPY, CRITICALITY_COPY, HINT_COPY } from '@/lib/copy';
 import { EngineerBadge } from '@/components/people';
+import { InfoHint } from '@/components/InfoHint';
 import { CoverageCard } from './CoverageCard';
 import { WhyPanel } from './WhyPanel';
 import { EvidenceDrawer } from '@/features/evidence/EvidenceDrawer';
@@ -32,6 +40,10 @@ export function CapabilityDetailView({ capabilityId }: { capabilityId: string })
     queryFn: () => api.getSystem(systemId ?? ''),
     enabled: Boolean(systemId),
   });
+  const platformsQuery = useQuery({
+    queryKey: queryKeys.platforms,
+    queryFn: api.listPlatforms,
+  });
 
   if (capabilityQuery.isPending) {
     return (
@@ -50,7 +62,7 @@ export function CapabilityDetailView({ capabilityId }: { capabilityId: string })
           <span className="mt-1 block text-xs text-slate-500">
             {capabilityQuery.error instanceof ApiError
               ? `Error code: ${capabilityQuery.error.code}`
-              : ''}
+              : 'Unexpected error.'}
           </span>
           <Link href="/" className="mt-3 block text-xs font-medium text-slate-700 underline">
             Back to the dashboard
@@ -62,16 +74,34 @@ export function CapabilityDetailView({ capabilityId }: { capabilityId: string })
 
   const capability = capabilityQuery.data;
   const insufficient = capability.exposure === 'INSUFFICIENT_EVIDENCE';
+  // Platform › System › Component › Capability. This is the only place in the
+  // product where all four levels of the hierarchy appear on one line.
+  const platformName = platformsQuery.data?.platforms.find(
+    (platform) => platform.platform_id === systemQuery.data?.platform_id,
+  )?.name;
+  const componentName = systemQuery.data?.components.find(
+    (component) => component.component_id === capability.component_id,
+  )?.name;
 
   return (
     <div className="mx-auto max-w-4xl py-6">
       <nav aria-label="Breadcrumb" className="text-xs font-medium text-slate-500">
+        <Link href="/" className="hover:text-slate-900 hover:underline">
+          {platformName ?? 'Dashboard'}
+        </Link>
+        <span className="mx-1.5">›</span>
         <Link
           href={`/systems/${capability.system_id}`}
           className="hover:text-slate-900 hover:underline"
         >
           {systemQuery.data?.name ?? capability.system_id}
         </Link>
+        {componentName ? (
+          <>
+            <span className="mx-1.5">›</span>
+            <span>{componentName}</span>
+          </>
+        ) : null}
         <span className="mx-1.5">›</span>
         <span className="text-slate-700">{capability.name}</span>
       </nav>
@@ -85,7 +115,7 @@ export function CapabilityDetailView({ capabilityId }: { capabilityId: string })
           href={`/systems/${capability.system_id}?capability=${capability.capability_id}&simulate=1`}
           className="motion-press rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800"
         >
-          Simulate unavailability
+          {ACTION_COPY.simulate}
         </Link>
       </div>
 
@@ -94,9 +124,7 @@ export function CapabilityDetailView({ capabilityId }: { capabilityId: string })
       >
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Continuity Risk Index
-            </div>
+            <MetricLabel hint={HINT_COPY.riskIndex}>Continuity risk</MetricLabel>
             <div className="mt-2 flex items-center gap-3">
               <RiskIndex value={capability.continuity_risk_index} />
               <RiskClassChip riskClass={capability.continuity_risk_class} />
@@ -104,9 +132,10 @@ export function CapabilityDetailView({ capabilityId }: { capabilityId: string })
           </div>
           <div className="flex flex-col gap-2">
             <ExposurePill exposure={capability.exposure} />
-            <ConfidenceLabel confidence={capability.evidence_confidence} />
-            <span className="text-xs text-slate-600">
-              Criticality {capability.operational_criticality}
+            <ConfidenceLabel confidence={capability.evidence_confidence} hint />
+            <span className="inline-flex items-center gap-1 text-xs text-slate-600">
+              {CRITICALITY_COPY[capability.operational_criticality]} importance
+              <InfoHint label="importance" text={HINT_COPY.criticality} />
             </span>
           </div>
           <button
@@ -114,7 +143,7 @@ export function CapabilityDetailView({ capabilityId }: { capabilityId: string })
             onClick={() => setWhyOpen(true)}
             className="ml-auto text-xs font-medium text-slate-600 underline decoration-slate-300 underline-offset-2 hover:text-slate-900"
           >
-            Why this risk?
+            How was this worked out?
           </button>
         </div>
         {insufficient ? (

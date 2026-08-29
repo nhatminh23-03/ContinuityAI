@@ -54,7 +54,7 @@ export function WhyPanel({
     (capability.index_modifiers?.length ?? 0) > 0;
 
   return (
-    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Why this risk?">
+    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="How was this worked out?">
       <button
         type="button"
         aria-label="Close"
@@ -68,7 +68,7 @@ export function WhyPanel({
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-lg font-medium text-slate-900">Why this risk?</h2>
+            <h2 className="text-lg font-medium text-slate-900">How was this worked out?</h2>
             <div className="mt-1 flex items-center gap-2 text-sm text-slate-600">
               {system.name}
               <RiskIndex value={system.continuity_risk_index} size="md" />
@@ -140,7 +140,7 @@ export function WhyPanel({
                     </div>
                   ))}
                   <div className="flex justify-between gap-3 border-t border-slate-900/10 pt-1.5 font-semibold text-slate-900">
-                    <dt>Continuity Risk Index</dt>
+                    <dt>Continuity risk</dt>
                     <dd>{capability.continuity_risk_index} / 100</dd>
                   </div>
                 </dl>
