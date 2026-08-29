@@ -161,6 +161,29 @@ def _serialise(payload: dict) -> str:
 def main() -> int:
     check_only = "--check" in sys.argv
 
+    from app.core.config import settings
+
+    # Fixtures are captured under `deterministic`, and only under `deterministic`.
+    #
+    # Three of them carry model-writable prose: `alex-simulation.json` holds the simulation summary,
+    # `backup-candidates.json` the strengths and gaps, `mitigation-plan.json` twelve task fields. Under
+    # a model provider that text is regenerated on every run and will not match, so `--check` would
+    # report permanent drift and `refresh` would commit prose that differs the next time anyone looks.
+    #
+    # The contract is the shape and the numbers. Prose is not part of it, and the honest way to say that
+    # is to capture the fixtures from the one provider whose output is reproducible rather than to teach
+    # the comparison to ignore fields — an ignore list would also quietly stop checking real regressions
+    # in those same fields.
+    if settings.ai_provider.lower() not in {"deterministic", "none", "", "stub"}:
+        print(
+            f"refusing to run under AI_PROVIDER={settings.ai_provider}. Fixtures pin the contract's "
+            f"shape and numbers, and three of them contain model-written prose that changes on every "
+            f"run. Re-run with AI_PROVIDER=deterministic:\n"
+            f"    AI_PROVIDER=deterministic python -m scripts.refresh_fixtures"
+            + (" --check" if check_only else "")
+        )
+        return 1
+
     from scripts.seed_demo import seed
 
     # A fresh database, so `sim_001` and `plan_001` are the first of their kind and the fixtures

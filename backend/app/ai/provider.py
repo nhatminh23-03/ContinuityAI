@@ -125,6 +125,12 @@ def get_provider(name: str | None = None) -> AIProvider:
         return CachedProvider(narrator=narrator)
     if requested in {"chain", "chained", "auto"}:
         return build_chain()
+    if requested in {"hybrid", "recommended"}:
+        # Rule-based extraction, model-written prose. The arrangement the measurement selected — see
+        # app/ai/hybrid.py for the numbers behind it.
+        from app.ai.hybrid import HybridProvider
+
+        return HybridProvider(narrator=build_chain())
     raise ValueError(
         f"Unknown AI_PROVIDER '{requested}'. Implement the AIProvider protocol in app/ai/ and "
         f"register it here. Do not call a model from outside this package."

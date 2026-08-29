@@ -78,3 +78,20 @@ def register_error_handlers(app: FastAPI) -> None:
             "Request failed validation.",
             {"errors": str(exc.errors())},
         )
+
+
+class NarrativeUnavailableError(AIExtractionError):
+    """A provider could not produce a narrative and was told not to substitute the template.
+
+    Exists so a chain of providers can tell "the model answered" from "this provider quietly fell back",
+    which it otherwise cannot: both model providers degrade to the deterministic template internally, so
+    a failed generation returns successfully and the next provider in the chain is never tried.
+
+    That was a real bug rather than a hypothetical. With `AI_PROVIDER=hybrid` configured and the watsonx
+    quota spent, `POST /simulations` returned template prose: watsonx caught its own HTTP 403, returned
+    the template, and the chain saw a success and never reached OpenRouter — which was working. The
+    chain's headline behaviour was dead code for all three narratives.
+
+    So a provider inside a chain is constructed with `degrade_to_template = False` and raises this
+    instead. The chain applies the template itself, once, after every model has actually been tried.
+    """

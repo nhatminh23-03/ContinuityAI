@@ -54,7 +54,7 @@ from app.ai.schemas import (
 )
 from app.ai.validation import validate_simulation_summary
 from app.core.config import settings
-from app.core.errors import AIExtractionError
+from app.core.errors import AIExtractionError, NarrativeUnavailableError
 from app.evidence.strength import strength_for_role
 from app.schemas.enums import EvidenceConfidence, EvidenceRole
 
@@ -101,6 +101,9 @@ class WatsonxProvider:
             )
         self.model_id = settings.watsonx_model_id
         self._fallback = DeterministicProvider()
+        # Set to False by `ChainedProvider`, which has another model to try and must be able to see
+        # that this one failed. See `NarrativeUnavailableError`.
+        self.degrade_to_template = True
         self._token: str | None = None
         self._token_expires_at: float = 0.0
         self._system_prompt = SYSTEM_PROMPT_FILE.read_text()
@@ -304,23 +307,52 @@ class WatsonxProvider:
             if validate_simulation_summary(sentence, context).accepted:
                 return sentence
         except AIExtractionError:
-            logger.warning("watsonx summary failed; using the deterministic template")
-        return self._fallback.summarize_simulation(context)
+            logger.warning("watsonx summary failed")
+        return self._or_raise(
+            "simulation summary", lambda: self._fallback.summarize_simulation(context)
+        )
+
+    def _or_raise(self, subject: str, produce):
+        """The template, unless this provider is inside a chain that has another model to try.
+
+        See `NarrativeUnavailableError`: falling back here unconditionally makes a failed generation
+        look like a successful one, which stops any outer chain from ever reaching its next provider.
+        """
+        if not self.degrade_to_template:
+            raise NarrativeUnavailableError(
+                f"watsonx could not produce the {subject}.",
+                {"provider": self.name, "subject": subject},
+            )
+        logger.warning("watsonx %s: using the deterministic template", subject)
+        return produce()
 
     def explain_candidate(self, context: CandidateNarrativeContext) -> CandidateNarrative:
         # The structured content — which capabilities are demonstrated, assisted, or missing — is
         # decided by the rules. A model here would only rephrase it, and a rephrasing that drifts
-        # is worse than a plain one, so the deterministic phrasing stands.
-        return self._fallback.explain_candidate(context)
+        # is worse than a plain one, so the deterministic phrasing stands *for this provider*.
+        #
+        # Routed through `_or_raise` rather than returning the template directly, which is the
+        # difference between "I choose not to" and "here is an answer". Inside a chain those are not
+        # the same thing: returning the template looked like success and stopped OpenRouter — which
+        # does model-write this one — from ever being asked. Declining lets the chain move on.
+        return self._or_raise(
+            "candidate narrative", lambda: self._fallback.explain_candidate(context)
+        )
 
     def generate_mitigation_plan(self, context: PlanContext) -> PlanDraft:
         """The deterministic plan is already gap-targeted and validated for 3-5 actions.
 
         A model could write warmer prose, but the plan is the artifact a manager approves and then
         someone executes — invented steps or an invented tool would be a real cost, and the
-        structure is what carries the value. Left deterministic on purpose.
+        structure is what carries the value. Left deterministic on purpose *for this provider*.
+
+        Declined rather than answered when inside a chain, for the reason given in
+        `explain_candidate`: a template returned as a success is indistinguishable from a generation,
+        and it blocked the next provider from being tried at all.
         """
-        return self._fallback.generate_mitigation_plan(context)
+        return self._or_raise(
+            "mitigation plan", lambda: self._fallback.generate_mitigation_plan(context)
+        )
 
     def close(self) -> None:
         self._client.close()

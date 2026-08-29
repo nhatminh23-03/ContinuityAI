@@ -133,6 +133,20 @@ class ChainedProvider:
         self._providers = providers
         self._templates = templates
         self.provenance = ProvenanceLog()
+
+        # Stop each member substituting the template on its own.
+        #
+        # Both model providers degrade to the deterministic template internally, which meant a failed
+        # generation returned *successfully* and this chain never reached its next provider. Measured
+        # with the watsonx quota spent: `POST /simulations` came back as template prose because watsonx
+        # caught its own HTTP 403, returned the template, and OpenRouter — which was working — was never
+        # asked. The chain's entire reason for existing was dead code for all three narratives.
+        #
+        # With this off, a member raises `NarrativeUnavailableError` and `_narrate` moves on. The
+        # template is applied here, once, after every model has genuinely been tried.
+        for provider in providers:
+            if hasattr(provider, "degrade_to_template"):
+                provider.degrade_to_template = False
         # Providers retired for the rest of the process after a permanent failure. See `_is_permanent`.
         self._retired: set[str] = set()
         self._retire_lock = threading.Lock()

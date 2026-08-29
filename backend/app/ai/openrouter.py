@@ -61,7 +61,7 @@ from app.ai.validation import (
     validate_simulation_summary,
 )
 from app.core.config import settings
-from app.core.errors import AIExtractionError
+from app.core.errors import AIExtractionError, NarrativeUnavailableError
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +76,14 @@ PLAN_PROMPT_FILE = PROMPT_DIR / "mitigation_plan_system.txt"
 # and costs reproducibility, which the evaluation in app/evaluation/ depends on.
 NARRATIVE_TEMPERATURE = 0.0
 SUMMARY_MAX_TOKENS = 300
-CANDIDATE_MAX_TOKENS = 700
+# Raised from 700 after a live failure: `Unterminated string starting at: line 9 column 5`. The reply
+# was cut off mid-JSON, parsing failed, and the narrative silently became a template — the exact
+# silent-degradation trap DEC-18 warned about when it rejected lowering token caps for latency.
+#
+# Truncation is the worst failure shape available here, because it looks like a model answer right up
+# to the point where it is discarded. Better to give the generation room and let the wall-clock
+# deadline in `app/ai/budget.py` bound the response, since that fallback is at least *reported*.
+CANDIDATE_MAX_TOKENS = 1400
 PLAN_MAX_TOKENS = 1600
 
 # A plan is one call per request; a candidate explanation is one of up to three in a row. The plan
@@ -244,6 +251,8 @@ class OpenRouterProvider:
             )
         self.model_id = settings.openrouter_model
         self._fallback = DeterministicProvider()
+        # Set to False by `ChainedProvider`. See `NarrativeUnavailableError`.
+        self.degrade_to_template = True
         self._simulation_prompt = SIMULATION_PROMPT_FILE.read_text()
         self._candidate_prompt = CANDIDATE_PROMPT_FILE.read_text()
         self._plan_prompt = PLAN_PROMPT_FILE.read_text()
@@ -403,7 +412,9 @@ class OpenRouterProvider:
                 return sentence
         except Exception as exc:  # noqa: BLE001 — see _degrade
             self._degrade("simulation summary", exc)
-        return self._fallback.summarize_simulation(context)
+        return self._or_raise(
+            "simulation summary", lambda: self._fallback.summarize_simulation(context)
+        )
 
     def explain_candidate(self, context: CandidateNarrativeContext) -> CandidateNarrative:
         user = (
@@ -426,7 +437,9 @@ class OpenRouterProvider:
                 return narrative
         except Exception as exc:  # noqa: BLE001 — see _degrade
             self._degrade("candidate narrative", exc)
-        return self._fallback.explain_candidate(context)
+        return self._or_raise(
+            "candidate narrative", lambda: self._fallback.explain_candidate(context)
+        )
 
     def generate_mitigation_plan(self, context: PlanContext) -> PlanDraft:
         known_evidence_ids = {
@@ -453,7 +466,23 @@ class OpenRouterProvider:
                 return outcome.draft
         except Exception as exc:  # noqa: BLE001 — see _degrade
             self._degrade("mitigation plan", exc)
-        return self._fallback.generate_mitigation_plan(context)
+        return self._or_raise(
+            "mitigation plan", lambda: self._fallback.generate_mitigation_plan(context)
+        )
+
+    def _or_raise(self, subject: str, produce):
+        """The template, unless an outer chain has another model worth trying.
+
+        Falling back unconditionally makes a failed generation indistinguishable from a successful one,
+        which is what stopped `ChainedProvider` from ever reaching its second provider. See
+        `NarrativeUnavailableError`.
+        """
+        if not self.degrade_to_template:
+            raise NarrativeUnavailableError(
+                f"openrouter could not produce the {subject}.",
+                {"provider": self.name, "subject": subject},
+            )
+        return produce()
 
     def _plan_user_prompt(self, context: PlanContext) -> str:
         drill_required = requires_recovery_drill(context.candidate_readiness)
