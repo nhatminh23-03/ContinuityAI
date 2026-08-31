@@ -18,8 +18,6 @@ Future of Work.**
 | [Selected challenge theme](#challenge-theme) | Wildcard — Future of Work |
 | [How IBM Bob was used](#how-ibm-bob-was-used) | Across planning, coding, testing, debugging and documentation |
 
-**Demo video (≤ 3 minutes):** *link to be added before submission.*
-
 ### Run it in about a minute
 
 ```bash
@@ -615,21 +613,6 @@ train more" — a specific person, a specific capability, a specific sequence.
 
 ## How IBM Bob was used
 
-> **To be completed by the team before submission.** The structure below follows the phases planned
-> in `docs/PRD.md` §28. Fill each subsection with what was actually done — concrete tasks, and the
-> commits or files that show the result. Nothing here should be written that did not happen.
-
-**Planning.** *(PRD decomposition into scoped implementation tasks, dependency identification,
-stop points.)*
-
-**Coding.** *(Backend models, endpoints, rule engine, simulator; frontend components and screens.)*
-
-**Testing.** *(Unit tests generated from the readiness, risk and simulation acceptance criteria.)*
-
-**Debugging.** *(Expected-versus-actual analysis against the hidden ground-truth scenarios.)*
-
-**Documentation.** *(README, architecture notes, setup, evaluation write-up, demo preparation.)*
-
 The development record itself is [`BUILD_WITH_BOB.md`](BUILD_WITH_BOB.md): one entry per unit of
 work stating what was built, which requirement or contract clause it implements, how it was
 validated, and what stayed open. It records the three specification defects the build surfaced —
@@ -723,19 +706,6 @@ migration step. The consequence worth knowing: a schema change requires a reseed
 any simulations and plans created through the API. Alembic is marked optional in
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) §5.2 and was deliberately not added
 ([`RECOMMENDATIONS.md`](RECOMMENDATIONS.md) R-15).
-
-## Demo
-
-**Public demo video (≤ 3 minutes):** *link to be added before submission.*
-
-Record along the **Start here** card on the dashboard: it names the riskiest capability and the
-engineer who holds it, and opens the four-stage rail the rest of the walkthrough follows.
-
-Hero scenario — NovaPay Payment Gateway. Jordan is the declared CODEOWNERS owner; the engineering
-evidence shows Alex has the strongest demonstrated Incident Recovery coverage. Simulating Alex as
-unavailable turns Incident Recovery and Certificate Management into critical coverage gaps while
-Retry Logic stays covered, moving the system from HIGH to CRITICAL. Maria returns as the strongest
-technical backup candidate; the manager selects her and approves a targeted transfer plan.
 
 ---
 
