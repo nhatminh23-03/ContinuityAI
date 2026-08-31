@@ -1,0 +1,46 @@
+{
+  "capability": {
+    "capability_id": "cap_incident_recovery",
+    "name": "Incident Recovery"
+  },
+  "candidates": [
+    {
+      "engineer_id": "eng_maria_gomez",
+      "name": "Maria Gomez",
+      "technical_overlap": "HIGH",
+      "strengths": [
+        "Demonstrated Monitoring",
+        "Demonstrated Provider Failover",
+        "Assisted Incident Recovery"
+      ],
+      "gaps": [
+        "No qualifying independent evidence for Incident Recovery",
+        "No qualifying independent evidence for Certificate Management"
+      ],
+      "evidence_confidence": "MEDIUM",
+      "supporting_evidence_ids": [
+        "evidence_inc_230",
+        "evidence_pr_402"
+      ]
+    },
+    {
+      "engineer_id": "eng_jordan_lee",
+      "name": "Jordan Lee",
+      "technical_overlap": "MEDIUM",
+      "strengths": [
+        "Demonstrated Retry Logic",
+        "Assisted Monitoring"
+      ],
+      "gaps": [
+        "No qualifying independent evidence for Incident Recovery",
+        "No qualifying independent evidence for Provider Failover"
+      ],
+      "evidence_confidence": "MEDIUM",
+      "supporting_evidence_ids": [
+        "evidence_issue_77",
+        "evidence_pr_391"
+      ]
+    }
+  ],
+  "disclaimer": "Technical overlap only. Workload, availability, staffing priorities, and career goals are not evaluated."
+}

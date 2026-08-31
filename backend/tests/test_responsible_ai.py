@@ -15,6 +15,7 @@ from pathlib import Path
 
 from sqlalchemy import inspect
 
+from app.ai.language_policy import FORBIDDEN_PHRASES, find_forbidden_phrases
 from app.db.session import ENGINE
 
 APP_ROOT = Path(__file__).resolve().parents[1] / "app"
@@ -38,17 +39,6 @@ FORBIDDEN_FIELD_FRAGMENTS = (
     "working_hours",
     "hours_worked",
     "match_percentage",
-)
-
-FORBIDDEN_PHRASES = (
-    "best employee",
-    "cannot recover",
-    "chance of failure",
-    "probability of outage",
-    "irreplaceable",
-    "critical employee",
-    "weak engineer",
-    "low-value engineer",
 )
 
 ENGINEER_COLUMN_ALLOWLIST = {"engineer_id", "name", "role", "team"}
@@ -99,6 +89,11 @@ def test_no_prohibited_phrase_appears_in_generated_text() -> None:
     system` is prohibited"), and an allowlist for that would make the check fragile in exactly the
     place it needs to be blunt. Runtime instruction strings in code are therefore phrased to avoid
     the banned words rather than to quote them.
+
+    `FORBIDDEN_PHRASES` is imported from `app.ai.language_policy` rather than duplicated here, so
+    this static scan and the runtime scan below stay checks against one list. This static scan is
+    necessarily blind to prose a model writes at runtime — see
+    `test_no_prohibited_phrase_appears_in_narrative_endpoint_responses` for that.
     """
     offenders: list[str] = []
     for directory in ("ai", "services", "recommendation", "mitigation", "simulation", "continuity"):
@@ -159,3 +154,65 @@ def test_risk_is_never_attached_to_an_engineer(client) -> None:
         if node["type"] == "ENGINEER":
             assert "continuity_risk_index" not in node.get("metadata", {})
             assert node.get("status") is None
+
+
+def test_no_prohibited_phrase_appears_in_narrative_endpoint_responses(client) -> None:
+    """The runtime counterpart to `test_no_prohibited_phrase_appears_in_generated_text` above.
+
+    That test AST-scans `.py` string literals, so it cannot see anything a model writes at
+    request time — it would keep passing even if a configured provider started emitting banned
+    wording, because nothing about that wording exists as a literal in the source tree. These are
+    the three endpoints in the whole API that return model-generated prose: a simulation summary,
+    a candidate explanation (strengths and gaps), and a mitigation plan (task titles,
+    descriptions, and acceptance criteria). No other endpoint produces free text, so no other
+    endpoint needs to be here.
+
+    Tests run against the deterministic provider (`conftest.py` never sets `AI_PROVIDER`), so this
+    currently asserts the template output is clean. That is the point: the same assertions then
+    also cover whatever a configured model provider writes, without the test needing to change.
+    """
+    fields: list[tuple[str, str]] = []
+
+    simulation = client.post(
+        "/api/v1/simulations",
+        json={
+            "simulation_type": "ENGINEER_UNAVAILABLE",
+            "engineer_id": "eng_alex_chen",
+            "scope": {"type": "SYSTEM", "id": "system_payment_gateway"},
+        },
+    ).json()
+    fields.append(("simulation.summary", simulation["summary"]))
+
+    candidates = client.post(
+        "/api/v1/recommendations/backup-candidates",
+        json={"capability_id": "cap_incident_recovery", "limit": 3},
+    ).json()
+    for candidate in candidates["candidates"]:
+        engineer_id = candidate["engineer_id"]
+        for index, strength in enumerate(candidate["strengths"]):
+            fields.append((f"candidate[{engineer_id}].strengths[{index}]", strength))
+        for index, gap in enumerate(candidate["gaps"]):
+            fields.append((f"candidate[{engineer_id}].gaps[{index}]", gap))
+
+    plan = client.post(
+        "/api/v1/mitigation-plans",
+        json={
+            "capability_id": "cap_incident_recovery",
+            "primary_engineer_id": "eng_alex_chen",
+            "selected_backup_engineer_id": "eng_maria_gomez",
+        },
+    ).json()
+    for task_index, task in enumerate(plan["tasks"]):
+        fields.append((f"task[{task_index}].title", task["title"]))
+        fields.append((f"task[{task_index}].description", task["description"]))
+        for index, criterion in enumerate(task["acceptance_criteria"]):
+            fields.append((f"task[{task_index}].acceptance_criteria[{index}]", criterion))
+
+    assert fields, "the three narrative endpoints produced no prose fields to scan"
+
+    offenders = [
+        f"{label}: {phrase!r} in {text[:80]!r}"
+        for label, text in fields
+        for phrase in find_forbidden_phrases(text)
+    ]
+    assert not offenders, "\n".join(offenders)

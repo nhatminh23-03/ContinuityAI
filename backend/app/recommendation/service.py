@@ -31,8 +31,11 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
+from app.ai.budget import narrate_in_parallel
+from app.ai.deterministic import DeterministicProvider
 from app.ai.provider import AIProvider, get_provider
 from app.ai.schemas import CandidateNarrativeContext
+from app.core.config import settings
 from app.continuity.facts import CapabilityFacts
 from app.core.errors import NotFoundError
 from app.evidence.strength import is_adequate, readiness_rank
@@ -88,6 +91,11 @@ NO_CANDIDATE_MESSAGE = (
     "No strong internal technical backup candidate was identified from the available evidence."
 )
 
+# The templates a narrative falls back to when it runs out of budget. Shared at module level
+# because `DeterministicProvider` holds no state — every method derives its answer from the context
+# it is handed — so one instance is safe on any thread and there is nothing to construct per call.
+_TEMPLATES = DeterministicProvider()
+
 
 class BackupCandidateService:
     def __init__(self, session: Session, provider: AIProvider | None = None) -> None:
@@ -115,7 +123,7 @@ class BackupCandidateService:
         for row in system_coverage:
             by_engineer.setdefault(row.engineer_id, {})[row.capability_id] = row
 
-        scored: list[tuple[int, BackupCandidate]] = []
+        scored: list[tuple[int, BackupCandidate, CandidateNarrativeContext]] = []
         for engineer_id, coverage_by_capability in by_engineer.items():
             if engineer_id in excluded or engineer_id not in engineers:
                 continue
@@ -129,23 +137,39 @@ class BackupCandidateService:
             )
             if score <= 0:
                 continue
-            scored.append(
-                (
-                    score,
-                    self._candidate(
-                        engineer_id,
-                        engineers[engineer_id].name,
-                        score,
-                        coverage_by_capability,
-                        capability,
-                        capabilities,
-                        system_evidence,
-                    ),
-                )
+            candidate, narrative_context = self._candidate(
+                engineer_id,
+                engineers[engineer_id].name,
+                score,
+                coverage_by_capability,
+                capability,
+                capabilities,
+                system_evidence,
             )
+            scored.append((score, candidate, narrative_context))
 
         scored.sort(key=lambda item: (-item[0], item[1].engineer_id))
-        candidates = [candidate for _, candidate in scored[: request.limit]]
+
+        # Narration happens here, after the slice, rather than inside the scoring loop above. The
+        # loop runs once per *eligible engineer* — four of them for cap_retry_logic on the seeded
+        # dataset, and bounded by nothing except how many engineers happen to qualify — so a
+        # model-backed provider was being paid for narratives on candidates that were then
+        # discarded, and enough of them to put AC-14's 12-second budget out of reach. Deferring
+        # bounds the provider calls at `limit`, which the contract caps at 3.
+        #
+        # Bounding them at three was necessary but not sufficient: three *sequential* model calls
+        # still measured 16.91s against that 12-second budget (OPEN-11). These three narratives
+        # describe three different people and share nothing, so they run together under one
+        # wall-clock deadline, and any that miss it are answered with the deterministic template.
+        # See app/ai/budget.py for why the deadline cannot be left to the transport.
+        selected = [(candidate, context) for _, candidate, context in scored[: request.limit]]
+        candidates = narrate_in_parallel(
+            selected,
+            narrate=lambda pair: self._narrate(pair[0], pair[1]),
+            fallback=lambda pair: self._narrate_from_template(pair[0], pair[1]),
+            deadline_seconds=settings.narrative_deadline_seconds,
+            max_workers=settings.narrative_max_workers,
+        )
 
         # `message` is omitted rather than sent as null when candidates exist: the contract only
         # documents it for the empty case, and an explicit null would show up as a contract diff.
@@ -166,10 +190,29 @@ class BackupCandidateService:
         """Whoever currently holds the capability, and whoever was simulated away.
 
         Offering the person you are trying to build a backup for would be worse than useless.
+
+        The primary is excluded **unconditionally**, and the `is_adequate` guard that used to sit
+        here was a bug. `CapabilityDetail.primary_engineer` is `facts.primary`, which is documented
+        as the strongest coverage "adequate or not", and it is the value the frontend sends as
+        `primary_engineer_id` — the knowledge source — when it asks for a plan. So on any capability
+        whose strongest holder is below PRACTICED, that person was returned as a candidate to back
+        up themselves, and selecting them produced `VALIDATION_ERROR` from
+        `MitigationPlanService`, which rejects a plan whose source and backup are the same person.
+
+        The guard failed precisely where it mattered most: a capability with no adequate holder is a
+        critical gap, which is exactly when a manager goes looking for a backup. `cap_refund_reversal`
+        is the live example — CRITICAL_GAP, strongest coverage Priya Nair at ASSISTED — and it broke
+        the plan screen every time she was picked.
+
+        There is a defensible thought behind the old guard: someone at ASSISTED is not really a
+        holder, so why not develop them? Because that is a different action from the one this endpoint
+        serves. A plan here transfers knowledge *from* a source *to* a backup, and a plan whose source
+        and backup are one person means nothing. If the only person with any evidence is the primary,
+        the honest answer is fewer candidates — or none, which the response already has a message for.
         """
         excluded: set[str] = set()
         primary = target.primary
-        if primary is not None and is_adequate(primary.readiness):
+        if primary is not None:
             excluded.add(primary.engineer_id)
         if simulation_id:
             simulation = SimulationRepository(self.session).get(simulation_id)
@@ -244,7 +287,13 @@ class BackupCandidateService:
         capability,
         capabilities: dict,
         system_evidence: list,
-    ) -> BackupCandidate:
+    ) -> tuple[BackupCandidate, CandidateNarrativeContext]:
+        """The candidate's structured half, plus the facts a provider may narrate.
+
+        The two are returned separately because narration is deferred to `_narrate`, which runs
+        only for the candidates that survive the `limit` slice. Everything here is computed for
+        every eligible engineer, because the score decides who survives.
+        """
         target_row = coverage_by_capability.get(capability.capability_id)
         target_readiness = (
             ReadinessLevel(target_row.readiness) if target_row is not None else ReadinessLevel.NONE
@@ -271,15 +320,13 @@ class BackupCandidateService:
             elif other.component_id == capability.component_id:
                 missing.append(other.name)
 
-        narrative = self.provider.explain_candidate(
-            CandidateNarrativeContext(
-                capability_name=capability.name,
-                candidate_name=engineer_name,
-                technical_overlap=self._band(score).value,
-                demonstrated_capabilities=demonstrated[:MAX_STRENGTHS],
-                assisted_capabilities=assisted[:MAX_STRENGTHS],
-                missing_capabilities=missing[:MAX_GAPS],
-            )
+        narrative_context = CandidateNarrativeContext(
+            capability_name=capability.name,
+            candidate_name=engineer_name,
+            technical_overlap=self._band(score).value,
+            demonstrated_capabilities=demonstrated[:MAX_STRENGTHS],
+            assisted_capabilities=assisted[:MAX_STRENGTHS],
+            missing_capabilities=missing[:MAX_GAPS],
         )
 
         supporting = [
@@ -299,14 +346,53 @@ class BackupCandidateService:
             else EvidenceConfidence.LOW
         )
 
-        return BackupCandidate(
-            engineer_id=engineer_id,
-            name=engineer_name,
-            technical_overlap=self._band(score),
-            strengths=narrative.strengths[:MAX_STRENGTHS],
-            gaps=narrative.gaps[:MAX_GAPS],
-            evidence_confidence=confidence,
-            supporting_evidence_ids=supporting,
+        return (
+            BackupCandidate(
+                engineer_id=engineer_id,
+                name=engineer_name,
+                technical_overlap=self._band(score),
+                # Filled by `_narrate` for the candidates that are actually returned.
+                strengths=[],
+                gaps=[],
+                evidence_confidence=confidence,
+                supporting_evidence_ids=supporting,
+            ),
+            narrative_context,
+        )
+
+    def _narrate(
+        self, candidate: BackupCandidate, context: CandidateNarrativeContext
+    ) -> BackupCandidate:
+        """Ask the provider for this candidate's strengths and gaps.
+
+        The one place a provider is called on this path, and it is called once per returned
+        candidate. Whatever the provider is, the facts it narrates were decided above by the
+        rules; a provider that fails or wanders returns the deterministic template instead, so
+        the structured half of the candidate is unaffected either way.
+
+        Called on a worker thread when there is more than one candidate. It reads no session and
+        mutates no service state — the context was built before narration began, and
+        `model_copy` returns a new object — so there is nothing here for concurrency to corrupt.
+        """
+        return self._apply(candidate, self.provider.explain_candidate(context))
+
+    def _narrate_from_template(
+        self, candidate: BackupCandidate, context: CandidateNarrativeContext
+    ) -> BackupCandidate:
+        """The same shape from the deterministic templates, for a narrative that ran out of time.
+
+        Not routed through `self.provider`: the provider is what just failed to answer inside the
+        budget, and asking it again would spend more of a budget that is already gone.
+        """
+        return self._apply(candidate, _TEMPLATES.explain_candidate(context))
+
+    @staticmethod
+    def _apply(candidate: BackupCandidate, narrative) -> BackupCandidate:
+        return candidate.model_copy(
+            update={
+                "strengths": narrative.strengths[:MAX_STRENGTHS],
+                "gaps": narrative.gaps[:MAX_GAPS],
+            }
         )
 
     @staticmethod

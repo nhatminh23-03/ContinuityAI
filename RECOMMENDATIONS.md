@@ -414,7 +414,9 @@ simulation URL, the storage is already there and it is a one-endpoint Category C
 |---|---|
 | `docs/ContinuityAI_PRD_v1.0.md` — untracked stale pre-audit PRD | User removed it |
 | `frontend/.env.local.example` referenced by the README but absent, and `frontend/.gitignore` `.env*` would have excluded it | Created, with a `!` negation added |
-| Working on branch `yaza_work`, which `TEAM_WORKFLOW_PERSON_A_B.md` section 7 forbids | Still outstanding — move to short-lived `feature/*` branches |
+| Working on branch `yaza_work`, which `TEAM_WORKFLOW_PERSON_A_B.md` section 7 forbids | **Resolved.** Work moved to `feature/backend-engines`, then `feature/frontend-screens` |
+| `verify_golden_path` judged AI operations against the 800 ms read budget regardless of provider, reporting a breach AC-14 does not claim | **Resolved** — the budget table is provider-aware (OPEN-12) |
+| No database migrations (R-15). `seed_demo` drops and recreates every table, so a schema change needs a reseed and discards simulations and plans | Documented in the README setup section rather than fixed; correct for a demo |
 | `README.md` claimed Python 3.9 will not work and 3.11 is required | Corrected; 3.10 is verified working |
 | `data/generated/` (evaluation output) | Gitignored |
 
@@ -501,3 +503,319 @@ at that point is rotation.
 **Worth noting for the submission:** `docs/DOMAIN_MODEL.md` and the PRD both commit to strong data
 boundaries, and a judge who finds credentials in the repository will weigh that against the
 responsible-data claims regardless of what the code does. Keeping this clean is part of the story.
+
+---
+
+# Items from Person B's gap register — 2026-08-24
+
+## R-24 — `single_expert_dependency_count` had no transport — **RESOLVED 2026-08-24**
+
+`docs/BACKEND_GAPS.md` GAP-01, and the only blocking item in Person B's three-way review of the PRD,
+the contract, and the implementation. The corrected dashboard puts a single-expert-dependency count on
+each platform card, and no field carried it anywhere — not in the contract, not in `PlatformSummary`,
+not in a fixture, not in `frontend/types/api.ts`. It had never been added.
+
+Added as a required field on `PlatformSummary` and logged as DEC-17. It counts capabilities under the
+platform whose adequate coverage is exactly one engineer, aggregated in SQL from the already-persisted
+`capability_assessments.adequate_engineer_count`, so no rule or column changed. Seeded values are
+Payments 4 and Identity 2; the brief's 3 and 1 were stale-brief figures.
+
+**The part worth remembering** is why the frontend could not have derived it. Summing
+`degraded_capability_count` looks equivalent and is not: under DEC-07 a lower-criticality capability
+with *zero* adequate engineers is `DEGRADED` rather than a critical gap, so the degraded count spans
+both the one-expert and no-expert cases. There is now a test that asserts the two numbers differ on
+the seeded data, purely so nobody later concludes the shortcut was fine.
+
+---
+
+## R-25 — A configured timeout that the transport does not honour is not a budget — **RESOLVED 2026-08-24**
+
+`OPEN-11` recorded `POST /recommendations/backup-candidates` at 16.91s against AC-14's 12 seconds under
+`AI_PROVIDER=openrouter`. Two causes, and the first is the interesting one.
+
+`openrouter_timeout_seconds` was applied through `httpx.Timeout`, and httpx has no total-request
+setting — its `read` timeout bounds the gap *between* socket reads. The gateway keeps the socket warm
+while the model generates, so the clock kept resetting and a call nominally budgeted at 3.5s ran to
+about 6. The code had already flagged this in a docstring as a "pathological slow trickle" that could
+defeat the budget. It is not pathological; it is the normal case. **Every latency number that budget
+implied was fiction, and nothing failed to make that visible** — the calls simply took as long as they
+took.
+
+Fixed in `app/ai/budget.py`: the three independent candidate narratives now run concurrently under one
+real wall-clock deadline, and anything that misses it is answered from the deterministic template.
+Logged as DEC-18. Also fixed the `httpx.Client` being rebuilt per request, which was paying a TLS
+handshake inside the very budget it was spending.
+
+The second finding was that the simulation half of OPEN-11 was **not a breach at all**: AC-14's
+2-second clause governs *deterministic* simulation, and under `openrouter` the summary is model-written,
+which makes it a 12-second AI explanation operation. 2.85s was always inside it.
+
+**Residual concern, tracked as OPEN-12.** The fix is verified against a stub provider that sleeps, not
+against the live gateway. The mechanism is proven — the endpoint returns on the deadline and falls back
+to templates — but the *numbers* under a real key are now predicted rather than measured. Re-measure
+before quoting them.
+
+**Effort to close OPEN-12:** one run with a live key, about ten minutes.
+
+---
+
+## R-26 — The fixture check was reporting success over files it never read — **RESOLVED 2026-08-24**
+
+Raised as GAP-03, which asked only for a challenge fixture. The underlying problem was worse.
+`scripts/refresh_fixtures.py` captured ten of the twelve files in `fixtures/`, so
+`refresh_fixtures --check` printed "all fixtures match live engine output" while
+`identity-systems.json` and `challenge-attest-jordan.json` were never compared to anything.
+
+**An uncaptured fixture is worse than a missing one**, because the mechanism that exists to catch drift
+actively reports success over it. Both fixtures happened to be accurate — the only difference
+regeneration produced was a live timestamp that needed pinning — so this had cost nothing yet. It would
+have, silently, on the first divergence.
+
+Both are captured now, the challenge last because it is the only golden-path call that mutates an
+assessment, with a reseed afterwards. `CAPTURED_FIXTURES` is declared, verified against what the run
+actually captured, and asserted against the directory by a test, so the next fixture added on either
+side fails a test instead of drifting.
+
+**Generalisable lesson worth carrying into the submission:** every check in this repository should be
+asked what it would *fail* to notice. This one had a blind spot exactly where it mattered, and it read
+as green.
+
+---
+
+## R-27 — A clean clone cannot run `npm run typecheck` before a build
+
+Minor, but it touches AC-15 (fresh clone plus documented setup reproduces the demo), so it is worth
+writing down rather than each of us rediscovering it.
+
+Two friction points on a fresh frontend setup:
+
+1. **`npm install` can fail on a root-owned npm cache** with `errno -13`, unrelated to this project.
+   The fix that needs no `sudo` is `npm install --cache /tmp/continuityai-npm-cache`, which sidesteps
+   the bad cache entirely. The `sudo chown -R 501:20 ~/.npm` that npm suggests also works but asks for
+   a password.
+2. **`npm run typecheck` fails on a clean clone** with `app/layout.tsx: TS2304 Cannot find name
+   'LayoutProps'`. Not a real error: `LayoutProps` is a global that Next 16 generates into
+   `.next/types` during a build, so `tsc --noEmit` has nothing to resolve until `npm run build` has run
+   once. `npm run build` passes, and its own TypeScript pass is clean.
+
+**Recommendation:** one line in the README setup section — run `npm run build` once before
+`npm run typecheck` — and, if it seems worth it, a `prebuild`-style step so the ordering is not
+folklore.
+
+**Effort:** 10 minutes · **Owner:** Person B, since it is the frontend setup path.
+
+---
+
+# The AI layer, finished and measured — 2026-08-24
+
+## R-01 — **RESOLVED 2026-08-24, and the answer was not the expected one**
+
+R-01 was the top item on this list for the whole build: "model-backed extraction is built but blocked".
+It is no longer blocked, and the resolution is a measurement rather than a delivery.
+
+The full corpus was extracted by `anthropic/claude-sonnet-5` and evaluated against the hidden ground
+truth alongside the rule-based extractor. **The rules won**: reconstruction 56/56 against 54/56,
+simulation 25/25 against 15/25, candidates 2/2 against 1/2. The model made two readiness errors, both on
+the hero capability and both too generous, which flipped Incident Recovery from `DEGRADED` to `COVERED`
+and broke the demo's opening claim.
+
+So the honest resolution of R-01 is: **the model-backed path is complete, exercised over the whole corpus,
+and deliberately not used for extraction, because it is worse.** It is used for the narratives, the
+taxonomy proposals and the criticality suggestions.
+
+That is a better outcome than the one this item was written expecting. R-01 was framed as a submission
+risk — "a judge can check the claim in ninety seconds". The claim we can now make is stronger than the one
+we were worried about not being able to make: not "we use AI here" but "we tested whether AI belongs here,
+and here is the run that says where it does and does not".
+
+**Effort remaining:** none. The follow-up is OPEN-14, the hybrid.
+
+---
+
+## R-28 — Over-promotion is one-directional, which makes it fixable
+
+The most useful detail in the losing run is that the model did not fail randomly. Every error was in the
+same direction: it read review comments and assisted work as independent execution, never the reverse. It
+was generous about people, consistently.
+
+That is a tractable failure. A hybrid that takes the model's recall — **13 claims it found and the rules
+missed** — while requiring corroboration before any promotion above `ASSISTED` would keep the extra reach
+and discard the specific mistake. One independent-execution claim from one artifact stays `ASSISTED` until
+a second artifact agrees.
+
+Worth doing because the ceiling on rule-based extraction is real and documented (R-01's original framing,
+and the 1-in-120 public-PR match rate). The rules are more accurate here, not more capable.
+
+**Effort:** half a day, plus a re-run of the evaluation to confirm it beats both. **Decision:** B — it
+changes extraction quality, not the contract. **Tracked as** OPEN-14.
+
+---
+
+## R-29 — Where the burden of proof sits — **AMENDED, then RESOLVED 2026-08-26**
+
+**This item was originally written as "a continuity tool must be biased toward alarm". That framing was
+wrong and is corrected below.** It is left visible rather than rewritten silently, because the correction
+is the useful part: checking whether the claim held in the code showed the code was doing something more
+careful than the recommendation described.
+
+`app/continuity/aggregation.py` ranks `INSUFFICIENT_EVIDENCE` **below** `DEGRADED`, with the comment "it is
+a data problem, and it should not outrank a coverage problem the evidence does support". A capability with
+no usable evidence gets `continuity_risk_index=None` — no number at all, rather than a high one. **A tool
+biased toward alarm treats missing data as danger. This one treats missing data as missing data.** Shipping
+the original wording would have invited a fair criticism ("so your numbers are inflated?") and would have
+had a future contributor implement the wrong thing.
+
+The accurate principle is three rules, and the second is what stops the first from being alarmism:
+
+1. **Claiming coverage requires evidence; claiming exposure does not.** `is_adequate` excludes stale
+   evidence, attestations cap at `MODERATE` so no quantity manufactures a `VALIDATED` expert, and readiness
+   only rises on demonstrated execution. The burden of proof sits on the reassuring answer.
+2. **Not knowing is its own answer, not a bad score.** `INSUFFICIENT_EVIDENCE` is a distinct state ranked
+   below a real coverage problem, carrying no index and no class. The tool says "I don't know" rather than
+   "this is dangerous".
+3. **The asymmetry is about systems, never people.** A gap is a statement about the record.
+   `app/ai/language_policy.py`: "evidence not found is a statement about the record; 'cannot' is a
+   statement about the person." Four prompt files repeat it, and the validation gate rejects inability
+   language at runtime.
+
+Rule 2 is what stops rule 1 from being alarmism; rule 3 is what stops the whole thing from being
+surveillance. Stated as one line about alarm, both are lost.
+
+**Why it is worth saying at all.** Both model experiments erred in the same direction — extraction
+over-promoted readiness, criticality came back higher than the humans in three of five cases — and the two
+have very different costs. Over-stating readiness says a capability is covered when it is not, and nobody
+investigates a problem the tool denies. Over-stating criticality draws attention to a system that may not
+need it, and a human corrects it; FR-010 already makes that correction authoritative. So the answer to
+"what happens when your model is wrong?" is: we measured which direction it is wrong in, and the
+architecture already puts the burden of proof on exactly that direction.
+
+**Resolved** by a paragraph in the README's responsible-use section. It deliberately does not claim this
+was designed in from the start — it was not stated anywhere, and the measurement is what made it visible.
+"We found this pattern in our own decisions when we tested the model" is both true and more credible than
+implying foresight.
+
+---
+
+## R-30 — `AI_PROVIDER=chain` must not be the day-to-day setting
+
+Operational trap worth writing down, because the natural instinct is to set the most capable provider and
+leave it.
+
+Seeding makes one model call per artifact. Under `chain` that is 640 live calls per seed — and the test
+suite seeds, so a single `pytest` run would make 640 calls. Slow, and not free.
+
+The right runtime once a cache exists is `AI_PROVIDER=cached` with
+`EXTRACTION_CACHE_FILE=chain_cache.json`: extraction replayed instantly from the committed cache, with
+live model prose over the top. `deterministic` stays the default so a clean clone works with no key.
+
+Documented in `backend/.env.example`. Recorded here because a config comment is easy to miss and the
+symptom — a slow, expensive test run — would take a while to attribute.
+
+**Effort:** none, already documented · **Owner:** whoever configures a machine.
+
+---
+
+# Implemented from this list — 2026-08-26
+
+## R-02 — Adversarial artifacts added, and an eighth check — **RESOLVED 2026-08-26**
+
+R-02 asked for deliberately misleading artifacts so the evaluation could show the rules declining to be
+fooled, on the grounds that 100% on cooperative data invites the criticism that the harness is
+self-consistent rather than accurate. Done: seven traps in the corpus and a new check requiring every
+one to be refused. All eight checks now pass.
+
+Three trap families, each a specific way a plausible implementation gets this wrong:
+
+| Trap | What it tests |
+|---|---|
+| `volume_without_execution` | Eight review and comment records, no execution. "Artifact, not activity" is a stated PRD principle and nothing tested it |
+| `attribution_by_name` | The body names one engineer as having done the work; the participant record names another. Attribution must follow the record |
+| `authority_language` | "Most senior", "the acknowledged expert", "de facto owner", citing no incident, change or runbook |
+
+**Declining a trap is a stronger claim than reconstructing a label**, which is why this is worth more
+than the seven checks it joins. The `attribution_by_name` trap is the one to quote: it is precisely the
+mistake the measured model extraction made (R-01), so the corpus now contains a permanent test for it.
+
+Two design points worth keeping. The constraints live in the hidden ground truth rather than the corpus,
+so the traps are visible and what they must fail to do is not. And **a trap missing from the corpus fails
+rather than passes** — a check that went green when its artifact was absent would go quiet the moment
+someone regenerated without the traps, which is the R-26 blind spot exactly.
+
+Writing the check first caught an error in my own constraint before it was committed: the first draft
+asserted an engineer stay at `NONE` when he had genuinely commented, so the rules were right and the
+constraint was wrong.
+
+---
+
+## OPEN-15 — The concurrency 402 is now waited out — **RESOLVED 2026-08-26**
+
+OpenRouter answers **HTTP 402 payment required** when concurrent requests would exceed the available
+balance. The message reads like an empty wallet and means "not all at once". Treating it as terminal
+abandoned **127 of 640 artifacts** on a six-worker run; the same run at one worker completed all 127.
+
+Backpressure now gets its own attempt budget, deliberately separate from `openrouter_max_retries`. The
+distinction is the point: a *failed* narrative is not worth a second call, because the template is
+already there — but backpressure means the request was never attempted, and the reason it was refused is
+our own concurrency. Waiting costs nothing because nothing was generated.
+
+The 402 body is inspected rather than the status alone, so a genuinely exhausted balance still fails
+fast instead of sleeping three times on its way to the same answer. Tests cover both halves.
+
+---
+
+## OPEN-12 — AC-14 measured live, and it found a real breach — **RESOLVED 2026-08-26**
+
+The latency fix from DEC-18 was verified against a stub that sleeps. Measured against the live gateway
+it found two things the stub could not.
+
+**A script bug that reported a breach AC-14 does not claim.** `verify_golden_path` applied an 800 ms
+budget to the candidate and plan endpoints regardless of provider. AC-14 gives AI plan and explanation
+operations 12 seconds, so under a model provider those numbers were being judged against the wrong
+clause. The budget table is now provider-aware.
+
+**A real breach the stub had hidden.** `POST /mitigation-plans` came back at **12.6 s against 12**. The
+DEC-18 fix applied the wall-clock deadline to the candidate narratives only, because the plan is a single
+call — and `narrate_in_parallel` deliberately takes a direct path for one item, which left the plan with
+nothing but the transport timeout that does not bound anything. `with_deadline` now covers it.
+
+Live, with the deadline in place:
+
+| Endpoint | Before | Now | AC-14 |
+|---|---|---|---|
+| `POST /simulations` | 3.8 s | 3.0 s | 12 s ✓ |
+| `POST /recommendations/backup-candidates` | 16.9 s worst | 6.7 s | 12 s ✓ |
+| `POST /mitigation-plans` | 12.6 s | 8.0 s | 12 s ✓ |
+| Six reads | — | 3–52 ms | 800 ms ✓ |
+
+---
+
+## R-31 — Under `openrouter` the mitigation plan usually falls back to the template
+
+Found while closing OPEN-12, and worth stating rather than leaving as a pleasant-looking 8.0 s.
+
+That 8.0 s is exactly `NARRATIVE_DEADLINE_SECONDS`, which means the plan generation **hit the deadline
+and used the deterministic template**. A 1600-token plan does not finish inside the budget on this model.
+Raising the deadline to 10.5 s does not fix it — measured, the call simply times out later, and it made
+the candidate narratives time out too by giving them longer to wait before giving up. So 8 s is the
+better setting and the fallback is the designed outcome, not a defect.
+
+The consequence to be honest about: **FR-018's plan prose is deterministic in practice under
+`openrouter`, even though the model path exists and works.** The plan is also the one narrative where
+that matters least — it is the artifact a manager approves and someone then executes, so the validated
+template is arguably the right answer anyway, which is the position `watsonx.py` took originally.
+
+Three ways to make it genuinely model-written if wanted: a faster model, a lower `PLAN_MAX_TOKENS`, or
+streaming so partial output can be assembled inside the budget. **Lowering the token cap is the
+tempting one and the worst**: truncated output fails JSON parsing and falls back *silently*, so it would
+buy latency by turning the model off while looking like success — the same trap DEC-18 rejected.
+
+**Effort:** an hour to try a faster model and re-measure · **Owner:** Person A · **Decision:** B
+
+---
+
+## R-22 — Not implemented, and why
+
+Attestation `occurred_on` remains open. It is a change to the challenge request shape, which makes it a
+Category C decision, and the challenge endpoint is the one Person B has only just acknowledged. Adding a
+field to it unilaterally in the same week seemed like the wrong order of operations for a 30-minute
+improvement. It stays a good idea; it needs the conversation first.

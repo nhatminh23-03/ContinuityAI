@@ -21,7 +21,28 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     database_url: str = f"sqlite:///{REPO_ROOT / 'backend' / 'continuity.db'}"
 
-    # Extraction provider: `deterministic` (offline, reproducible) or `watsonx` (IBM watsonx.ai).
+    # Browser origins allowed to call the API. Comma-separated so it can be set from a shell
+    # without JSON quoting.
+    #
+    # This was hardcoded to `http://localhost:3000`, which is fine until port 3000 is taken — and
+    # then the failure is unpleasant to diagnose: the frontend loads, every page renders its shell,
+    # and only the data fetches fail, in the browser, with a CORS error that never reaches the
+    # backend log. Running the frontend on another port is a normal thing to have to do, so it must
+    # not require editing Python.
+    #
+    # Kept to an explicit list rather than `*`. A wildcard would work here and is the wrong habit to
+    # leave in a repository that argues for careful data boundaries.
+    cors_origins: str = (
+        "http://localhost:3000,http://127.0.0.1:3000,"
+        "http://localhost:3001,http://127.0.0.1:3001"
+    )
+
+    @property
+    def cors_origin_list(self) -> list[str]:
+        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+
+    # Provider: `deterministic` (offline, reproducible), `cached` (replayed model extraction),
+    # `watsonx` (IBM watsonx.ai) or `openrouter` (model-written narratives, rule-based extraction).
     ai_provider: str = "deterministic"
     ai_model: str = ""
     ai_api_key: str = ""
@@ -38,6 +59,54 @@ class Settings(BaseSettings):
     # Hard service ceiling per instance — 2/s on the plan this was developed against. Exceeding it
     # returns 429 for the whole burst, so the client paces itself rather than discovering the limit.
     watsonx_requests_per_second: float = 2.0
+
+    # OpenRouter, an OpenAI-compatible gateway. Used the other way round from watsonx: extraction
+    # stays deterministic and the model writes only the three manager-facing narratives, each of
+    # which passes app/ai/validation.py before it can be returned. Credentials live in
+    # backend/.env, which is gitignored.
+    openrouter_api_key: str = ""
+    openrouter_base_url: str = "https://openrouter.ai/api/v1"
+    openrouter_model: str = "anthropic/claude-sonnet-5"
+    # AC-14 allows 12 seconds for an AI plan or explanation operation. `explain_candidate` is
+    # issued once per *returned* candidate — app/recommendation/service.py narrates after the
+    # `limit` slice — and the contract caps `limit` at 3, so three sequential calls is the bound
+    # and the per-call ceiling is a third of the budget. Narrating inside the scoring loop instead
+    # made that bound the number of eligible engineers, which is four on the seeded data and
+    # capped by nothing. A slower answer is worth less than the template it falls back to.
+    openrouter_timeout_seconds: float = 3.5
+    # Extraction and the optional enrichments are *not* inside an API request, so AC-14 does not
+    # govern them and the tight narrative budget above is the wrong number: it is a third of a
+    # 12-second response budget, and a cold call to a large model does not fit in it. Measured
+    # symptom — the first call of a process timed out on the read and the second, on a warm pooled
+    # connection, succeeded. A seed that fails on its first artifact and works on its second is the
+    # worst kind of flaky.
+    #
+    # Generous on purpose. A slow seed is an inconvenience; a seed that abandons artifacts produces a
+    # knowledge graph with holes in it, and holes in the graph move risk numbers.
+    openrouter_batch_timeout_seconds: float = 40.0
+
+    # Which committed extraction cache `AI_PROVIDER=cached` replays. Named after the provider that
+    # built it, so a reader can always tell what produced the graph they are looking at — the cache is
+    # the one artifact here whose provenance must never be ambiguous.
+    extraction_cache_file: str = "watsonx_cache.json"
+    # One attempt by default, for the same reason: a second call costs the rest of the budget and
+    # buys a wording, while the template is already sitting there. Raise it where latency is not
+    # budgeted.
+    openrouter_max_retries: int = 0
+
+    # The wall-clock ceiling on the narration phase of one request, enforced by app/ai/budget.py
+    # rather than by the transport. `openrouter_timeout_seconds` above turned out not to bound a
+    # call at all — httpx's read timeout bounds the gap between socket reads, and the gateway keeps
+    # the socket warm while the model generates — so a real total has to be imposed by something
+    # that can stop waiting. See OPEN-11.
+    #
+    # 8 seconds against AC-14's 12 for an AI explanation operation. The margin is for the rest of
+    # the request: scoring, evidence reads, serialisation. Measured generation is about 6 seconds,
+    # so a healthy call fits and a stalled one is cut off with the template in its place. Set to 0
+    # to skip model narration entirely and always use the templates.
+    narrative_deadline_seconds: float = 8.0
+    # The contract caps `limit` at 3, so three is the most that is ever asked for at once.
+    narrative_max_workers: int = 3
 
     # Shared contract fixtures, jointly owned. Contract decision CI-14.
     fixtures_path: Path = REPO_ROOT / "fixtures"

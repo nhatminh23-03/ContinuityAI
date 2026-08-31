@@ -18,10 +18,14 @@ Failure policy differs by method, deliberately:
   strengths, and plan text are prose over facts the rules already decided, so a timeout should
   degrade the wording rather than break the demo (ARCHITECTURE.md section 85).
 
+Of the three narratives only `summarize_simulation` spends a model call; `explain_candidate` and
+`generate_mitigation_plan` return the deterministic text and say in their own bodies why.
+
 Every response is validated by `app/ai/validation.py` before anything reaches the database — the same
 gate the deterministic provider passes through. An invented capability, a claim against someone who
 is not a recorded participant, or a cross-system attribution is rejected regardless of which provider
-produced it.
+produced it, and the one model-written sentence goes through `validate_simulation_summary` before it
+is returned or persisted.
 """
 
 from __future__ import annotations
@@ -36,6 +40,7 @@ from pathlib import Path
 import httpx
 
 from app.ai.deterministic import DeterministicProvider
+from app.ai.extraction import extract_with
 from app.ai.provider import ExtractionContext
 from app.ai.schemas import (
     ArtifactExtraction,
@@ -47,8 +52,9 @@ from app.ai.schemas import (
     PlanDraft,
     SimulationSummaryContext,
 )
+from app.ai.validation import validate_simulation_summary
 from app.core.config import settings
-from app.core.errors import AIExtractionError
+from app.core.errors import AIExtractionError, NarrativeUnavailableError
 from app.evidence.strength import strength_for_role
 from app.schemas.enums import EvidenceConfidence, EvidenceRole
 
@@ -95,6 +101,9 @@ class WatsonxProvider:
             )
         self.model_id = settings.watsonx_model_id
         self._fallback = DeterministicProvider()
+        # Set to False by `ChainedProvider`, which has another model to try and must be able to see
+        # that this one failed. See `NarrativeUnavailableError`.
+        self.degrade_to_template = True
         self._token: str | None = None
         self._token_expires_at: float = 0.0
         self._system_prompt = SYSTEM_PROMPT_FILE.read_text()
@@ -224,81 +233,20 @@ class WatsonxProvider:
     def extract_artifact_semantics(
         self, artifact: ArtifactInput, context: ExtractionContext
     ) -> ArtifactExtraction:
-        candidates = context.by_system(artifact.system_hint)
-        if not candidates or not artifact.participants:
-            # Nothing to attribute to, or nobody to attribute it to. Spending a model call to
-            # confirm that would be wasteful.
-            return ArtifactExtraction(
-                artifact_id=artifact.artifact_id,
-                system_id=artifact.system_hint,
-                ambiguity=["no capabilities in scope" if not candidates else "no participants"],
-            )
+        """FR-004. The prompt, the closed-world rules and the discard logic live in
+        `app/ai/extraction.py`, shared with every other model-backed provider.
 
-        raw = self._chat(self._system_prompt, self._user_prompt(artifact, context), EXTRACTION_MAX_TOKENS)
-
-        try:
-            payload = self._parse_json(raw)
-        except json.JSONDecodeError as exc:
-            raise AIExtractionError(
-                f"watsonx returned output that is not JSON for {artifact.source_reference}.",
-                {"artifact_id": artifact.artifact_id, "snippet": raw[:200]},
-            ) from exc
-
-        taxonomy = {c.capability_id for c in candidates}
-        participants = {p.engineer_id for p in artifact.participants}
-        claims: list[CapabilityClaim] = []
-        ambiguity = [str(a) for a in payload.get("ambiguity", []) if a]
-
-        for entry in payload.get("claims", []) or []:
-            if not isinstance(entry, dict):
-                continue
-            try:
-                role = EvidenceRole(str(entry.get("evidence_role", "")).strip().upper())
-            except ValueError:
-                ambiguity.append(f"unrecognised evidence_role {entry.get('evidence_role')!r}")
-                continue
-
-            capability_id = str(entry.get("capability_id", "")).strip()
-            engineer_id = str(entry.get("engineer_id", "")).strip()
-            summary = str(entry.get("summary") or "").strip()
-            rationale = str(entry.get("rationale") or "").strip()
-
-            # Cheap local checks first so obvious rubbish never reaches validation. The real gate is
-            # still app/ai/validation.py, which both providers pass through.
-            if capability_id not in taxonomy or engineer_id not in participants:
-                ambiguity.append(
-                    f"discarded claim outside the supplied lists: {capability_id!r}/{engineer_id!r}"
-                )
-                continue
-            if not summary or not rationale:
-                ambiguity.append(f"discarded uncited claim for {capability_id}/{engineer_id}")
-                continue
-
-            claims.append(
-                CapabilityClaim(
-                    capability_id=capability_id,
-                    engineer_id=engineer_id,
-                    evidence_role=role,
-                    # Derived, never taken from the model. PRD section 16.1.
-                    evidence_strength=strength_for_role(role),
-                    summary=summary,
-                    rationale=f"watsonx/{self.model_id}: {rationale}",
-                    extraction_confidence=EvidenceConfidence.MEDIUM,
-                    is_conflicting=self._fallback._looks_conflicting(artifact),
-                )
-            )
-
-        component_id = None
-        if len({c.capability_id for c in claims}) == 1:
-            claimed = next(iter({c.capability_id for c in claims}))
-            component_id = next((c.component_id for c in candidates if c.capability_id == claimed), None)
-
-        return ArtifactExtraction(
-            artifact_id=artifact.artifact_id,
-            system_id=artifact.system_hint,
-            component_id=component_id,
-            claims=claims,
-            ambiguity=ambiguity,
+        This used to be written out here in full. Moving it out is what stops two providers from
+        growing two subtly different definitions of extraction — which would turn the comparison in
+        `scripts/extract_with_provider.py` into a measurement of the parsers rather than the models.
+        Only the transport and the provenance label are specific to watsonx.
+        """
+        return extract_with(
+            artifact,
+            context,
+            chat=lambda system, user, max_tokens: self._chat(system, user, max_tokens),
+            provider_label=f"watsonx/{self.model_id}",
+            is_conflicting=self._fallback._looks_conflicting(artifact),
         )
 
     @staticmethod
@@ -350,26 +298,61 @@ class WatsonxProvider:
             f"Risk class moves from {context.risk_class_before} to {context.risk_class_after}."
         )
         try:
-            sentence = self._chat(system, user, NARRATIVE_MAX_TOKENS).strip().strip('"')
-            return sentence or self._fallback.summarize_simulation(context)
+            sentence = self._chat(system, user, NARRATIVE_MAX_TOKENS).strip().strip('"').strip()
+            # The same gate `OpenRouterProvider.summarize_simulation` applies, for the same
+            # reason: this value is returned by `POST /simulations` *and* persisted into
+            # `result_json`, so an ungated sentence would outlive the request that produced it.
+            # An empty reply is a rejection here rather than a separate branch — the gate already
+            # treats it as one.
+            if validate_simulation_summary(sentence, context).accepted:
+                return sentence
         except AIExtractionError:
-            logger.warning("watsonx summary failed; using the deterministic template")
-            return self._fallback.summarize_simulation(context)
+            logger.warning("watsonx summary failed")
+        return self._or_raise(
+            "simulation summary", lambda: self._fallback.summarize_simulation(context)
+        )
+
+    def _or_raise(self, subject: str, produce):
+        """The template, unless this provider is inside a chain that has another model to try.
+
+        See `NarrativeUnavailableError`: falling back here unconditionally makes a failed generation
+        look like a successful one, which stops any outer chain from ever reaching its next provider.
+        """
+        if not self.degrade_to_template:
+            raise NarrativeUnavailableError(
+                f"watsonx could not produce the {subject}.",
+                {"provider": self.name, "subject": subject},
+            )
+        logger.warning("watsonx %s: using the deterministic template", subject)
+        return produce()
 
     def explain_candidate(self, context: CandidateNarrativeContext) -> CandidateNarrative:
         # The structured content — which capabilities are demonstrated, assisted, or missing — is
         # decided by the rules. A model here would only rephrase it, and a rephrasing that drifts
-        # is worse than a plain one, so the deterministic phrasing stands.
-        return self._fallback.explain_candidate(context)
+        # is worse than a plain one, so the deterministic phrasing stands *for this provider*.
+        #
+        # Routed through `_or_raise` rather than returning the template directly, which is the
+        # difference between "I choose not to" and "here is an answer". Inside a chain those are not
+        # the same thing: returning the template looked like success and stopped OpenRouter — which
+        # does model-write this one — from ever being asked. Declining lets the chain move on.
+        return self._or_raise(
+            "candidate narrative", lambda: self._fallback.explain_candidate(context)
+        )
 
     def generate_mitigation_plan(self, context: PlanContext) -> PlanDraft:
         """The deterministic plan is already gap-targeted and validated for 3-5 actions.
 
         A model could write warmer prose, but the plan is the artifact a manager approves and then
         someone executes — invented steps or an invented tool would be a real cost, and the
-        structure is what carries the value. Left deterministic on purpose.
+        structure is what carries the value. Left deterministic on purpose *for this provider*.
+
+        Declined rather than answered when inside a chain, for the reason given in
+        `explain_candidate`: a template returned as a success is indistinguishable from a generation,
+        and it blocked the next provider from being tried at all.
         """
-        return self._fallback.generate_mitigation_plan(context)
+        return self._or_raise(
+            "mitigation plan", lambda: self._fallback.generate_mitigation_plan(context)
+        )
 
     def close(self) -> None:
         self._client.close()

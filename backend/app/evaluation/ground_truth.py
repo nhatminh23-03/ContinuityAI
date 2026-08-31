@@ -35,6 +35,11 @@ class GroundTruth:
     expected_declared_owner_mismatch: list[str] = field(default_factory=list)
     expected_simulation: dict = field(default_factory=dict)
     expected_backup_candidates: dict = field(default_factory=dict)
+    # Artifacts written to fool the rules, and the constraint each one must not breach.
+    # RECOMMENDATIONS.md R-02. Kept here rather than in the corpus so the answer key stays on the
+    # hidden side of the boundary: the traps are visible to anyone reading `data/synthetic/`, but what
+    # they are supposed to *fail* to do is not.
+    adversarial_artifacts: list[dict] = field(default_factory=list)
 
     @property
     def by_pair(self) -> dict[tuple[str, str], str]:
@@ -76,4 +81,5 @@ def load_ground_truth(path: Path | None = None) -> GroundTruth:
         expected_declared_owner_mismatch=payload.get("expected_declared_owner_mismatch", []),
         expected_simulation=payload.get("expected_simulation", {}),
         expected_backup_candidates=payload.get("expected_backup_candidates", {}),
+        adversarial_artifacts=payload.get("adversarial_artifacts", []),
     )

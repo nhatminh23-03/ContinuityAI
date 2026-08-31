@@ -164,10 +164,35 @@ def main() -> None:
             for item in found:
                 print(f"    - {item}")
 
-    print("\nlatency (AC-14: reads < 800 ms, simulation < 2 s)")
+    # AC-14 has three clauses, and which one applies depends on the provider — so the budget table
+    # cannot be a constant. "Deterministic simulation returns in <2 seconds; normal read APIs target
+    # <800ms local p95; AI plan/explanation operations target <12 seconds."
+    #
+    # Under a model provider the simulation summary, the candidate narratives and the plan are all AI
+    # explanation operations and get the 12-second clause. Under `deterministic` they are none of
+    # those things and the strict budgets apply. Applying 800ms to a model-written plan reported a
+    # breach that AC-14 does not actually claim, which is its own kind of wrong answer.
+    from app.core.config import settings
+
+    ai_backed = settings.ai_provider.lower() not in {"deterministic", "none", "", "stub"}
+    ai_operations = ("simulations", "recommendations", "mitigation-plans")
+
+    def budget_for(label: str) -> float:
+        if ai_backed and any(operation in label for operation in ai_operations):
+            return 12000.0
+        if "simulations" in label:
+            return 2000.0
+        return 800.0
+
+    header = (
+        "AC-14: reads < 800 ms, AI operations < 12 s (model provider active)"
+        if ai_backed
+        else "AC-14: reads < 800 ms, simulation < 2 s"
+    )
+    print(f"\nlatency ({header})")
     breaches = []
     for label, milliseconds in timings:
-        budget = 2000.0 if "simulations" in label else 800.0
+        budget = budget_for(label)
         status = "ok" if milliseconds <= budget else "OVER"
         if status == "OVER":
             breaches.append(f"{label} {milliseconds:.0f} ms > {budget:.0f} ms")

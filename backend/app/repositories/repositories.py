@@ -110,6 +110,32 @@ class CapabilityRepository(_Repo):
         )
         return {a.capability_id: a for a in self.session.scalars(stmt)}
 
+    def sole_expert_count_for_platform(self, platform_id: str) -> int:
+        """How many capabilities under this platform rest on exactly one adequate engineer.
+
+        `adequate_engineer_count` is persisted by the continuity engine and is already
+        staleness-aware — `CoverageFact.is_adequate` excludes STALE evidence per PRD rule R6 — so
+        this counts rows rather than re-deriving anything.
+
+        The `== 1` test is deliberately the same one `app/continuity/aggregation.py` uses to raise
+        `SOLE_EXPERT_CAPABILITY` and `MULTIPLE_SOLE_EXPERT_CAPABILITIES`. Those reason codes are
+        already on the wire, so a second definition here would let a platform card disagree with
+        the reason codes on the system beneath it.
+
+        Note this is not the same as summing `degraded_capability_count`: under DEC-07 a
+        lower-criticality capability with *zero* adequate engineers is DEGRADED rather than a
+        critical gap, so degraded counts both the sole-expert case and the no-expert case.
+        """
+        stmt = (
+            select(func.count())
+            .select_from(CapabilityAssessment)
+            .join(Capability, Capability.capability_id == CapabilityAssessment.capability_id)
+            .join(System, System.system_id == Capability.system_id)
+            .where(System.platform_id == platform_id)
+            .where(CapabilityAssessment.adequate_engineer_count == 1)
+        )
+        return int(self.session.scalar(stmt) or 0)
+
 
 class EngineerRepository(_Repo):
     def get(self, engineer_id: str) -> Engineer | None:

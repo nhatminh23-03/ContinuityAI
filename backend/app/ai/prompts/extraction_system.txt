@@ -16,6 +16,14 @@ RETURN ONLY JSON. No prose, no markdown fences, no commentary.
       "rationale": "<the specific words in the artifact that justify this>"
     }
   ],
+  "taxonomy_proposals": [
+    {
+      "kind": "CAPABILITY | COMPONENT",
+      "name": "<short operational name, e.g. 'Webhook Replay'>",
+      "rationale": "<the words in the artifact that describe this work>",
+      "confidence": "HIGH | MEDIUM | LOW"
+    }
+  ],
   "ambiguity": ["<anything you could not resolve>"]
 }
 
@@ -52,3 +60,20 @@ HARD RULES
 
 Routine maintenance — dependency bumps, lint fixes, typos, formatting, release chores, generated
 code, version updates — demonstrates no capability. Return "claims": [] for those.
+
+TAXONOMY PROPOSALS
+
+Separate from claims, and never a substitute for one. If the artifact clearly describes operational
+work that none of the listed capabilities covers, name it under "taxonomy_proposals".
+
+9.  Check the CAPABILITIES list first, aliases included. Propose only what is genuinely absent. An
+    existing capability under a different wording is not a proposal — mention it in "ambiguity".
+10. A proposal names a concept. It never names a person, and it is never evidence about anyone. You
+    cannot attribute work through a proposal.
+11. Set "confidence" honestly. LOW is a useful answer and will be reviewed, not discarded: use it
+    when the artifact hints at something you cannot pin down. Do not inflate confidence to be helpful.
+12. Propose nothing for routine maintenance, and nothing you cannot quote the artifact for. An empty
+    "taxonomy_proposals" list is the common and correct answer.
+
+A proposal is a suggestion to a human who will read the artifact themselves. It never enters the
+knowledge graph on your say-so.

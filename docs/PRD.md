@@ -807,7 +807,7 @@ For MVP, map the rule class to a band, then apply small, inspectable modifiers. 
 |------------------------------------------------------------------------------------------|----------------------------|
 | Missing critical runbook                                                                 | +5                         |
 | Incomplete/outdated runbook                                                              | +3                         |
-| High operational dependency (e.g., majority of recent P1 recovery evidence concentrated) | +3                         |
+| High operational dependency (e.g., majority of recent P1 recovery evidence concentrated) | +3 — **not implemented**    |
 | Best backup only EXPOSED                                                                 | +3                         |
 | Best backup ASSISTED                                                                     | +1                         |
 | Current complete runbook                                                                 | -3                         |
@@ -815,6 +815,15 @@ For MVP, map the rule class to a band, then apply small, inspectable modifiers. 
 | Second VALIDATED engineer                                                                | -8                         |
 
 Clamp to the band corresponding to the authoritative risk class so modifiers cannot silently change the classification. Example: CRITICAL anchor 90 + missing runbook 5 + high dependency 3 = 98; display “98 / 100 CRITICAL.”
+
+**Annotation, added during implementation (`RECOMMENDATIONS.md` R-08).** *High operational dependency* is
+deliberately not implemented. It is true of nearly every sole-expert capability in the seeded data, so it
+would add a constant to exactly the capabilities the sole-expert modifier already penalises — double-counting
+one signal under two names and making the index harder to explain rather than more accurate. If it is wanted
+later it should be redefined to capture something the sole-expert modifier does not, such as concentration
+across a *component* rather than a capability. `app/continuity/reason_codes.py` is the implemented list, and
+one modifier not in this table — `SOLE_ADEQUATE_ENGINEER`, +1 — was added there for the reason recorded in
+`docs/DECISIONS.md`.
 
 ## 17.3 Platform/system aggregation
 

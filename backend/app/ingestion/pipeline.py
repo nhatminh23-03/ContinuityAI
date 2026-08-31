@@ -22,23 +22,44 @@ from dataclasses import dataclass, field
 
 from sqlalchemy.orm import Session
 
+import re
+
+from sqlalchemy import select
+
 from app.ai.provider import AIProvider, ExtractionContext
-from app.ai.schemas import ArtifactInput, TaxonomyCapability
+from app.ai.schemas import ArtifactExtraction, ArtifactInput, TaxonomyCapability
 from app.ai.validation import validate_extraction
 from app.core.errors import AIExtractionError
 from app.evidence.freshness import freshness_for
 from app.ingestion.adapters import normalise_reference
-from app.models import Artifact, Evidence
+from app.models import Artifact, Evidence, TaxonomyProposalRow
+from app.schemas.enums import EvidenceConfidence, TaxonomyProposalStatus
 
 
 @dataclass
 class IngestionReport:
     artifacts_ingested: int = 0
     artifacts_without_claims: int = 0
+    # FR-005: distinct concepts proposed, and how many of those the model itself marked LOW.
+    taxonomy_proposals: int = 0
+    low_confidence_proposals: int = 0
     evidence_created: int = 0
     claims_rejected: list[str] = field(default_factory=list)
     strengths_corrected: list[str] = field(default_factory=list)
     ambiguities: list[str] = field(default_factory=list)
+
+    def proposal_summary(self) -> str:
+        """FR-005, reported separately from evidence because it is a different kind of output.
+
+        Proposals are suggestions for a human and carry no evidence, so folding them into the evidence
+        line would overstate what the run produced.
+        """
+        if not self.taxonomy_proposals:
+            return "no taxonomy concepts proposed"
+        return (
+            f"{self.taxonomy_proposals} taxonomy concept(s) proposed for review "
+            f"({self.low_confidence_proposals} low confidence)"
+        )
 
     def summary(self) -> str:
         return (
@@ -93,6 +114,13 @@ def ingest(
         report.strengths_corrected.extend(outcome.corrections)
         report.ambiguities.extend(f"{artifact.source_reference}: {a}" for a in extraction.ambiguity)
 
+        # FR-005. Recorded before the `no claims` early return below, deliberately: an artifact that
+        # produced no claim *because the taxonomy has no name for what it describes* is the single most
+        # informative case for a proposal, and returning early would throw exactly those away.
+        _record_proposals(
+            session, artifact, extraction, report, provider_label=getattr(provider, "name", "?")
+        )
+
         if not outcome.claims:
             report.artifacts_without_claims += 1
             continue
@@ -131,3 +159,100 @@ def ingest(
 
     session.flush()
     return report
+
+
+def _proposal_slug(kind: str, name: str, system_id: str | None) -> str:
+    """A stable id, so the same concept proposed by two artifacts is one row with a count of two.
+
+    Derived rather than allocated, for the same reason evidence ids are: a reseed must not renumber
+    things a reviewer has already looked at.
+    """
+    stem = re.sub(r"[^a-z0-9]+", "_", name.strip().lower()).strip("_")
+    scope = system_id or "unscoped"
+    return f"proposal_{kind.lower()}_{scope}_{stem}"
+
+
+def _record_proposals(
+    session: Session,
+    artifact: ArtifactInput,
+    extraction: ArtifactExtraction,
+    report: IngestionReport,
+    *,
+    provider_label: str,
+) -> None:
+    """Persist FR-005 proposals, merging repeats rather than duplicating them.
+
+    Nothing here touches `capabilities`, `evidence`, or any assessment. A proposal is a note to a human;
+    the closed-world guarantee for the graph is only worth having if this function cannot weaken it, so
+    the only table it writes is its own.
+
+    Repeats increment `occurrences` instead of adding rows. A concept named by one artifact is a guess;
+    the same concept named by nine is a gap in the taxonomy, and that count is what makes a review list
+    sortable by something more useful than recency.
+    """
+    for proposal in extraction.taxonomy_proposals:
+        proposal_id = _proposal_slug(proposal.kind.value, proposal.name, proposal.system_id)
+        existing = session.get(TaxonomyProposalRow, proposal_id)
+        if existing is not None:
+            existing.occurrences += 1
+            # Keep the highest confidence seen. A concept one artifact was unsure about and another
+            # stated plainly is better described by the plain one.
+            if _confidence_rank(proposal.confidence) > _confidence_rank(
+                EvidenceConfidence(existing.confidence)
+            ):
+                existing.confidence = proposal.confidence.value
+                existing.rationale = proposal.rationale
+                existing.source_reference = proposal.source_reference
+            continue
+
+        session.add(
+            TaxonomyProposalRow(
+                proposal_id=proposal_id,
+                kind=proposal.kind.value,
+                name=proposal.name,
+                system_id=proposal.system_id,
+                component_id=proposal.component_id,
+                rationale=proposal.rationale,
+                confidence=proposal.confidence.value,
+                status=TaxonomyProposalStatus.PROPOSED.value,
+                source_reference=proposal.source_reference,
+                artifact_id=artifact.artifact_id,
+                proposed_by=provider_label,
+                occurrences=1,
+            )
+        )
+        # Flushed immediately so the next artifact's `session.get` above can see it.
+        #
+        # Without this the merge silently does not work: `session.get` resolves persistent rows, not
+        # ones still pending in the session, so two artifacts proposing the same concept before a flush
+        # both insert and the unique constraint aborts the whole seed. Found by
+        # `test_repeated_proposals_are_merged_with_a_count`, which is exactly the shape a real corpus
+        # produces — the same missing concept is usually described by several artifacts.
+        #
+        # Proposals are rare next to artifacts, so the cost of flushing each one is nothing.
+        session.flush()
+        report.taxonomy_proposals += 1
+        if proposal.confidence is EvidenceConfidence.LOW:
+            report.low_confidence_proposals += 1
+
+
+def _confidence_rank(confidence: EvidenceConfidence) -> int:
+    return {
+        EvidenceConfidence.LOW: 0,
+        EvidenceConfidence.MEDIUM: 1,
+        EvidenceConfidence.HIGH: 2,
+    }[confidence]
+
+
+def proposals_for_review(session: Session) -> list[TaxonomyProposalRow]:
+    """Everything still awaiting a human, most-corroborated first.
+
+    Ordered by occurrences before confidence on purpose: a concept nine artifacts mention is a stronger
+    signal about the taxonomy than one the model happened to feel confident about once.
+    """
+    stmt = (
+        select(TaxonomyProposalRow)
+        .where(TaxonomyProposalRow.status == TaxonomyProposalStatus.PROPOSED.value)
+        .order_by(TaxonomyProposalRow.occurrences.desc(), TaxonomyProposalRow.name)
+    )
+    return list(session.scalars(stmt))

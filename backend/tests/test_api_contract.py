@@ -49,6 +49,30 @@ def test_the_api_surface_is_exactly_the_agreed_endpoints() -> None:
     assert versioned == frozen | added_by_decision
 
 
+def test_every_shared_fixture_is_captured_by_the_refresh_script() -> None:
+    """A fixture the refresh script does not capture cannot be checked for drift.
+
+    `refresh_fixtures --check` only compares the payloads it captured, so an uncaptured file makes
+    it print "all fixtures match live engine output" without having looked at that file at all.
+    `identity-systems.json` and `challenge-attest-jordan.json` were both in that state — added by
+    hand from live captures — which is `docs/BACKEND_GAPS.md` GAP-03. Asserting set equality against
+    the directory means the next fixture added on either side fails here instead of drifting
+    silently for a week.
+
+    This is the cheapest of the fixture tests and the only one that catches an *absence*.
+    """
+    from tests.conftest import FIXTURES
+
+    from scripts.refresh_fixtures import CAPTURED_FIXTURES
+
+    on_disk = {path.stem for path in FIXTURES.glob("*.json")}
+    assert on_disk == CAPTURED_FIXTURES, (
+        "fixtures/ and the refresh script disagree. Only in fixtures/: "
+        f"{sorted(on_disk - CAPTURED_FIXTURES)}. Only in the script: "
+        f"{sorted(CAPTURED_FIXTURES - on_disk)}."
+    )
+
+
 # ---------------------------------------------------------------------------------------
 # 1-2. Platforms
 # ---------------------------------------------------------------------------------------
@@ -65,9 +89,71 @@ def test_platforms_match_the_fixture_and_expose_no_platform_risk_score(client) -
         assert platform["critical_gap_count"] == reference["critical_gap_count"]
         assert platform["system_count"] == reference["system_count"]
         assert platform["drift_status"] == reference["drift_status"]
+        assert (
+            platform["single_expert_dependency_count"]
+            == reference["single_expert_dependency_count"]
+        )
         # Contract section 2.1: no synthesised platform-level score exists.
         assert "continuity_risk_index" not in platform
         assert "continuity_risk_class" not in platform
+
+
+def test_single_expert_dependency_count_counts_capabilities_with_exactly_one_adequate_engineer(
+    client, session
+) -> None:
+    """The field must equal the persisted per-capability count, not a re-derivation.
+
+    Guards DEC-17/GAP-01: the number is aggregated in SQL from
+    `capability_assessments.adequate_engineer_count`, so this recomputes the same thing in Python
+    from the same rows and requires agreement. If someone later reimplements the aggregate with a
+    different notion of "adequate", this fails.
+    """
+    from app.models import Capability, CapabilityAssessment, System
+
+    rows = (
+        session.query(System.platform_id, CapabilityAssessment.adequate_engineer_count)
+        .join(Capability, Capability.system_id == System.system_id)
+        .join(
+            CapabilityAssessment,
+            CapabilityAssessment.capability_id == Capability.capability_id,
+        )
+        .all()
+    )
+    expected: dict[str, int] = {}
+    for platform_id, adequate in rows:
+        expected.setdefault(platform_id, 0)
+        if adequate == 1:
+            expected[platform_id] += 1
+
+    body = client.get("/api/v1/platforms").json()
+    assert expected, "no capability assessments were seeded, so this test proves nothing"
+    for platform in body["platforms"]:
+        assert platform["single_expert_dependency_count"] == expected[platform["platform_id"]]
+
+
+def test_single_expert_dependency_count_is_not_the_degraded_count(client) -> None:
+    """The reason the field had to exist at all.
+
+    `docs/BACKEND_GAPS.md` GAP-01 warned that the frontend must not approximate this by summing
+    `degraded_capability_count`. That warning is only worth trusting if the two actually differ on
+    the seeded data, so this asserts they do — otherwise a client-side approximation would pass
+    every test we have and be wrong on the first dataset where the shortcut breaks.
+
+    They differ because under DEC-07 a lower-criticality capability with *zero* adequate engineers
+    is DEGRADED rather than a critical gap, so the degraded count spans both the one-expert and the
+    no-expert cases.
+    """
+    platforms = client.get("/api/v1/platforms").json()["platforms"]
+    for platform in platforms:
+        systems = client.get(f"/api/v1/platforms/{platform['platform_id']}/systems").json()
+        degraded_total = sum(s["degraded_capability_count"] for s in systems["systems"])
+        if platform["single_expert_dependency_count"] != degraded_total:
+            return
+    raise AssertionError(
+        "single_expert_dependency_count equals the summed degraded count on every platform, so "
+        "this dataset no longer demonstrates why the field is not client-derivable. Either the "
+        "seed changed or DEC-07 changed; re-read GAP-01 before deleting this test."
+    )
 
 
 def test_systems_under_a_platform_are_returned_with_their_assessments(client) -> None:
@@ -239,3 +325,34 @@ def test_a_sparse_capability_returns_insufficient_evidence_and_no_index(client) 
     assert body["exposure"] == "INSUFFICIENT_EVIDENCE"
     assert body["continuity_risk_index"] is None
     assert body["continuity_risk_class"] is None
+
+
+def test_cors_allows_the_frontend_origin_and_is_configurable() -> None:
+    """The browser is the only client that matters here, and CORS is invisible to the backend log.
+
+    A rejected origin produces a failure the frontend sees and this process does not: pages render,
+    fetches fail, nothing is logged server-side. So the allowlist is asserted rather than assumed,
+    and asserted through `settings` so that running the frontend on a non-default port is a
+    configuration change rather than a code change.
+    """
+    from app.core.config import Settings, settings
+
+    assert "http://localhost:3000" in settings.cors_origin_list
+
+    configured = Settings(cors_origins="http://localhost:3100, http://127.0.0.1:3100")
+    assert configured.cors_origin_list == [
+        "http://localhost:3100",
+        "http://127.0.0.1:3100",
+    ], "whitespace around a comma-separated origin must not produce an entry that never matches"
+
+
+def test_a_browser_request_from_the_frontend_origin_is_allowed(client) -> None:
+    """End to end through the middleware, not just the setting.
+
+    The header is what the browser actually enforces on, so this checks the response carries it.
+    """
+    response = client.get(
+        "/api/v1/platforms", headers={"Origin": "http://localhost:3000"}
+    )
+    assert response.status_code == 200
+    assert response.headers.get("access-control-allow-origin") == "http://localhost:3000"

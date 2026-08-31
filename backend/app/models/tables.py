@@ -246,6 +246,42 @@ class CapabilityAssessment(Base):
     adequate_engineer_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
 
+class TaxonomyProposalRow(Base):
+    """A concept a model proposed that the taxonomy does not contain. FR-005.
+
+    Its own table, and pointedly not a row in `capabilities`. A proposal has no evidence, no engineer,
+    and no assessment; nothing in `app/continuity/` reads this table. That is what lets the product ask
+    a model to name concepts it was not given while keeping extraction closed-world — the two would
+    otherwise contradict each other.
+
+    Promotion into `capabilities` is a human act. `status` exists so "flagged for review" is a state a
+    proposal can be in and move out of, rather than a label with nothing behind it.
+    """
+
+    __tablename__ = "taxonomy_proposals"
+
+    proposal_id: Mapped[str] = mapped_column(String, primary_key=True)
+    kind: Mapped[str] = mapped_column(String, nullable=False)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    system_id: Mapped[str | None] = mapped_column(String)
+    component_id: Mapped[str | None] = mapped_column(String)
+    rationale: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    # The model's own confidence. LOW is the FR-005 review flag, not a reason to discard.
+    confidence: Mapped[str] = mapped_column(String, nullable=False, default="LOW")
+    status: Mapped[str] = mapped_column(String, nullable=False, default="PROPOSED")
+    # Provenance, on the same terms as any claim (FR-006): a reviewer reads the artifact, not the
+    # proposal's word for it.
+    source_reference: Mapped[str | None] = mapped_column(String)
+    artifact_id: Mapped[str | None] = mapped_column(ForeignKey("artifacts.artifact_id"))
+    # Which provider proposed it, so a bad run can be traced to a model rather than to the taxonomy.
+    proposed_by: Mapped[str] = mapped_column(String, nullable=False, default="")
+    # How many artifacts independently suggested the same concept. A concept seen once is a guess;
+    # seen repeatedly it is a gap in the taxonomy, and that is the signal worth sorting a review by.
+    occurrences: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+
+    __table_args__ = (UniqueConstraint("kind", "name", "system_id", name="uq_taxonomy_proposal"),)
+
+
 class SystemAssessment(Base):
     __tablename__ = "system_assessments"
 

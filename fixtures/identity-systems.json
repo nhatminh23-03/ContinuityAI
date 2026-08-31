@@ -1,0 +1,40 @@
+{
+  "platform": {
+    "platform_id": "platform_identity",
+    "name": "Identity Platform"
+  },
+  "systems": [
+    {
+      "system_id": "system_authentication",
+      "platform_id": "platform_identity",
+      "name": "Authentication",
+      "description": "Verifies customer and staff credentials and issues sessions",
+      "business_criticality": "CRITICAL",
+      "continuity_risk_index": 68,
+      "continuity_risk_class": "HIGH",
+      "exposure": "CRITICAL_GAP",
+      "evidence_confidence": "MEDIUM",
+      "critical_gap_count": 1,
+      "degraded_capability_count": 1,
+      "covered_capability_count": 4,
+      "insufficient_evidence_count": 0,
+      "drift_status": "STABLE"
+    },
+    {
+      "system_id": "system_authorization",
+      "platform_id": "platform_identity",
+      "name": "Authorization",
+      "description": "Evaluates access policy and manages roles and permissions",
+      "business_criticality": "HIGH",
+      "continuity_risk_index": 54,
+      "continuity_risk_class": "MODERATE",
+      "exposure": "DEGRADED",
+      "evidence_confidence": "LOW",
+      "critical_gap_count": 0,
+      "degraded_capability_count": 1,
+      "covered_capability_count": 2,
+      "insufficient_evidence_count": 1,
+      "drift_status": "STABLE"
+    }
+  ]
+}

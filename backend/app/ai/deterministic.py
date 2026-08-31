@@ -41,6 +41,7 @@ from app.ai.schemas import (
     SimulationSummaryContext,
     TaxonomyCapability,
 )
+from app.ai.validation import requires_recovery_drill
 from app.evidence.strength import strength_for_role
 from app.models.enums import ParticipantRole
 from app.schemas.enums import (
@@ -48,7 +49,6 @@ from app.schemas.enums import (
     EvidenceRole,
     EvidenceSourceType,
     MitigationTaskType,
-    ReadinessLevel,
 )
 
 # (source_type, participant_role) -> evidence role. Anything unmapped yields no claim, which is
@@ -292,7 +292,11 @@ class DeterministicProvider:
 
         # Someone with no hands-on evidence at all needs the drill before the write-up; someone
         # who has already assisted does not. The plan reflects the gap, not a fixed template.
-        if context.candidate_readiness in {ReadinessLevel.NONE.value, ReadinessLevel.EXPOSED.value}:
+        #
+        # The condition is `requires_recovery_drill` rather than a local readiness check because
+        # `validate_plan_draft` enforces the same AC-09 rule on a model-written plan. Two copies
+        # of it would drift, and the drift would be silent.
+        if requires_recovery_drill(context.candidate_readiness):
             tasks.append(
                 PlanTaskDraft(
                     title=f"Run an unaided {capability} drill",

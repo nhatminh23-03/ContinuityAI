@@ -190,6 +190,145 @@ PINNED_CONFLICT_ARTIFACTS: list[dict] = [
     },
 ]
 
+# Artifacts written to fool the rules. RECOMMENDATIONS.md R-02.
+#
+# The evaluation scores 100%, and the fair objection is that the generator emits evidence patterns
+# chosen to be classifiable — so a perfect score might only show the pipeline agreeing with itself.
+# These exist to make that objection testable. Each one looks like capability and is not, and the
+# eighth evaluation check requires the rules to decline every one of them.
+#
+# **Declining is a much stronger claim than 100% on cooperative data**, because each of these is a
+# specific way a plausible system gets this wrong:
+#
+#   1. Volume mistaken for capability. Someone who reviews and comments constantly, and never
+#      executes, must stay EXPOSED however many artifacts they appear in. "Artifact, not activity"
+#      is a stated PRD principle and this is the only thing that tests it.
+#   2. Attribution by name. A body that says someone did the work, while the source system's
+#      participant list says otherwise, must not create coverage for the person named in prose.
+#      This is the shape of the mistake a language model makes — and, measured, did make.
+#   3. Authority language mistaken for evidence. "Owns this area", "the expert", "most senior" are
+#      claims about status, not records of execution, and must move nothing.
+#
+# **Placement is what keeps them safe.** Each is attached to an `(engineer, capability)` pair that
+# already sits at or above the readiness the artifact could possibly justify, on capabilities whose
+# evidence list no fixture captures. So they can only fail *upward* — if the rules are fooled, a
+# readiness rises, the eighth check fails, and a fixture moves. Nothing here can quietly pass.
+#
+# Deliberately not on the hero capability: `incident-recovery-evidence.json` pins its exact evidence
+# list, so adding records there would change a frozen fixture for a reason unrelated to the test.
+ADVERSARIAL_CAPABILITY = "cap_token_rotation"
+
+PINNED_ADVERSARIAL_ARTIFACTS: list[dict] = [
+    # 1. Volume without execution. Grace is EXPOSED on Token Rotation: one review and one comment.
+    #    Five more of the same must leave her exactly where she was.
+    {
+        "kind": "code_reviews",
+        "reference": "REV-9001",
+        "title": "Review: Token Rotation scheduling change",
+        "body": (
+            "Grace Liu reviewed a change to Token Rotation scheduling and left detailed comments on "
+            "naming and test coverage. She did not run the rotation herself."
+        ),
+        "date": "2026-06-02",
+        "system_id": "system_authentication",
+        "participants": [{"engineer_id": "eng_grace_liu", "participant_role": "REVIEWER"}],
+        "file_paths": ["services/identity/token_rotation.py"],
+    },
+    {
+        "kind": "code_reviews",
+        "reference": "REV-9002",
+        "title": "Review: Token Rotation retry handling",
+        "body": (
+            "Grace Liu reviewed retry handling around Token Rotation, asked three clarifying "
+            "questions, and approved. No execution is recorded against her."
+        ),
+        "date": "2026-05-19",
+        "system_id": "system_authentication",
+        "participants": [{"engineer_id": "eng_grace_liu", "participant_role": "REVIEWER"}],
+        "file_paths": ["services/identity/token_rotation.py"],
+    },
+    {
+        "kind": "code_reviews",
+        "reference": "REV-9003",
+        "title": "Review: Token Rotation metrics",
+        "body": (
+            "Grace Liu reviewed the metric names emitted during Token Rotation and suggested two "
+            "renames. Review only."
+        ),
+        "date": "2026-04-27",
+        "system_id": "system_authentication",
+        "participants": [{"engineer_id": "eng_grace_liu", "participant_role": "REVIEWER"}],
+        "file_paths": ["services/identity/token_rotation.py"],
+    },
+    {
+        "kind": "issues",
+        "reference": "ISS-9001",
+        "title": "Discussion: Token Rotation cadence",
+        "body": (
+            "Grace Liu commented at length on how often Token Rotation should run and what the "
+            "failure handling ought to look like. A design discussion, not an execution."
+        ),
+        "date": "2026-06-20",
+        "system_id": "system_authentication",
+        "participants": [{"engineer_id": "eng_grace_liu", "participant_role": "COMMENTER"}],
+        "file_paths": [],
+    },
+    {
+        "kind": "issues",
+        "reference": "ISS-9002",
+        "title": "Discussion: Token Rotation rollout sequencing",
+        "body": (
+            "Grace Liu wrote the longest comment on the thread, proposing a sequencing plan for "
+            "Token Rotation across environments. No rotation was performed."
+        ),
+        "date": "2026-07-08",
+        "system_id": "system_authentication",
+        "participants": [{"engineer_id": "eng_grace_liu", "participant_role": "COMMENTER"}],
+        "file_paths": [],
+    },
+    # 2. Attribution by name. The body says Tom Becker performed the work single-handedly; the source
+    #    system recorded only Grace Liu, as a commenter. Tom is a Payments engineer with no Identity
+    #    coverage at all, so if the rules read prose instead of the participant list he acquires a
+    #    capability in a platform he has never worked in — a false positive the ground truth exposes
+    #    immediately.
+    #
+    #    Grace is the recorded participant deliberately: she is already EXPOSED on Token Rotation, so
+    #    this trap adds no coverage row and moves no denominator. An earlier draft used an engineer
+    #    with no coverage here, and the check caught the consequence — he correctly gained EXPOSED for
+    #    genuinely commenting, which is right behaviour but made the corpus carry a coverage row the
+    #    ground truth has no label for.
+    {
+        "kind": "incidents",
+        "reference": "INC-9001",
+        "title": "P3 Authentication — Token Rotation stall",
+        "body": (
+            "Scheduled Token Rotation stalled overnight. Tom Becker is described in the write-up as "
+            "having driven the fix and completed the rotation single-handedly, but the on-call record "
+            "lists only Grace Liu, who commented on the thread. The narrative and the participant "
+            "record disagree."
+        ),
+        "date": "2026-03-11",
+        "system_id": "system_authentication",
+        "participants": [{"engineer_id": "eng_grace_liu", "participant_role": "COMMENTER"}],
+        "file_paths": [],
+    },
+    # 3. Authority language. Status claims are not execution records.
+    {
+        "kind": "issues",
+        "reference": "ISS-9003",
+        "title": "Discussion: who owns Token Rotation",
+        "body": (
+            "Grace Liu is described on this thread as the most senior engineer in the area, the "
+            "acknowledged expert on Token Rotation, and its de facto owner. No incident, change, or "
+            "runbook is cited anywhere in the discussion."
+        ),
+        "date": "2026-07-22",
+        "system_id": "system_authentication",
+        "participants": [{"engineer_id": "eng_grace_liu", "participant_role": "COMMENTER"}],
+        "file_paths": [],
+    },
+]
+
 # Evidence pattern per true readiness label. Each entry is (kind, participant_role).
 RECIPES: dict[str, list[tuple[str, str]]] = {
     "VALIDATED": [
@@ -384,8 +523,12 @@ def generate() -> dict[str, list[dict]]:
     buckets: dict[str, list[dict]] = {kind: [] for kind in REFERENCE_PREFIX}
     problems: list[str] = []
 
-    # 1. Authored artifacts: the hero capability, plus the one conflicting record.
-    pinned = [*PINNED_HERO_ARTIFACTS, *PINNED_CONFLICT_ARTIFACTS]
+    # 1. Authored artifacts: the hero capability, the conflicting record, and the adversarial set.
+    pinned = [
+        *PINNED_HERO_ARTIFACTS,
+        *PINNED_CONFLICT_ARTIFACTS,
+        *PINNED_ADVERSARIAL_ARTIFACTS,
+    ]
     for artifact in pinned:
         record = {k: v for k, v in artifact.items() if k != "kind"}
         buckets[artifact["kind"]].append(record)

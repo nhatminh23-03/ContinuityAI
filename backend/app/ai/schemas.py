@@ -28,6 +28,7 @@ from app.schemas.enums import (
     EvidenceRole,
     EvidenceSourceType,
     EvidenceStrength,
+    TaxonomyProposalKind,
 )
 
 
@@ -94,6 +95,48 @@ class CapabilityClaim(BaseModel):
         return value
 
 
+class TaxonomyProposal(BaseModel):
+    """A capability or component the model saw in an artifact that the taxonomy does not contain.
+
+    FR-005: "AI shall propose components/capabilities using existing metadata first and flag
+    low-confidence concepts for review."
+
+    **A proposal is not a capability, and this separation is the whole design.** Claims are closed-world
+    — `TaxonomyCapability` above explains why — so a proposal deliberately cannot carry evidence, cannot
+    be attributed to an engineer, and never reaches the readiness or risk engines. It is a suggestion
+    addressed to a human, held in its own table, and a manager promoting one is the only path into the
+    taxonomy.
+
+    Without that split, FR-005 and the closed world would contradict each other: asking a model to name
+    concepts it was not given, while requiring that it never name a concept it was not given. Proposals
+    resolve it by being a different kind of object rather than a weaker kind of claim. A hallucinated
+    capability here costs a manager ten seconds of reading; in the graph it would silently move a risk
+    index.
+
+    `confidence` is the model's own, and `LOW` is the flag FR-005 asks for rather than a reason to
+    discard — a half-recognised concept is often the interesting one.
+    """
+
+    kind: TaxonomyProposalKind
+    name: str
+    system_id: str | None = None
+    # Set when the model believes this belongs under an existing component; null when it is proposing
+    # the component itself.
+    component_id: str | None = None
+    rationale: str
+    confidence: EvidenceConfidence = EvidenceConfidence.LOW
+    # The artifact the concept was seen in, so a reviewer can read the source rather than trust the
+    # proposal. Same provenance requirement as any claim (FR-006).
+    source_reference: str | None = None
+
+    @field_validator("name", "rationale")
+    @classmethod
+    def _non_empty(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("a proposal must be named and justified, like any other claim")
+        return value
+
+
 class ArtifactExtraction(BaseModel):
     """Structured result for one artifact. May legitimately contain zero claims.
 
@@ -107,6 +150,8 @@ class ArtifactExtraction(BaseModel):
     claims: list[CapabilityClaim] = Field(default_factory=list)
     ambiguity: list[str] = Field(default_factory=list)
     possible_taxonomy_duplicates: list[str] = Field(default_factory=list)
+    # FR-005. Kept out of `claims` on purpose: these are suggestions for a human, not evidence.
+    taxonomy_proposals: list[TaxonomyProposal] = Field(default_factory=list)
 
 
 class SimulationSummaryContext(BaseModel):

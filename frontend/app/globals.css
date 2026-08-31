@@ -1,26 +1,298 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Warm near-white neutrals from the shared design-token sheet. */
+  --background: #fcf8fa;
+  --foreground: #1b1b1d;
+  --muted-foreground: #45464d;
+
+  /* Status colours — the only saturated colours in the interface.
+     Applied to capabilities and systems only; people stay monochrome. */
+  --status-critical-gap: #a63d57; /* deep rose */
+  --status-degraded: #a8752c; /* warm ochre */
+  --status-covered: #3d8a80; /* muted teal */
+  --status-insufficient: #76777d; /* dashed grey outline, no fill */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-inter);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+/* Liquid-glass surfaces. The sidebar and chips share the treatment; frosted
+   content cards are calmer (less transparency, softer blur). */
+.glass-panel {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.62),
+    rgba(255, 255, 255, 0.38)
+  );
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow:
+    0 8px 32px rgba(27, 27, 29, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Overlay surfaces. A modal or drawer has to stay legible over whatever it
+   covers, so panels inside a dialog trade transparency for contrast. The
+   sidebar sits outside any dialog and keeps the full liquid-glass treatment. */
+[role='dialog'] .glass-panel {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.97),
+    rgba(255, 255, 255, 0.93)
+  );
+  backdrop-filter: blur(28px) saturate(1.2);
+  -webkit-backdrop-filter: blur(28px) saturate(1.2);
+  border: 1px solid rgba(27, 27, 29, 0.08);
+  box-shadow:
+    0 16px 48px rgba(27, 27, 29, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Grouping cards nested in a solid overlay need a tint of their own, since a
+   translucent white no longer separates them from the panel behind it. The
+   inset ring draws the edge without adding a border that would shift layout. */
+[role='dialog'] .glass-panel .bg-white\/50 {
+  background-color: rgba(27, 27, 29, 0.035);
+  box-shadow: inset 0 0 0 1px rgba(27, 27, 29, 0.06);
+}
+
+.frosted-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(27, 27, 29, 0.06);
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(27, 27, 29, 0.06);
+}
+
+/* Liquid-glass status chips: gradient tint on the semantic scale, glassy body. */
+.glass-chip {
+  backdrop-filter: blur(10px) saturate(1.3);
+  -webkit-backdrop-filter: blur(10px) saturate(1.3);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+/* Semantic gradient tints. LOW/COVERED teal · MODERATE light ochre ·
+   HIGH deep ochre · CRITICAL rose. Capabilities and systems only. */
+.chip-low {
+  background: linear-gradient(135deg, rgba(61, 138, 128, 0.28), rgba(61, 138, 128, 0.12));
+}
+.chip-moderate {
+  background: linear-gradient(135deg, rgba(201, 153, 46, 0.26), rgba(201, 153, 46, 0.1));
+}
+.chip-high {
+  background: linear-gradient(135deg, rgba(168, 117, 44, 0.32), rgba(168, 117, 44, 0.14));
+}
+.chip-critical {
+  background: linear-gradient(135deg, rgba(166, 61, 87, 0.3), rgba(166, 61, 87, 0.13));
+}
+
+/* INSUFFICIENT_EVIDENCE: dashed grey outline, no fill. */
+.pill-insufficient {
+  border: 1.5px dashed var(--status-insufficient);
+  background: transparent;
+}
+
+/* ==========================================================================
+   Motion
+   Every animation below moves transform and opacity only, so nothing here can
+   reflow the page or contribute to layout shift. Durations and easing are
+   tokens rather than per-component values, so the whole interface shares one
+   rhythm. The reduced-motion block at the end is the opt-out and is not
+   optional — it neutralises everything defined here.
+   ========================================================================== */
+
+:root {
+  --motion-fast: 140ms;
+  --motion: 220ms;
+  --motion-slow: 320ms;
+  /* Enter decelerates into place; exit accelerates away. Never linear. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --stagger: 35ms;
+}
+
+@keyframes motion-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes motion-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Centred modals carry the translate that positions them, so the keyframe has
+   to restate it — a bare scale() would drop the centring mid-animation. */
+@keyframes motion-modal {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+
+@keyframes motion-drawer {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
+@keyframes motion-ladder {
+  from {
+    opacity: 0;
+    transform: scaleY(0.2);
+  }
+}
+
+@keyframes motion-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* `backwards` holds the from-state through any delay, so staggered items stay
+   hidden until their turn instead of flashing in and then animating. */
+.motion-rise {
+  animation: motion-rise var(--motion) var(--ease-out) backwards;
+}
+
+.motion-fade {
+  animation: motion-fade var(--motion) var(--ease-out) backwards;
+}
+
+.motion-modal {
+  animation: motion-modal var(--motion) var(--ease-out) backwards;
+}
+
+.motion-drawer {
+  animation: motion-drawer var(--motion) var(--ease-out) backwards;
+}
+
+/* One class on the container animates every child in sequence, so list item
+   components stay untouched. Past the tenth item the delay stops growing —
+   a long list should not take three seconds to finish arriving. */
+.motion-stagger > * {
+  animation: motion-rise var(--motion) var(--ease-out) backwards;
+}
+.motion-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.motion-stagger > *:nth-child(2) { animation-delay: calc(1 * var(--stagger)); }
+.motion-stagger > *:nth-child(3) { animation-delay: calc(2 * var(--stagger)); }
+.motion-stagger > *:nth-child(4) { animation-delay: calc(3 * var(--stagger)); }
+.motion-stagger > *:nth-child(5) { animation-delay: calc(4 * var(--stagger)); }
+.motion-stagger > *:nth-child(6) { animation-delay: calc(5 * var(--stagger)); }
+.motion-stagger > *:nth-child(7) { animation-delay: calc(6 * var(--stagger)); }
+.motion-stagger > *:nth-child(8) { animation-delay: calc(7 * var(--stagger)); }
+.motion-stagger > *:nth-child(9) { animation-delay: calc(8 * var(--stagger)); }
+.motion-stagger > *:nth-child(n + 10) { animation-delay: calc(9 * var(--stagger)); }
+
+/* Press and hover feedback. Transform-only so surrounding content never
+   shifts and the pressed state cannot cause jitter. */
+.motion-press {
+  transition:
+    transform var(--motion-fast) var(--ease-out),
+    box-shadow var(--motion) var(--ease-out),
+    background-color var(--motion-fast) var(--ease-out);
+}
+.motion-press:active {
+  transform: scale(0.985);
+}
+
+.motion-lift {
+  transition:
+    transform var(--motion) var(--ease-out),
+    box-shadow var(--motion) var(--ease-out);
+}
+.motion-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(27, 27, 29, 0.1);
+}
+.motion-lift:active {
+  transform: translateY(-2px) scale(0.995);
+}
+
+/* Readiness ladder bars grow from their base. The stagger is set inline per
+   bar, since the bar count varies with the readiness level. */
+.motion-ladder {
+  transform-origin: bottom;
+  animation: motion-ladder var(--motion) var(--ease-out) backwards;
+}
+
+/* A sweep reads as work in progress; an opacity pulse reads as a broken
+   element. Replaces the opacity pulse on skeleton surfaces. */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(148, 163, 184, 0.1) 25%,
+    rgba(148, 163, 184, 0.26) 37%,
+    rgba(148, 163, 184, 0.1) 63%
+  );
+  background-size: 400% 100%;
+  background-position: 200% 0;
+  animation: motion-shimmer 1.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .motion-lift:hover,
+  .motion-lift:active,
+  .motion-press:active {
+    transform: none;
+  }
+}
+
+/* Sidebar navigation. The active item grows a rail on its leading edge rather
+   than only swapping its background, so moving between destinations reads as
+   one continuous change instead of two unrelated repaints. */
+.nav-item {
+  position: relative;
+  transition:
+    background-color var(--motion) var(--ease-out),
+    color var(--motion) var(--ease-out),
+    box-shadow var(--motion) var(--ease-out);
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 18px;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--foreground);
+  transform: translateY(-50%) scaleY(0);
+  opacity: 0;
+  transition:
+    transform var(--motion) var(--ease-out),
+    opacity var(--motion) var(--ease-out);
+}
+
+.nav-item[aria-current='page']::before {
+  transform: translateY(-50%) scaleY(1);
+  opacity: 1;
 }

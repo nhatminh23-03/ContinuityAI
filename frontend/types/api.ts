@@ -86,9 +86,18 @@ export type MitigationTaskType =
 
 export type CriticalitySource = 'HUMAN_CONFIRMED' | 'AI_SUGGESTED';
 
+/** How a manager disputes an assessment. Every value is an evidence operation,
+ *  never an outcome — scores change because evidence changes (DEC-10). */
+export type ChallengeType =
+  | 'LINK_EVIDENCE'
+  | 'MANAGER_ATTESTATION'
+  | 'CORRECT_CAPABILITY_MAPPING';
+
 export type ErrorCode =
   | 'NOT_FOUND'
   | 'VALIDATION_ERROR'
+  /** Only reachable when the backend has API_TOKEN configured (DEC-13). */
+  | 'UNAUTHORIZED'
   | 'INSUFFICIENT_EVIDENCE'
   | 'AI_EXTRACTION_FAILED'
   | 'GRAPH_INCONSISTENCY'
@@ -116,6 +125,12 @@ export interface PlatformSummary {
   description: string | null;
   system_count: number;
   critical_gap_count: number;
+  /**
+   * Capabilities resting on exactly one adequate engineer — "one person away from a gap".
+   * Not derivable from `degraded_capability_count`, which also counts capabilities with no
+   * adequate engineer at all (DEC-07). Contract 6.1, added by DEC-17.
+   */
+  single_expert_dependency_count: number;
   /** Highest system risk. The MVP calculates no platform-level score. */
   highest_system_risk_index: number | null;
   drift_status: KnowledgeDriftStatus;
@@ -198,6 +213,14 @@ export interface CapabilityRef {
   name: string;
 }
 
+/** One adjustment behind the Continuity Risk Index. Read with the class anchor
+ *  (LOW 20 · MODERATE 50 · HIGH 70 · CRITICAL 90), the deltas explain position
+ *  within a band. Optional and additive (DEC-11). */
+export interface IndexModifier {
+  code: string;
+  delta: number;
+}
+
 export interface CapabilityDetail {
   capability_id: string;
   component_id: string;
@@ -211,6 +234,7 @@ export interface CapabilityDetail {
   evidence_confidence: EvidenceConfidence;
   /** Machine-readable rule reason codes. The frontend owns the display copy. */
   rules_triggered?: string[];
+  index_modifiers?: IndexModifier[];
   primary_engineer: EngineerRef | null;
   best_remaining_coverage: EngineerRef | null;
   engineer_coverage: EngineerCoverage[];
@@ -390,4 +414,62 @@ export interface ApprovePlanResponse {
   status: MitigationPlanStatus;
   approved_by: string;
   approved_at: string;
+}
+
+/* ---------- challenge (endpoint 11, DEC-10) ---------- */
+
+/**
+ * The manager supplies evidence or a correction — there is deliberately no
+ * field for a readiness level, exposure, confidence, or risk index.
+ */
+export interface ChallengeRequest {
+  challenge_type: ChallengeType;
+  submitted_by: string;
+  comment: string;
+  /** LINK_EVIDENCE and MANAGER_ATTESTATION: the engineer whose coverage is concerned. */
+  engineer_id?: string;
+  /** LINK_EVIDENCE: the artifact extraction missed, by source reference (e.g. "INC-221"). */
+  source_reference?: string;
+  /** MANAGER_ATTESTATION: the claimed role. Capped at MODERATE strength server-side. */
+  evidence_role?: EvidenceRole;
+  /** CORRECT_CAPABILITY_MAPPING: the record to move. */
+  evidence_id?: string;
+  target_capability_id?: string;
+}
+
+/** A capability assessment at a point in time, for before/after of a recompute. */
+export interface AssessmentSnapshot {
+  exposure: CapabilityExposure;
+  continuity_risk_index?: number | null;
+  continuity_risk_class?: ContinuityRiskClass | null;
+  evidence_confidence: EvidenceConfidence;
+  readiness?: ReadinessLevel | null;
+  rules_triggered?: string[];
+}
+
+export interface SystemSnapshot {
+  continuity_risk_index?: number | null;
+  continuity_risk_class?: ContinuityRiskClass | null;
+  exposure: CapabilityExposure;
+  critical_gap_count: number;
+  degraded_capability_count: number;
+  covered_capability_count: number;
+}
+
+export interface ChallengeResponse {
+  challenge_id: string;
+  challenge_type: ChallengeType;
+  capability_id: string;
+  engineer_id?: string;
+  submitted_by: string;
+  submitted_at: string;
+  /** What actually changed in the evidence layer. */
+  evidence_created?: string | null;
+  evidence_moved?: string | null;
+  /** The recomputation, reported rather than requested. */
+  capability_before: AssessmentSnapshot;
+  capability_after: AssessmentSnapshot;
+  system_before: SystemSnapshot;
+  system_after: SystemSnapshot;
+  recomputed: boolean;
 }

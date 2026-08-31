@@ -131,5 +131,47 @@
       { "engineer_id": "eng_maria_gomez", "technical_overlap": "HIGH" },
       { "engineer_id": "eng_jordan_lee", "technical_overlap": "MEDIUM" }
     ]
-  }
+  },
+  "adversarial_note": "Artifacts written to fool the readiness rules. RECOMMENDATIONS.md R-02. Each looks like capability and is not; the evaluation requires the rules to decline every one. Declining these is a stronger claim than a perfect score on cooperative data, because each names a specific way a plausible system gets this wrong.",
+  "adversarial_artifacts": [
+    {
+      "reference": "REV-9001",
+      "trap": "volume_without_execution",
+      "description": "One of five extra review and comment records for an engineer who never executes. Volume must not become capability.",
+      "ceiling": { "engineer_id": "eng_grace_liu", "capability_id": "cap_token_rotation", "readiness": "EXPOSED" }
+    },
+    {
+      "reference": "REV-9002",
+      "trap": "volume_without_execution",
+      "ceiling": { "engineer_id": "eng_grace_liu", "capability_id": "cap_token_rotation", "readiness": "EXPOSED" }
+    },
+    {
+      "reference": "REV-9003",
+      "trap": "volume_without_execution",
+      "ceiling": { "engineer_id": "eng_grace_liu", "capability_id": "cap_token_rotation", "readiness": "EXPOSED" }
+    },
+    {
+      "reference": "ISS-9001",
+      "trap": "volume_without_execution",
+      "ceiling": { "engineer_id": "eng_grace_liu", "capability_id": "cap_token_rotation", "readiness": "EXPOSED" }
+    },
+    {
+      "reference": "ISS-9002",
+      "trap": "volume_without_execution",
+      "ceiling": { "engineer_id": "eng_grace_liu", "capability_id": "cap_token_rotation", "readiness": "EXPOSED" }
+    },
+    {
+      "reference": "INC-9001",
+      "trap": "attribution_by_name",
+      "description": "The body says Tom Becker performed the work single-handedly; the source system recorded only Grace Liu, as a commenter. Attribution must follow the participant record, never a name in prose. Tom has no Identity coverage, so being fooled would grant him a capability in a platform he has never worked in.",
+      "no_coverage": { "engineer_id": "eng_tom_becker", "capability_id": "cap_token_rotation" },
+      "ceiling": { "engineer_id": "eng_grace_liu", "capability_id": "cap_token_rotation", "readiness": "EXPOSED" }
+    },
+    {
+      "reference": "ISS-9003",
+      "trap": "authority_language",
+      "description": "Describes an engineer as the most senior, the acknowledged expert, and the de facto owner, citing no incident, change or runbook. Status is not execution.",
+      "ceiling": { "engineer_id": "eng_grace_liu", "capability_id": "cap_token_rotation", "readiness": "EXPOSED" }
+    }
+  ]
 }

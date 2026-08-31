@@ -1,0 +1,9 @@
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "System 'system_does_not_exist' not found.",
+    "details": {
+      "system_id": "system_does_not_exist"
+    }
+  }
+}

@@ -23,8 +23,12 @@ from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
+from app.ai.budget import with_deadline
+from app.ai.deterministic import DeterministicProvider
 from app.ai.provider import AIProvider, get_provider
 from app.ai.schemas import PlanContext
+from app.ai.validation import MAX_PLAN_TASKS, MIN_PLAN_TASKS
+from app.core.config import settings
 from app.core.errors import MitigationGenerationError, NotFoundError, ValidationError
 from app.evidence.strength import is_adequate
 from app.models import MitigationPlan, MitigationTask
@@ -53,10 +57,21 @@ from app.schemas.mitigation import (
 )
 from app.schemas.mitigation import MitigationTask as MitigationTaskDTO
 
+# The templates a plan falls back to when the model runs out of budget. Shared at module level
+# because `DeterministicProvider` holds no state, so one instance is safe on any thread.
+_TEMPLATES = DeterministicProvider()
+
 # AC-10 requires 3 to 5 actions. A generator that returns 2 or 9 has misunderstood the job, and
 # silently trimming would hide that.
-MIN_TASKS = 3
-MAX_TASKS = 5
+#
+# Taken from the narrative gate rather than restated as literals. The gate needs the same two
+# numbers to reject a model-written plan (`app/ai/validation.py`), and as two independent
+# literals the pair could be changed on one side only — after which the gate would reject every
+# plan forever, silently, because a rejection falls back to the template and looks like success.
+# `app/ai` must not import from `app/mitigation`, and this module already depends on `app.ai`, so
+# the shared definition lives there and the dependency runs this way round.
+MIN_TASKS = MIN_PLAN_TASKS
+MAX_TASKS = MAX_PLAN_TASKS
 MAX_REFERENCE_EVIDENCE = 2
 
 
@@ -110,18 +125,30 @@ class MitigationPlanService:
         reference_evidence = self._reference_evidence(source.engineer_id, capability.capability_id)
         target_readiness = self._target_readiness(capability, candidate_readiness)
 
-        draft = self.provider.generate_mitigation_plan(
-            PlanContext(
-                capability_name=capability.name,
-                system_name=system.name if system else capability.system_id,
-                component_name=component.name if component else capability.component_id,
-                source_engineer_name=source.name,
-                candidate_name=candidate.name,
-                candidate_readiness=candidate_readiness.value,
-                target_readiness=target_readiness.value,
-                missing_capabilities=missing,
-                reference_evidence=reference_evidence,
-            )
+        plan_context = PlanContext(
+            capability_name=capability.name,
+            system_name=system.name if system else capability.system_id,
+            component_name=component.name if component else capability.component_id,
+            source_engineer_name=source.name,
+            candidate_name=candidate.name,
+            candidate_readiness=candidate_readiness.value,
+            target_readiness=target_readiness.value,
+            missing_capabilities=missing,
+            reference_evidence=reference_evidence,
+        )
+        # Bounded by a real wall-clock deadline, for the same reason the candidate narratives are.
+        # Measured live under AI_PROVIDER=openrouter, this endpoint returned in 12.6 seconds against
+        # AC-14's 12 — one model call, well past its nominal 7-second budget, because the transport
+        # timeout bounds the gap between socket reads rather than the call. See app/ai/budget.py.
+        #
+        # The plan is the artifact a manager approves and someone then executes, so the fallback here
+        # is not a compromise: `DeterministicProvider.generate_mitigation_plan` is gap-targeted and
+        # validated for its action count, and it is what this provider would have returned anyway had
+        # the model wandered.
+        draft = with_deadline(
+            lambda: self.provider.generate_mitigation_plan(plan_context),
+            lambda: _TEMPLATES.generate_mitigation_plan(plan_context),
+            settings.narrative_deadline_seconds,
         )
 
         if not MIN_TASKS <= len(draft.tasks) <= MAX_TASKS:
@@ -145,13 +172,24 @@ class MitigationPlanService:
             created_at=datetime.now(timezone.utc),
         )
         for index, task in enumerate(draft.tasks, start=1):
+            # `task.task_type` is a plain str from the provider, not yet validated against the
+            # enum. Coercing it here, before the plan is added to the session, is what keeps an
+            # invalid value from ever being committed — `_to_response` doing the coercion later
+            # was the bug: by then the row was already persisted and permanently unreadable.
+            try:
+                task_type = MitigationTaskType(task.task_type)
+            except ValueError as exc:
+                raise MitigationGenerationError(
+                    f"Plan generation produced an invalid task type '{task.task_type}'.",
+                    {"capability_id": capability.capability_id, "task_type": task.task_type},
+                ) from exc
             plan.tasks.append(
                 MitigationTask(
                     task_id=f"task_{index:03d}",
                     plan_id=plan_id,
                     title=task.title,
                     description=task.description,
-                    type=task.task_type,
+                    type=task_type.value,
                     sequence=index,
                     acceptance_criteria=task.acceptance_criteria,
                     linked_evidence_ids=task.linked_evidence_ids,

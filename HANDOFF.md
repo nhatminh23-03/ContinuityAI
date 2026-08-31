@@ -334,7 +334,7 @@ Before either: skim `RECOMMENDATIONS.md` R-01 and R-20.
 
 ---
 
-## 2026-08-15 (same day, later) — Person A scope closed (Person A)
+## 2026-08-17 — Person A scope closed (Person A)
 
 Backend is finished. Everything on Person A's list in `TEAM_WORKFLOW_PERSON_A_B.md` section 2 is
 built, tested, and verified, and the remaining `RECOMMENDATIONS.md` items that were backend-only are
@@ -490,7 +490,7 @@ no remaining work that does not need a decision from you.
 
 ---
 
-## 2026-08-15 (same day, last session) — Model-backed extraction wired to IBM watsonx (Person A)
+## 2026-08-17 (later) — Model-backed extraction wired to IBM watsonx (Person A)
 
 Short version: the watsonx provider is **built, credential-verified, and measured against the
 rule-based one**. The graph the API serves is still rule-derived, because the watsonx account's token
@@ -589,3 +589,820 @@ workflow and public data, `19d8e54` watsonx provider, `56ca862` a cache-reportin
 I have deliberately not merged to `main`, because whether we merge or open a pull request is a joint
 call and merging is the harder one to undo. Say which you prefer and I will do it. If you would rather
 just branch your frontend work off `feature/backend-engines` and merge both at once, that works too.
+
+---
+
+## 2026-08-17 — Backend verified, decisions closed, and the entire screen phase built (Person B)
+
+**Read this first.** The stale warning above is resolved: `feature/backend-engines` was merged to
+`main` via PR #1, and all frontend work now lives on **`feature/frontend-screens`** (branched from
+`main`, 14 commits, not pushed). The dev server may already be running on :3002.
+
+### Completed
+
+- **Backend reality check.** All eleven endpoints verified live; 10/10 fixtures byte-match
+  (`scripts.verify_golden_path`); 21 payloads captured to `docs/api-samples/` with a manifest.
+- **`docs/BACKEND_GAPS.md`** — one BLOCKING item: `single_expert_dependency_count` has no
+  transport anywhere (Category C proposal for Person A); nine deferrable items; eight design
+  constraints; full AC-01…16 data-path table; zero enum drift.
+- **`docs/UI_REVIEW.md`** — all six mockups reviewed and corrected; component inventory; seven
+  missing screens; resolved design decisions (liquid-glass gradient chips, four-entry sidebar,
+  name + role on engineer rows).
+- **Frontend foundation.** Grainient WebGL background (vendored, `ogl` dep) under a liquid-glass
+  sidebar; Inter + tokens; strict Zod contract lock over all 12 root fixtures (`npm test`,
+  vitest); adapter covers all eleven endpoints with the mock/live switch.
+- **All nine screens**, mock-first, each individually approved: dashboard, system detail,
+  evidence drawer, contextual graph (fixed-coordinate layout, readiness-scaled edges, dashed
+  declared-owner edge, focus dim), why panel (70+1+1=72 arithmetic), simulation sandbox
+  (74→93 with survivors), backup candidates, mitigation plan (edit-before-approve per CI-12,
+  session store per GAP-02), capability detail. Golden path clickable end to end on fixtures.
+
+### Decisions made (Person B)
+
+- **DEC-01 values are canonical** (74/HIGH, 74→93, Identity 68, five capabilities, Maria Gomez);
+  the working brief's older 58/MODERATE set was stale.
+- **DEC-10 acknowledged — the eleventh endpoint stays**, and the frontend will build the
+  challenge drawer (types, Zod schema, and adapter function already exist).
+- Two fixtures added to jointly-owned `fixtures/` from live captures: `identity-systems.json`,
+  `challenge-attest-jordan.json`.
+
+### For Person A at the next sync
+
+1. GAP-01: add `single_expert_dependency_count` to `PlatformSummary` (Category C, yes/no needed).
+2. Wire the two new fixtures into `scripts/refresh_fixtures.py` and `fixtures/README.md`.
+3. Doc amendments: PRD §17.1 class column (DEC-07), ARCHITECTURE §29 / CONTRACT §10.2 (OPEN-09),
+   PRD §11.1 example numbers (71/52 live).
+4. R-23 key rotation is still pending and only Person B can do it.
+
+### In progress / blocked
+
+Nothing in progress; nothing blocked.
+
+### Recommended next task
+
+The final phase: challenge drawer UI (fixture and adapter ready), loading/empty/error state suite
+switching on `error.code`, the INSUFFICIENT_EVIDENCE live check (`cap_permission_audit`), flip
+`NEXT_PUBLIC_USE_MOCKS=false` for the full live golden-path pass (report divergences, do not
+absorb), responsive pass at 1280px, and the PRD §27 demo-script walkthrough.
+
+### Running it
+
+Backend: `cd backend && .venv/bin/python -m uvicorn app.main:app --reload` (:8000, auto-seeds).
+Frontend: `cd frontend && npm run dev` (mock mode by default; `.env.local` with
+`NEXT_PUBLIC_USE_MOCKS=false` for live). Tests: `npm test` (contract lock + units),
+`npm run typecheck`, `npm run build` — all green at handoff.
+
+---
+
+## 2026-08-18 — Final phase complete: the product is demo-ready (Person B)
+
+### Completed
+
+Everything in the recommended-next-task list above, same session:
+
+- **Challenge drawer** built and verified live: attesting Jordan moves him EXPOSED → PRACTICED,
+  Incident Recovery 72/HIGH → 15/LOW COVERED, the system holds 74/HIGH (degraded 2 → 1) — the
+  strong demo beat from the backend handoff, now clickable. FR-020 and AC-11 closed front-to-end.
+- **State suite** complete on every screen; errors switch on `error.code` only.
+- **Live golden-path pass** on `NEXT_PUBLIC_USE_MOCKS=false`: zero payload divergences; the full
+  chain executed with real mutations (sim_002 74 → 93, candidates, plan generated, edited,
+  approved per CI-12). INSUFFICIENT_EVIDENCE, engineer-filtered evidence, and the focused graph's
+  seven evidence nodes all verified live. Database reseeded afterwards — demo state pristine.
+- **One environment finding:** the backend pins CORS to `http://localhost:3000` — the frontend
+  MUST run on :3000 against live. A stale dev server on :3002 was stopped; `frontend/.env.local`
+  (gitignored, local) now selects live mode.
+- **Responsive** verified at 1280×860, no horizontal overflow. **Demo script:** every product
+  beat of PRD §27 lands; the 0:00–0:18 opening and 2:30 architecture graphic are video assets.
+
+### Branch state
+
+`feature/frontend-screens`, 16 commits, not pushed. `main` untouched since PR #1. Merging or a PR
+is the joint call.
+
+### Remaining (submission work, not build work)
+
+Demo video and screenshots; README product-narrative half (Person A's technical half is drafted);
+the Person A sync items: GAP-01 (`single_expert_dependency_count`, the one blocking gap), wiring
+`identity-systems.json` + `challenge-attest-jordan.json` into `refresh_fixtures.py` and the
+fixtures README, doc amendments (PRD §17.1 class column, ARCHITECTURE §29 / CONTRACT §10.2, PRD
+§11.1 example numbers), and the R-23 key rotation (Person B only).
+
+---
+
+## 2026-08-21 — OpenRouter narrative provider: implementation and documentation (five-task plan)
+
+### Completed
+
+A five-task plan (`.superpowers/sdd/superpowers-brainstorming-continuityai-merry-heron/`) added a
+second model-backed `AIProvider`, the mirror image of the existing `watsonx` one: extraction stays
+rule-based (`OpenRouterProvider.extract_artifact_semantics` delegates to `DeterministicProvider`)
+and a model writes the three manager-facing narratives instead — the simulation summary, a
+candidate's strengths and gaps, and the mitigation plan's task text. In order:
+
+1. Fixed a pre-existing latent bug found while preparing for model-backed narratives:
+   `MitigationPlanService.create` persisted `task.task_type` before validating it against
+   `MitigationTaskType`, so an invalid value (never emitted by the deterministic provider, but
+   reachable from a model) would commit and then 500 on every subsequent read.
+2. Added the validation gate (`backend/app/ai/validation.py`, `language_policy.py`,
+   `prohibited_phrases.txt`): every narrative a provider generates is checked for prohibited
+   phrases, probability/likelihood language, inability language, and unattested names before it
+   can reach a caller; anything rejected falls back to the deterministic template and logs at
+   WARN. The name check is a documented heuristic with known blind spots (single-word inventions,
+   lower-case invented capabilities, fully capitalised lines) — pinned by
+   `test_known_blind_spots_of_the_name_check` so nobody mistakes it for closed-world grounding.
+3. Added `OpenRouterProvider` (`backend/app/ai/openrouter.py`) and its three prompt files, wired
+   through `app/ai/provider.py` and `app/core/config.py`
+   (`openrouter_api_key/base_url/model/timeout_seconds/max_retries`). A follow-up review fix moved
+   candidate narration to run only over returned candidates (bounded by the contract's `limit`
+   cap of 3) rather than every eligible engineer, which is what makes the AC-14 12-second budget
+   arithmetic (3 × 3.5s = 10.5s) actually hold.
+4. Made the responsible-AI phrase check scan the three narrative endpoints' live responses at
+   runtime, not just source-code string literals — the static scan could not have caught anything
+   a configured model provider writes.
+5. Documentation, this task: `fixtures/README.md` (fixture-capture policy: always
+   `AI_PROVIDER=deterministic`, and why narrative-field diffs under `openrouter` in
+   `verify_golden_path` are expected, not drift), `README.md` (AI-provider section extended with
+   the fourth provider, a precise "what runs" statement, and an honest account of the gate's
+   blind spots), `docs/DECISIONS.md` (DEC-15), `backend/.env.example` (the three OpenRouter
+   variables, no values).
+
+`AI_PROVIDER` still defaults to `deterministic` throughout — nothing above is switched on. Full
+backend suite: 262 passed (`cd backend && PYTHONPATH=. .venv/bin/python -m pytest -q`).
+
+### Decisions made
+
+**DEC-15** (`docs/DECISIONS.md`), Category C, **needs Person A's acknowledgement**: the OpenRouter
+provider reopens two decisions `watsonx.py:360-362` and `:366-371` document (keeping
+`explain_candidate` and `generate_mitigation_plan` deterministic on purpose) and argues the
+validation gate answers the objection, while stating the gate's blind spots honestly rather than
+claiming closed-world grounding.
+
+### Files changed across the five-task plan
+
+`backend/app/mitigation/service.py`, `backend/app/ai/{validation,language_policy,openrouter,provider}.py`,
+`backend/app/ai/prompts/{simulation_summary_system,candidate_narrative_system,mitigation_plan_system}.txt`,
+`backend/app/ai/prohibited_phrases.txt`, `backend/app/core/config.py`,
+`backend/app/recommendation/service.py`, `backend/tests/test_{mitigation_service,narrative_validation,openrouter_provider,recommendation_service,responsible_ai,golden_path}.py`,
+`fixtures/README.md`, `README.md`, `docs/DECISIONS.md`, `backend/.env.example`, `BUILD_WITH_BOB.md`.
+
+### In progress / blocked
+
+Nothing in progress. Blocked on Person A: DEC-15 acknowledgement (OPEN-10), and this task's report
+notes two pre-existing gaps that are Person A's or a joint call, not fixed here per the
+documentation-only scope of task 5 — see "Open questions" in this session's `BUILD_WITH_BOB.md`
+entry (a missing build-log entry for the responsible-AI runtime-scan commit, and `README.md`'s
+Checks section still stating "131 tests" against a suite that is now 262).
+
+### Recommended next task
+
+Walk Person A through DEC-15. Separately: a live pass with a real OpenRouter key
+(`AI_PROVIDER=openrouter`), confirming narrative prose is grounded and measuring actual latency
+against AC-14 for `POST /mitigation-plans` and `POST /recommendations/backup-candidates` — the
+budget arithmetic in this build is sized correctly but has not yet been measured against a live
+model.
+
+---
+
+## 2026-08-22 — Overlay legibility, a motion layer, and the golden path made navigable (Person B)
+
+### Completed
+
+Four units of frontend work, plus the runtime flip that preceded them. No backend source was
+touched in any of it.
+
+1. **`AI_PROVIDER` flipped to `openrouter`** in `backend/.env` (gitignored, untracked, backed up
+   first) and verified end to end: `get_provider()` returns `OpenRouterProvider`, extraction still
+   delegates to the rules, no reseed occurs, and the frozen numbers hold. The narrative gate was
+   observed firing in production — it rejected a candidate strength claiming independence for an
+   assisted-only capability and fell back to the template with a WARN, and a malformed JSON reply
+   fell back cleanly on the same pass.
+
+2. **Overlay legibility.** The four overlays carried `.glass-panel`, the same 0.62 → 0.38 white
+   treatment as the sidebar, and body copy sat on a moving saturated field. Two rules scoped to
+   `[role='dialog']` raise the fill to 0.97 → 0.93 and tint the grouping cards nested inside them.
+   Both are additive; the sidebar is outside any dialog, so its liquid glass is untouched by
+   construction and no component markup changed.
+
+3. **A motion layer.** Duration and easing tokens, six keyframe sets, and utility classes for
+   overlay entrances, staggered lists, press and hover feedback, the readiness ladder, shimmer
+   skeletons, and the sidebar's active rail — plus `PageTransition`, which re-keys the content
+   column on the pathname so route changes replay the entrance. Everything moves `transform` and
+   `opacity` only. One `prefers-reduced-motion` block neutralises all of it. No new dependency.
+
+4. **The `/systems` route, which did not exist.** One of four sidebar destinations rendered the
+   framework 404. Added `frontend/app/systems/page.tsx`, reusing `SystemsTable` and its existing
+   sort so the dashboard and the index cannot disagree.
+
+5. **The golden path made navigable.** `frontend/components/FlowSteps.tsx` renders the four stages
+   with completed ones linking back. `app/systems/[systemId]/candidates/page.tsx` no longer falls
+   back to a hardcoded `cap_incident_recovery` when its parameter is missing — reached directly it
+   had been offering Incident Recovery candidates on systems that do not have that capability, with
+   no indication anything was substituted. `CandidatesView` now carries `system` forward so the plan
+   screen can offer return paths, and approving a plan renders a confirmation with two onward
+   actions instead of silently removing the approve button.
+
+### Decisions made
+
+**DEC-16** (`docs/DECISIONS.md`), Category B, no acknowledgement needed: headline risk indices are
+revealed, never counted up. A count-up paints intermediate figures the engine never returned and
+that are indistinguishable on screen from ones it did. Recorded because the reasoning is invisible
+from the code — a later contributor would see an unanimated number and a tempting improvement.
+
+Three amendments to `docs/DECISIONS.md` were made with explicit approval this session: DEC-16 above,
+closing **OPEN-07** (the runtime provider is no longer rule-based in every configuration), and
+opening **OPEN-11** for the AC-14 breach below.
+
+### Files changed
+
+Added `frontend/app/systems/page.tsx`, `frontend/components/FlowSteps.tsx`,
+`frontend/components/PageTransition.tsx`. Modified `frontend/app/globals.css` and eighteen frontend
+component and page files, `README.md`, `docs/DECISIONS.md`, `BUILD_WITH_BOB.md`, `HANDOFF.md`.
+`backend/` was not modified; `backend/.env` is gitignored and carries the provider flip only.
+
+`README.md` corrections: the Checks section said 262 tests against a suite of 269; the OpenRouter
+timing section said a live measurement against `POST /simulations` was "worth doing", which has
+since been done and is now reported with its numbers; the clean-clone walkthrough said
+`python3 -m venv`, which on macOS commonly resolves to the system 3.9 that the README's own
+prerequisite line rules out.
+
+### In progress / blocked
+
+Nothing in progress.
+
+**OPEN-11 — AC-14 is breached under `openrouter`.** Measured live 2026-08-21: `POST /simulations`
+2.85s against a 2s budget, `POST /recommendations/backup-candidates` 11.93s typical and 16.91s
+worst against 12s. Reads are fine at 16–23ms. The cause is roughly 6s per model call against a
+3.5s nominal timeout, because httpx's read timeout bounds the gap between socket reads rather than
+total generation. Four responses are open — cap `max_tokens`, use a faster model, run the candidate
+calls concurrently, or accept and document — and none is chosen. `deterministic` is unaffected and
+remains the committed default.
+
+**OPEN-10 — DEC-15 still needs Person A's acknowledgement.**
+
+### Things a fresh session will trip over
+
+- **`pydantic-settings` resolves `env_file=".env"` relative to the working directory.** Started from
+  `backend/` the provider is `openrouter`; started from the repository root it is `deterministic`,
+  silently, with no error and a 200 response. Uvicorn must be started from `backend/`.
+- **The full suite must be run with `AI_PROVIDER=deterministic`.** Under `openrouter` two tests fail
+  by design — `test_the_configured_provider_satisfies_the_interface` and
+  `test_the_returned_candidates_still_match_the_contract_fixture` — because fixtures are captured
+  under the deterministic provider. They pass in 0.5s once the variable is set. The run also takes
+  four minutes and spends real credit.
+- **`refresh_fixtures --check` calls `drop_all()`** despite its name, and `verify_golden_path` writes
+  a simulation, a plan, and an approval. Neither is safe against a demo database you care about.
+- **The frontend must run on port 3000 and be reached as `localhost`**, not `127.0.0.1` — CORS pins
+  the literal origin string.
+- `UI Design/` is 2 MB of source mockups, deliberately untracked. It is not recoverable from the
+  repository.
+
+### Recommended next task
+
+Decide OPEN-11. Capping `max_tokens` is the cheapest of the four responses and the most likely to
+work, since the model's narratives run considerably longer than the templates they replace; it needs
+measuring rather than assuming. Everything else is either Person A's (OPEN-10, OPEN-09, GAP-01) or
+already recorded.
+
+---
+
+## 2026-08-24 — Your gap register, closed (Person A)
+
+I merged `feature/frontend-screens`, checked it first, and worked through `docs/BACKEND_GAPS.md`.
+**GAP-01, GAP-03, OPEN-10 and OPEN-11 are all closed.** 281 backend tests, 29 frontend tests, all
+seven evaluation checks still at 100%, no fixture drift, every endpoint inside AC-14.
+
+Your branch was a clean descendant of the backend branch — merge base was exactly its tip — so this
+was a fast-forward with nothing of either side bypassed. Your gap register was accurate throughout:
+every value you captured live by hand was already correct, and the only difference regeneration
+produced anywhere was one timestamp that needed pinning.
+
+### GAP-01 — `single_expert_dependency_count` is on the wire
+
+One new required field on `PlatformSummary` (contract §6.1, logged as DEC-17):
+
+```json
+{ "platform_id": "platform_payments", "system_count": 3, "critical_gap_count": 1,
+  "single_expert_dependency_count": 4, "highest_system_risk_index": 74, "drift_status": "NEW_RISK" }
+```
+
+**Seeded values are Payments 4 and Identity 2.** The brief's 3 and 1 were stale, as your register
+already suspected. Payment Gateway contributes two of Payments' four (Incident Recovery, Certificate
+Management), Refund Engine and Billing Integration one each.
+
+You were right that it is not client-derivable, and there is now a test that proves it rather than
+just asserting it: `test_single_expert_dependency_count_is_not_the_degraded_count` fails if the two
+numbers ever coincide on the seeded data, so nobody can later conclude the shortcut was equivalent.
+
+Already done on your side so nothing breaks: `types/api.ts`, the `strictObject` in
+`lib/api/schemas.ts` — which would have rejected the response otherwise — and `PlatformCard.tsx`,
+where I removed your `no transport yet — GAP-01` comment and rendered it as "N single-expert
+capabilities". **Restyle that freely, it is your card.** I only wanted the stale comment gone and the
+number visible.
+
+### GAP-03 — captured, and the deeper problem fixed
+
+You asked for a challenge fixture. What I found was that `refresh_fixtures.py` captured ten of the
+twelve files in `fixtures/`, so `--check` was printing "all fixtures match live engine output"
+without ever comparing `identity-systems.json` or `challenge-attest-jordan.json` to anything.
+
+An uncaptured fixture is worse than a missing one, because the check built to catch drift reports
+success over it. Both are captured now. `challenge-attest-jordan.json` is captured last, because the
+challenge is the only golden-path call that mutates an assessment, and the script reseeds afterwards
+so running it does not leave you with an attestation you did not make. `submitted_at` is pinned to an
+illustrative instant for the same reason `approved_at` is.
+
+There is now a `CAPTURED_FIXTURES` manifest, verified against what the run actually captured, and a
+test asserting it matches the directory. **If you add a fixture, add it to that map too** — the same
+way `fixtureSchemas` works on your side — and a test will tell you rather than a screen.
+
+### OPEN-11 — one real breach, one misread requirement
+
+Worth reading both halves, because only one was a bug.
+
+**The simulation was never a breach.** AC-14 says "*Deterministic* simulation returns in <2 seconds".
+Under `openrouter` the summary sentence is model-written, so it is an AI explanation operation with a
+12-second target, and 2.85s was always comfortably inside it. The deterministic simulation, which is
+what that clause actually governs, measures 7.3ms. I recorded this rather than quietly "fixing" it,
+because claiming a fix for a requirement we had read wrong is worse than the original mistake.
+
+**The candidates endpoint was real**, and your diagnosis of the cause was right and worth spelling
+out: `openrouter_timeout_seconds` bounded nothing at all. httpx has no total-request setting, its
+`read` timeout bounds the gap *between* socket reads, and the gateway keeps the socket warm while the
+model generates — so the clock kept resetting. The code's own docstring had flagged this as a
+"pathological slow trickle"; it turns out to be the normal case. A timeout the transport does not
+honour is not a budget.
+
+Fixed in `app/ai/budget.py` (DEC-18). The three candidate narratives describe three different people
+and share nothing, so they now run concurrently under one real wall-clock deadline
+(`NARRATIVE_DEADLINE_SECONDS`, default 8 against AC-14's 12). Anything that misses it is answered from
+the deterministic template. Ranked order is preserved regardless of which finishes first, so
+candidates cannot get reordered by latency.
+
+**Nothing changes for you.** No endpoint, DTO, or fixture moved, and the default provider is still
+`deterministic`. Two things you might find useful: setting `NARRATIVE_DEADLINE_SECONDS=0` skips model
+narration entirely and always uses the templates, which is the escape hatch if you are demoing on bad
+wifi; and a narrative that times out is invisible in the response — the candidate still has
+`strengths`, `gaps`, and every structured field, just template wording. That is by design, but it
+means you cannot tell from the payload whether the model answered.
+
+**One caveat, tracked as OPEN-12.** The fix is verified against a stub provider that sleeps, not the
+live gateway. The mechanism is proven; the numbers under a real key are now *predicted* rather than
+measured. Neither of us should quote them until someone re-runs it with a key.
+
+### DEC-15 — acknowledged, the provider stands
+
+OPEN-10 is closed. Your reading was right: the objection recorded in `watsonx.py` was about
+*unchecked* model prose, and that is not what you built. Every generation passes the gate before it
+can be returned, the plan that reaches a caller is the gate's filtered draft rather than the model's,
+and extraction stays rule-based so nothing model-written reaches the graph the numbers come from. The
+split you drew — model on the prose, rules on the numbers — is what `watsonx.py` was reaching for from
+the other side. Full reasoning in `docs/DECISIONS.md`.
+
+### Two setup things I hit, so you do not have to
+
+1. **`npm install` failed** with `errno -13` on a root-owned npm cache — nothing to do with this
+   project. `npm install --cache /tmp/continuityai-npm-cache` sidesteps it with no `sudo`. That is how
+   the current `node_modules` was installed.
+2. **`npm run typecheck` fails on a clean clone** with `app/layout.tsx: TS2304 Cannot find name
+   'LayoutProps'`. Not a real error and not something you broke: Next 16 generates that global into
+   `.next/types` during a build, so `tsc --noEmit` has nothing to resolve until `npm run build` has run
+   once. After a build it is clean. Worth a README line, and it is `RECOMMENDATIONS.md` R-27.
+
+Current frontend state on my machine: `npm run build` compiles clean with a clean TypeScript pass and
+9 routes, `npm test` is 29 passing in 6 files, `npm run typecheck` clean after the build.
+
+### Verified, not assumed
+
+| Check | Result |
+|---|---|
+| `pytest -q` | 281 passed |
+| `npm test` | 29 passed, 6 files — includes the contract lock over all 12 fixtures |
+| `npm run build` | clean, TypeScript pass clean |
+| `scripts.run_evaluation` | all 7 checks 100% |
+| `refresh_fixtures --check` | all fixtures match live engine output |
+| `verify_golden_path` | every endpoint inside AC-14; reads 2.8–39.9ms, simulation 7.3ms |
+| live `GET /api/v1/platforms` | returns the new field, byte-identical to the fixture |
+
+Every frozen number still holds: 72/HIGH, 74/HIGH with 0/2/3, 74 → 93 HIGH → CRITICAL with 2/1/2,
+Payments highest 74, Identity highest 68, Maria HIGH, Jordan MEDIUM.
+
+### What is still open
+
+| Item | Owner | Note |
+|---|---|---|
+| OPEN-12 — re-measure AC-14 under `openrouter` with a live key | Both | Ten minutes. Do it before the demo is recorded under that provider |
+| GAP-02, GAP-04, GAP-05, GAP-06, GAP-09 | Both | All still deferrable, all still correct as you wrote them (OPEN-13) |
+| watsonx extraction stuck at 313/640 on a spent token quota | Person A | Needs quota headroom. If the model then beats the rules on accuracy, some readiness values shift and frozen fixtures move with them — a contract change to coordinate |
+| Delete `keys.md`, rotate the three keys | User | R-23 |
+| R-27 — README line about building before typechecking | Person B | 10 minutes |
+| Demo video, screenshots, product narrative | Person B | — |
+
+### Recommended next task
+
+**You:** carry on with the screens. The dashboard card now has every number §C.1 asked for, and the
+graph is the largest remaining piece.
+
+**Me:** nothing that does not need a decision or a credential. OPEN-12 needs a key; the watsonx
+extraction needs quota. Say the word on either and I will pick it up.
+
+### Addendum, same day — verified running end to end, and one defect that found
+
+I ran both halves together rather than inferring it from green tests, and it was worth doing.
+
+**The app works.** Every one of the eight frontend routes returns 200 against the live backend, every
+endpoint answers 200/201 in the backend log, and — the check I would trust most — every live payload
+validates against *your* Zod schemas, not just against the fixtures. I walked the full golden path
+through `lib/api/schemas.ts`: platforms, both platform system lists, system detail, the graph both
+unfocused and focused, capability detail, evidence, simulation, candidates, plan. All eleven pass. The
+demo numbers are correct live: Payments highest 74 with 4 single-expert capabilities, Payment Gateway
+74/HIGH, simulation 74 → 93 and HIGH → CRITICAL with 2/1/2.
+
+**The defect: CORS was hardcoded to `http://localhost:3000`.**
+
+On this machine both of our documented ports are occupied by an unrelated project — a FastAPI app on
+8000 and a Next 14 server on 3000. Moving the backend is easy, because
+`NEXT_PUBLIC_API_BASE_URL` exists. Moving the *frontend* was not: the origin allowlist was a literal in
+`main.py`, so a frontend on any other port had its fetches rejected by the browser.
+
+That failure mode is nastier than it sounds. The page loads, every shell renders, the navigation works
+— and only the data fetches fail, in the browser, with a CORS error that **never appears in the backend
+log at all**. Nothing on the server knows anything went wrong. If you had hit this cold you would
+reasonably have gone looking for a bug in the adapter.
+
+`CORS_ORIGINS` is now a comma-separated setting, defaulting to ports 3000 and 3001 on both `localhost`
+and `127.0.0.1`. Two tests cover it: one asserts the setting parses and tolerates whitespace, one
+drives a request through the middleware and checks the response header. Kept as an explicit list rather
+than `*`, because a wildcard is the wrong habit for a repository that argues for careful boundaries.
+
+**If you hit a port clash**, this is the whole workaround, no code edits:
+
+```bash
+# backend on another port, allowing the frontend's origin
+cd backend && CORS_ORIGINS=http://localhost:3100 .venv/bin/python -m uvicorn app.main:app --port 8001
+
+# frontend/.env.local
+NEXT_PUBLIC_USE_MOCKS=false
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8001
+```
+
+One more thing you will want to know: **`frontend/.env.local` did not exist**, and without it the app
+defaults to mock mode. So it would have rendered perfectly while never once calling the backend, which
+is the other failure that looks like success. `cp .env.local.example .env.local` is the step; I have
+done it locally, and the file is gitignored so it is not in the commit.
+
+### Bug you found on the plan screen — fixed
+
+`VALIDATION_ERROR` on step 4 of the Refund Engine flow. This was mine, in the backend, and your
+screenshot was enough to find it.
+
+**What happened.** `_excluded_engineers` in `app/recommendation/service.py` excluded the primary
+engineer from the candidate list *only if their readiness was adequate*:
+
+```python
+if primary is not None and is_adequate(primary.readiness):   # the bug
+    excluded.add(primary.engineer_id)
+```
+
+`CapabilityDetail.primary_engineer` is `facts.primary`, documented as the strongest coverage "adequate
+or not", and it is what you send as `primary_engineer_id` — the knowledge source. So on any capability
+whose strongest holder sits below `PRACTICED`, that person was returned as a candidate to back up
+themselves. Selecting them sent source == backup, and `MitigationPlanService` correctly refuses that,
+which is the `VALIDATION_ERROR` you saw.
+
+The guard failed precisely where it mattered most. No adequate holder means a critical gap, which is
+exactly when someone goes looking for a backup. You were on Refund Reversal — `CRITICAL_GAP`, strongest
+coverage Priya Nair at `ASSISTED` — so the flow broke every time Priya was picked.
+
+**Three capabilities were affected, not one.** I only learned that by writing the test first and
+reverting the fix to watch it fail: `cap_refund_reversal` (Priya), `cap_session_recovery` (Sofia
+Ruiz), and `cap_permission_audit` (Grace Liu). All three produced the same error. The Payment Gateway
+demo path never hit it because Alex is `VALIDATED` and was excluded either way — which is why every
+suite was green and why my own live walkthrough missed it. I tested the happy path; you clicked
+somewhere else.
+
+**The fix** is to exclude the primary unconditionally. There was a defensible thought behind the old
+guard — someone at `ASSISTED` is not really a holder, so why not develop them? — but that is a
+different action from the one this endpoint serves. A plan transfers knowledge *from* a source *to* a
+backup, and a plan where those are the same person means nothing. Where the primary was the only
+person with evidence, the capability now offers one fewer candidate, which is the honest answer.
+
+**Nothing you render changes.** No DTO, endpoint, or fixture moved; `backup-candidates.json` is for
+Incident Recovery, where Alex was already excluded. All seven evaluation checks still 100%,
+`refresh_fixtures --check` green, every frozen number unchanged.
+
+**Two tests now cover it**, written as invariants rather than pinned to Refund Reversal, because the
+bug was a general rule with one visible symptom and the next dataset will put a different capability
+in that state:
+
+- no capability offers its own primary as a backup candidate
+- **every candidate the API offers can actually produce a plan**
+
+The second is the one I would keep. Both endpoints were individually correct — the mismatch only
+existed in the sequence the interface walks, and nothing tested that sequence. Swept across all 25
+capabilities, live: no primary offered as its own backup, and every candidate produces a plan.
+
+Worth saying plainly: this is a class of bug the backend suite structurally could not catch, because it
+only appears when two correct endpoints are used in order. **If you hit another dead-end button, send
+the screenshot — that is the fastest path to these.**
+
+---
+
+## 2026-08-24 (later) — The AI layer is finished, and the model lost the bake-off (Person A)
+
+Every AI requirement in the PRD is now built. Then we measured the central one, and the result changes
+what we should say in the submission — so read the second half of this even if you skip the first.
+
+### All five AI requirements are now implemented
+
+| FR | Requirement | State |
+|---|---|---|
+| FR-004 | AI converts artifacts into structured evidence | Built and **measured** — see below |
+| FR-017 | AI explains why a candidate is suitable | Live model prose, gated |
+| FR-018 | AI creates the mitigation plan | Live model prose, gated |
+| FR-005 | AI proposes components/capabilities, flags low-confidence concepts | **New.** Was the last deliberate gap (GAP-06) |
+| FR-010 | AI may suggest system criticality | **New.** Human-confirmed always wins |
+
+`AI_PROVIDER=chain` runs every configured model in order — watsonx, then OpenRouter — with per-call
+failover, so a spent quota no longer stops a run. Your OpenRouter key is live and working; watsonx is
+still quota-blocked, so in practice OpenRouter does the work.
+
+**Nothing on the wire changed.** No endpoint, DTO, enum or fixture moved. All 12 fixtures still match
+live output, and every frozen number holds.
+
+### The measurement, which is the actual news
+
+The open question since we started: is a model better than string matching at reading these artifacts? I
+extracted the **whole corpus** with `anthropic/claude-sonnet-5` — 640/640, cached and committed — and ran
+the evaluation under both, with everything downstream identical.
+
+| Check | Rules | Model |
+|---|---|---|
+| Knowledge reconstruction | **56/56** | 54/56 |
+| Exposure classification | **25/25** | 24/25 |
+| Counterfactual simulation | **25/25** | **15/25** |
+| Backup candidates | **2/2** | 1/2 |
+| Critical gaps / ownership / grounding | 100% | 100% |
+
+The model found *more* — 144 claims against 126 — and that is the trap. It made two readiness errors,
+both on Incident Recovery, both **too high**: Jordan `EXPOSED` read as `PRACTICED`, Maria `ASSISTED` read
+as `PRACTICED`. Jordan's record there is two years of review comments.
+
+Those two promotions give Incident Recovery two more adequate engineers, so it flips `DEGRADED → COVERED`
+and **"Alex is the only person who can recover the payment gateway" stops being true.** The simulation
+becomes 74 → 91 with one critical gap instead of 74 → 93 with two. The 60% simulation score is that one
+error propagating.
+
+The direction is what settles it: a continuity tool that overestimates readiness tells a manager they are
+covered when they are not, and nobody goes looking for a problem the tool says does not exist.
+
+**So rule-based extraction stays, and it is now a measured decision.** Worth saying plainly because it
+inverts the intuition: our 100% scores are not the rules being flattered by a synthetic corpus. The model
+had the same corpus, the same prompt, the same validation gate, and did worse.
+
+### What this means for your half
+
+**Say this, and it is all true:** a language model reads the incident and review record and writes the
+manager-facing explanations, behind a validation gate that rejects invented capabilities, invented people
+and probability language, with the deterministic template as the fallback. It proposes taxonomy concepts
+the organisation has no name for yet, and suggests system criticality that a human can override. The risk
+analysis itself is deterministic and reproducible **by design** — and we can now show the experiment that
+proves that is the right design rather than asserting it.
+
+**Do not say** the model builds the knowledge graph. It does not, and the reason it does not is a better
+story than the claim would have been.
+
+If a judge asks "how do you stop the model inventing risk scores?", the answer is: there is no interface
+through which it could return one, and here is the run where letting it read the evidence made the product
+measurably worse. That is a much stronger answer than a description of a guardrail.
+
+Numbers you can quote: **13 claims the model found and the rules missed** (its recall is genuinely better
+in places), **3 of 5** agreement on criticality with all disagreements one direction — the model is more
+alarmist than the humans — and **640/640** artifacts extracted with full provenance recorded per claim.
+
+### Two operational notes
+
+**OpenRouter 402s are about concurrency, not balance.** `"would exceed your available credits given your
+current in-flight requests"` — six workers failed 127 of 640 artifacts; one worker completed all 127. If
+you ever run extraction, use `--workers 1`.
+
+**Do not set `AI_PROVIDER=chain` in `.env` for day-to-day work.** Seeding makes one model call per
+artifact, so every test run would make 640 live calls. The right runtime is
+`AI_PROVIDER=cached` with `EXTRACTION_CACHE_FILE=chain_cache.json` — extraction replayed instantly from
+the committed cache, live model prose over the top. `deterministic` remains the default so a clean clone
+still works with no key at all.
+
+### Verified
+
+309 backend tests, 29 frontend tests, all seven evaluation checks at 100% under the default provider,
+`refresh_fixtures --check` green, `verify_golden_path` inside AC-14. Frozen numbers unchanged: 72/HIGH,
+74/HIGH with 0/2/3, 74 → 93 HIGH → CRITICAL with 2/1/2, Payments 74, Identity 68, Maria HIGH, Jordan
+MEDIUM.
+
+Full write-up in `data/extraction/comparison_report.md`; decisions DEC-19 to DEC-22 in
+`docs/DECISIONS.md`. The README's "open question" section is now the answer.
+
+---
+
+## 2026-08-27 — The interface made legible for a first-time reader (Person B)
+
+### Completed
+
+Branch switched to `feature/ai-layer-and-evaluation`, which is the *same commit* as
+`feature/frontend-screens` — Person A built on top of Person B's work and pushed to both refs. There
+was nothing to merge.
+
+The application matched the specification and every screen rendered its DTO faithfully, and that was
+the defect: the interface spoke the data model's language, not the manager's. Reviewed against the
+running application by a reader who had studied the PRD and still could not tell what to do with it.
+
+1. **One vocabulary, in `frontend/lib/copy.ts`.** Coverage states, readiness, drift, evidence role,
+   strength, freshness, provenance sources, the primary action and seven hint texts now live in one
+   file. `exposure` had named three unrelated things — the capability's risk state, the `EXPOSED`
+   readiness rung (an engineer who has only *observed*), and the `EXPOSURE` evidence role — all
+   three visible on the system page at once. The word is retired from the interface; the enums are
+   untouched.
+2. **Two labels were wrong, not just opaque.** `DEGRADED` is the sole-expert state per
+   `DOMAIN_MODEL.md` §5.4, so "Weak backup" asserted a backup that does not exist; `CRITICAL_GAP` is
+   nobody qualified at all, which "No proven backup" understated. Now "Backup at risk" and "No
+   proven coverage".
+3. **Action-first dashboard.** A dismissible three-step strip, then `StartHereCard` naming the
+   riskiest capability and the engineer who holds it, linking into the flow. All values received;
+   selection reuses `sortSystemsByRisk` and `defaultCapabilityId`.
+4. **Coverage now sits above the graph** on the system page, and headline figures carry "/ 100".
+5. **Sidebar is three entries** (Home, Systems, Plans). `/simulations` still resolves, unlisted.
+
+### Decisions made
+
+**DEC-23** (`docs/DECISIONS.md`), Category B, no acknowledgement needed: user-facing wording is
+named for what a reader needs to know rather than for the field it renders. Recorded because the
+labels now deliberately diverge from the specification's terms — the contract governs the wire,
+`lib/copy.ts` governs the words. Supersedes the four-entry sidebar decision, annotated in
+`docs/UI_REVIEW.md`.
+
+One sub-decision worth knowing: the candidate card briefly read "Shared capability" and was
+**reverted** to "Technical overlap", because the API's disclaimer renders verbatim at the foot of the
+same screen using that term. One concept with two names on one page is the problem being solved.
+
+### Files changed
+
+Created `frontend/components/InfoHint.tsx`, `frontend/features/dashboard/{FirstRunStrip,StartHereCard}.tsx`,
+`frontend/vitest.config.ts`. Modified `frontend/lib/copy.ts`, fourteen component and page files,
+`frontend/features/systems/capabilities.ts`, `frontend/tests/capabilities.test.ts`,
+`docs/DECISIONS.md`, `docs/UI_REVIEW.md`, `BUILD_WITH_BOB.md`. No new dependency. `backend/` and
+`data/` untouched.
+
+### Things a fresh session will trip over
+
+- **`vitest` does not read `tsconfig.json`.** The `@/` alias only ever appeared in tested modules as
+  a *type* import, which is erased before resolution, so nobody noticed. The first runtime `@/`
+  import made a whole suite fail to load — four tests vanished from the count rather than failing.
+  `frontend/vitest.config.ts` now declares the alias. Watch the test *count*, not just the pass/fail
+  line.
+- **The pane's synthetic clicks do not reach React's delegated handlers.** Driving the UI in the
+  browser tool needs a full `pointerdown/mousedown/pointerup/mouseup/click` sequence, and hover
+  needs `mouseover` (not `mouseenter`, which does not bubble). A `left_click` that appears to do
+  nothing is usually this, not a bug — but check before assuming, because one real bug was found
+  this way: `InfoHint` closed on click because hover had already opened it.
+- **The frontend runs on :3001, not :3000.** Another project of the user's ("Yehub") owns :3000.
+  Person A's `6bba6e3` made the CORS origin list configurable, which is why 3001 works;
+  `.claude/launch.json` is set to it.
+- **`AI_PROVIDER` is `deterministic`.** `cached` cannot seed on this branch: `chain_cache.json`
+  covers 640 artifacts but is missing exactly the 7 adversarial ones added in `f439f37`
+  (`REV-9001..3`, `INC-9001`, `ISS-9001..3`), so it predates the corpus it ships with. Fix is
+  `python -m scripts.extract_with_provider --provider chain`. Not done here — `data/` is read-only
+  under Person B's constraints and the cache is Person A's artifact.
+- The full backend suite must run with `AI_PROVIDER=deterministic`; under a model provider two tests
+  fail by design and the run costs money and four minutes.
+
+### In progress / blocked
+
+Nothing in progress. Nothing blocked.
+
+### Recommended next task
+
+Regenerate `chain_cache.json` so `AI_PROVIDER=cached` works — it is the configuration the branch's
+own `.env.example` recommends for daily work, and it is currently broken on a clean clone. After
+that, a second legibility pass on the three screens this one did not restructure: the plan screen,
+the challenge drawer, and the capability detail page. Their wording is updated but their layout was
+not reconsidered.
+
+---
+
+## 2026-08-29 — The three unfinished surfaces closed (Person B)
+
+### Completed
+
+The previous session left three items open. Each was concealing defects, which is the finding worth
+carrying forward: **a screen nobody can reach is a screen nobody audits**, and the earlier "no raw
+enums remain" sweep passed only because it scanned rendered text.
+
+1. **Challenge is a pane of the evidence drawer, not a second dialog.** Two stacked `aria-modal`
+   drawers landed pixel-for-pixel on each other, and both registered a `window` Escape handler, so
+   one press closed both and discarded the recompute result. Now one dialog, two panes toggled by
+   the `hidden` attribute; Escape retreats one level; drafts survive a step back. Missing-evidence
+   rows open it with that engineer pre-selected.
+2. **The four-level hierarchy is stated in place.** Platform cards carry a system count and a hint
+   that platforms hold no score of their own; the dashboard's platform grid has a heading stating
+   containment; the capability list is grouped by component; the capability detail route carries the
+   only breadcrumb showing all four levels.
+3. **The plan renders as an ordered sequence**, not a 2×2 grid of apparent peers. Reverses
+   `docs/UI_REVIEW.md`'s endorsement, annotated there.
+4. **`/capabilities/[id]` had no inbound link and never had.** `CoverageCard` now links to it.
+
+### Decisions made
+
+**DEC-24** (`docs/DECISIONS.md`), Category B. Records the three changes above, the four defects
+fixed alongside them, and — added after an adversarial review of the diff — corrections to three
+labels DEC-23 introduced that turned out to be inaccurate rather than merely terse.
+
+The label corrections matter and are easy to undo by accident:
+- `CRITICAL_GAP` as "No proven coverage" is true of a **capability** and false of a **system**,
+  because `ENGINEERING_RULES.md:250` makes a system's exposure the worst of its capabilities'.
+  `ExposurePill` now takes `scope`; system rows read "Worst: no proven coverage".
+- `DEGRADED` as "Backup at risk" asserts a backup exists. `exposure.py` reaches it with **zero**
+  proven engineers when the capability is MEDIUM or LOW. It now reads "No resilient backup".
+- `EXPOSED` / `EXPOSURE` as "Has observed" / "Was present for it" kept only the narrowest sense;
+  `DOMAIN_MODEL.md` 5.3 and 5.10 include reviewing and discussing, and the server's own summaries
+  say "reviewed or discussed". Now matched to that.
+
+### Files changed
+
+Renamed `frontend/features/challenge/ChallengeDrawer.tsx` → `ChallengeForm.tsx`. Modified
+`frontend/lib/copy.ts`, seventeen component and page files,
+`frontend/features/mitigation/planStore.ts`, `frontend/tests/{planStore,capabilities}.test.ts`,
+`docs/DECISIONS.md`, `docs/UI_REVIEW.md`, `BUILD_WITH_BOB.md`. No new dependency. `backend/` and
+`data/` untouched.
+
+### Things a fresh session will trip over
+
+- **Do not drive forms with synthetic click sequences against the live backend.** Testing the
+  challenge form this session submitted a real challenge, which recomputed Incident Recovery from
+  `DEGRADED` to `COVERED` and destroyed the frozen 72. Recovered by reseeding
+  (`AI_PROVIDER=deterministic PYTHONPATH=. .venv/bin/python -m scripts.seed_demo`, ~3s) and
+  re-checking every frozen value. The backend log at the scratchpad path is where to look:
+  `grep POST backend.log`.
+- **The wording audit must cover screens that are hard to reach.** Both leaks found inside the
+  challenge form had survived a sweep that only inspected rendered text.
+- **`ExposurePill` needs `scope="system"` wherever it is fed a system's exposure.** There is
+  currently exactly one such call site (`SystemsTable`). A new one that forgets it will state
+  something false.
+- The other traps from the previous entry still apply: frontend on **:3001** (another project owns
+  :3000), `AI_PROVIDER=deterministic` required for the backend suite, `cached` still broken because
+  `chain_cache.json` predates the seven adversarial artifacts.
+
+### In progress / blocked
+
+Nothing in progress. Nothing blocked.
+
+### Recommended next task
+
+Two small things this session deliberately left. The mapping-challenge form asks the manager to
+type a target capability id by hand into a free-text field with a `cap_retry_logic` placeholder; it
+should be a select over the system's capabilities, which the graph payload already carries — the
+only remaining change that needs a new query rather than a relabel. And `chain_cache.json` still
+needs regenerating so `AI_PROVIDER=cached` works, which is Person A's artifact.
+
+---
+
+## 2026-08-29 (later) — Mapping-correction rebuilt around what the server does (Person B)
+
+### Completed
+
+The follow-up was "replace the free-text capability id with a dropdown". Reading
+`backend/app/challenge/service.py` first showed the field was not the problem: the whole mode could
+not succeed.
+
+- `_correct_mapping` moves the record **into** the URL capability and rejects any record already
+  filed there — but the dropdown was populated from that capability's own evidence, so every option
+  was one the server would refuse.
+- `target_capability_id` is declared in `schemas/challenge.py` and **read nowhere** in the backend.
+
+Rebuilt: the dropdown offers records filed under the *other* capabilities of the same system, each
+labelled with where it currently sits; the free-text field is gone; the mode hint now states the
+real direction; the request sends the URL capability as the target so the payload is truthful.
+
+### Decisions made
+
+DEC-24 extended with the above. **OPEN-16** raised for Person A: honour `target_capability_id` or
+drop it from the schema.
+
+### Files changed
+
+`frontend/features/challenge/ChallengeForm.tsx`, `docs/DECISIONS.md`, `BUILD_WITH_BOB.md`.
+
+### Things a fresh session will trip over
+
+- **Read the service before trusting a form's field list.** Two of this form's three controls were
+  wired to behaviour the backend does not have.
+- Acceptance was proved **by construction, not by submitting** — all 32 offered records checked
+  against both server rules. Do not POST to `/capabilities/{id}/challenge` against the demo
+  database; an earlier session did and destroyed the frozen Incident Recovery 72.
+
+### In progress / blocked
+
+Nothing in progress. OPEN-16 is Person A's.
+
+### Recommended next task
+
+`chain_cache.json` still needs regenerating so `AI_PROVIDER=cached` works — Person A's artifact, and
+the configuration their own `.env.example` recommends for daily work.

@@ -1,0 +1,254 @@
+{
+  "scope": {
+    "type": "SYSTEM",
+    "id": "system_payment_gateway",
+    "name": "Payment Gateway"
+  },
+  "nodes": [
+    {
+      "id": "system_payment_gateway",
+      "type": "SYSTEM",
+      "label": "Payment Gateway",
+      "status": "DEGRADED",
+      "metadata": {
+        "business_criticality": "CRITICAL"
+      }
+    },
+    {
+      "id": "component_gateway_integration",
+      "type": "COMPONENT",
+      "label": "Gateway Integration",
+      "metadata": {}
+    },
+    {
+      "id": "cap_incident_recovery",
+      "type": "CAPABILITY",
+      "label": "Incident Recovery",
+      "status": "DEGRADED",
+      "metadata": {
+        "operational_criticality": "CRITICAL"
+      }
+    },
+    {
+      "id": "eng_alex_chen",
+      "type": "ENGINEER",
+      "label": "Alex Chen",
+      "metadata": {
+        "role": "Senior Payments Engineer",
+        "team": "Payments Engineering"
+      }
+    },
+    {
+      "id": "eng_jordan_lee",
+      "type": "ENGINEER",
+      "label": "Jordan Lee",
+      "metadata": {
+        "role": "Payments Engineer",
+        "team": "Payments Engineering"
+      }
+    },
+    {
+      "id": "eng_maria_gomez",
+      "type": "ENGINEER",
+      "label": "Maria Gomez",
+      "metadata": {
+        "role": "Platform Engineer",
+        "team": "Payments Engineering"
+      }
+    },
+    {
+      "id": "evidence_doc_17",
+      "type": "EVIDENCE",
+      "label": "DOC-17",
+      "status": "STRONG",
+      "metadata": {
+        "source_type": "DOCUMENT",
+        "artifact_date": "2026-06-01",
+        "freshness": "FRESH",
+        "evidence_role": "KNOWLEDGE_CAPTURE"
+      }
+    },
+    {
+      "id": "evidence_inc_184",
+      "type": "EVIDENCE",
+      "label": "INC-184",
+      "status": "STRONG",
+      "metadata": {
+        "source_type": "INCIDENT",
+        "artifact_date": "2026-05-14",
+        "freshness": "FRESH",
+        "evidence_role": "INDEPENDENT_EXECUTION"
+      }
+    },
+    {
+      "id": "evidence_inc_230",
+      "type": "EVIDENCE",
+      "label": "INC-230",
+      "status": "MODERATE",
+      "metadata": {
+        "source_type": "INCIDENT",
+        "artifact_date": "2026-04-18",
+        "freshness": "FRESH",
+        "evidence_role": "ASSISTED_EXECUTION"
+      }
+    },
+    {
+      "id": "evidence_inc_221",
+      "type": "EVIDENCE",
+      "label": "INC-221",
+      "status": "STRONG",
+      "metadata": {
+        "source_type": "INCIDENT",
+        "artifact_date": "2026-03-02",
+        "freshness": "FRESH",
+        "evidence_role": "INDEPENDENT_EXECUTION"
+      }
+    },
+    {
+      "id": "evidence_pr_402",
+      "type": "EVIDENCE",
+      "label": "PR-402",
+      "status": "MODERATE",
+      "metadata": {
+        "source_type": "PULL_REQUEST",
+        "artifact_date": "2026-02-10",
+        "freshness": "FRESH",
+        "evidence_role": "CONTRIBUTION"
+      }
+    },
+    {
+      "id": "evidence_issue_77",
+      "type": "EVIDENCE",
+      "label": "ISSUE-77",
+      "status": "WEAK",
+      "metadata": {
+        "source_type": "ISSUE",
+        "artifact_date": "2024-08-05",
+        "freshness": "AGING",
+        "evidence_role": "EXPOSURE"
+      }
+    },
+    {
+      "id": "evidence_pr_391",
+      "type": "EVIDENCE",
+      "label": "PR-391",
+      "status": "WEAK",
+      "metadata": {
+        "source_type": "CODE_REVIEW",
+        "artifact_date": "2024-06-12",
+        "freshness": "AGING",
+        "evidence_role": "EXPOSURE"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "system_payment_gateway",
+      "target": "component_gateway_integration",
+      "type": "HAS_COMPONENT",
+      "metadata": {}
+    },
+    {
+      "source": "component_gateway_integration",
+      "target": "cap_incident_recovery",
+      "type": "REQUIRES_CAPABILITY",
+      "metadata": {
+        "operational_criticality": "CRITICAL"
+      }
+    },
+    {
+      "source": "eng_alex_chen",
+      "target": "cap_incident_recovery",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "VALIDATED",
+        "freshness": "FRESH",
+        "evidence_confidence": "HIGH"
+      }
+    },
+    {
+      "source": "eng_jordan_lee",
+      "target": "cap_incident_recovery",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "EXPOSED",
+        "freshness": "AGING",
+        "evidence_confidence": "MEDIUM"
+      }
+    },
+    {
+      "source": "eng_maria_gomez",
+      "target": "cap_incident_recovery",
+      "type": "DEMONSTRATES",
+      "metadata": {
+        "readiness": "ASSISTED",
+        "freshness": "FRESH",
+        "evidence_confidence": "MEDIUM"
+      }
+    },
+    {
+      "source": "eng_jordan_lee",
+      "target": "system_payment_gateway",
+      "type": "DECLARED_OWNER",
+      "metadata": {
+        "source": "CODEOWNERS"
+      }
+    },
+    {
+      "source": "eng_alex_chen",
+      "target": "evidence_doc_17",
+      "type": "SUPPORTED_BY",
+      "metadata": {
+        "capability_id": "cap_incident_recovery"
+      }
+    },
+    {
+      "source": "eng_alex_chen",
+      "target": "evidence_inc_184",
+      "type": "SUPPORTED_BY",
+      "metadata": {
+        "capability_id": "cap_incident_recovery"
+      }
+    },
+    {
+      "source": "eng_maria_gomez",
+      "target": "evidence_inc_230",
+      "type": "SUPPORTED_BY",
+      "metadata": {
+        "capability_id": "cap_incident_recovery"
+      }
+    },
+    {
+      "source": "eng_alex_chen",
+      "target": "evidence_inc_221",
+      "type": "SUPPORTED_BY",
+      "metadata": {
+        "capability_id": "cap_incident_recovery"
+      }
+    },
+    {
+      "source": "eng_maria_gomez",
+      "target": "evidence_pr_402",
+      "type": "SUPPORTED_BY",
+      "metadata": {
+        "capability_id": "cap_incident_recovery"
+      }
+    },
+    {
+      "source": "eng_jordan_lee",
+      "target": "evidence_issue_77",
+      "type": "SUPPORTED_BY",
+      "metadata": {
+        "capability_id": "cap_incident_recovery"
+      }
+    },
+    {
+      "source": "eng_jordan_lee",
+      "target": "evidence_pr_391",
+      "type": "SUPPORTED_BY",
+      "metadata": {
+        "capability_id": "cap_incident_recovery"
+      }
+    }
+  ]
+}

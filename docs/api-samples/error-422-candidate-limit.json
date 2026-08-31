@@ -1,0 +1,9 @@
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Request failed validation.",
+    "details": {
+      "errors": "[{'type': 'less_than_equal', 'loc': ('body', 'limit'), 'msg': 'Input should be less than or equal to 3', 'input': 9, 'ctx': {'le': 3}}]"
+    }
+  }
+}

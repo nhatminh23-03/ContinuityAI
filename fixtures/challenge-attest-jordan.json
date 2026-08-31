@@ -1,0 +1,50 @@
+{
+  "challenge_id": "challenge_001",
+  "challenge_type": "MANAGER_ATTESTATION",
+  "capability_id": "cap_incident_recovery",
+  "engineer_id": "eng_jordan_lee",
+  "submitted_by": "eng_manager_sarah",
+  "submitted_at": "2026-08-15T10:35:00Z",
+  "evidence_created": "evidence_attest_jordan_lee_incident_recovery",
+  "evidence_moved": null,
+  "capability_before": {
+    "exposure": "DEGRADED",
+    "continuity_risk_index": 72,
+    "continuity_risk_class": "HIGH",
+    "evidence_confidence": "HIGH",
+    "readiness": "EXPOSED",
+    "rules_triggered": [
+      "CRITICAL_CAPABILITY",
+      "SINGLE_VALIDATED_ENGINEER",
+      "NO_PRACTICED_OR_VALIDATED_BACKUP"
+    ]
+  },
+  "capability_after": {
+    "exposure": "COVERED",
+    "continuity_risk_index": 15,
+    "continuity_risk_class": "LOW",
+    "evidence_confidence": "HIGH",
+    "readiness": "PRACTICED",
+    "rules_triggered": [
+      "CRITICAL_CAPABILITY",
+      "ADEQUATE_BACKUP_PRESENT"
+    ]
+  },
+  "system_before": {
+    "continuity_risk_index": 74,
+    "continuity_risk_class": "HIGH",
+    "exposure": "DEGRADED",
+    "critical_gap_count": 0,
+    "degraded_capability_count": 2,
+    "covered_capability_count": 3
+  },
+  "system_after": {
+    "continuity_risk_index": 74,
+    "continuity_risk_class": "HIGH",
+    "exposure": "DEGRADED",
+    "critical_gap_count": 0,
+    "degraded_capability_count": 1,
+    "covered_capability_count": 4
+  },
+  "recomputed": true
+}

@@ -9,6 +9,8 @@
 
 import alexSimulation from '../../public/fixtures/alex-simulation.json';
 import backupCandidates from '../../public/fixtures/backup-candidates.json';
+import challengeAttestJordan from '../../public/fixtures/challenge-attest-jordan.json';
+import identitySystems from '../../public/fixtures/identity-systems.json';
 import incidentRecoveryEvidence from '../../public/fixtures/incident-recovery-evidence.json';
 import incidentRecovery from '../../public/fixtures/incident-recovery.json';
 import mitigationPlanApproved from '../../public/fixtures/mitigation-plan-approved.json';
@@ -22,6 +24,7 @@ import type {
   ApprovePlanResponse,
   BackupCandidateResponse,
   CapabilityDetail,
+  ChallengeResponse,
   EvidenceResponse,
   GraphResponse,
   MitigationPlanResponse,
@@ -34,6 +37,7 @@ import type {
 export const checkedFixtures = {
   platforms: platforms as PlatformListResponse,
   paymentsSystems: paymentsSystems as SystemListResponse,
+  identitySystems: identitySystems as SystemListResponse,
   paymentGateway: paymentGateway as SystemDetail,
   paymentGatewayGraph: paymentGatewayGraph as GraphResponse,
   incidentRecovery: incidentRecovery as CapabilityDetail,
@@ -42,4 +46,5 @@ export const checkedFixtures = {
   backupCandidates: backupCandidates as BackupCandidateResponse,
   mitigationPlan: mitigationPlan as MitigationPlanResponse,
   mitigationPlanApproved: mitigationPlanApproved as ApprovePlanResponse,
+  challengeAttestJordan: challengeAttestJordan as ChallengeResponse,
 } as const;

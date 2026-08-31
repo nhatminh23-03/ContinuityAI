@@ -119,15 +119,20 @@ class ExtractionCache:
 class CachedProvider:
     name = "cached"
 
-    def __init__(self, path: Path | None = None) -> None:
-        self.cache = ExtractionCache.load(path)
+    def __init__(self, path: Path | None = None, narrator: object | None = None) -> None:
+        self.cache = ExtractionCache.load(path or cache_path(settings.extraction_cache_file))
         if not self.cache.entries:
             raise ValueError(
-                f"AI_PROVIDER=cached needs an extraction cache at {self.cache.path}. "
-                f"Build one with: python -m scripts.extract_with_provider --provider watsonx"
+                f"AI_PROVIDER=cached needs an extraction cache at {self.cache.path}. Build one with: "
+                f"python -m scripts.extract_with_provider --provider chain — then set "
+                f"EXTRACTION_CACHE_FILE to the file it wrote."
             )
         self.model_id = self.cache.model_id
+        # What actually built this graph, which is the cache's provider rather than `cached`. Replaying
+        # a model's output is still that model's output, and the seed summary should say so.
+        self.extraction_provider_name = f"cached:{self.cache.provider_name or 'unknown'}"
         self._fallback = DeterministicProvider()
+        self._narrator = narrator or self._fallback
 
     def extract_artifact_semantics(
         self, artifact: ArtifactInput, context: ExtractionContext
@@ -141,13 +146,19 @@ class CachedProvider:
             )
         return extraction
 
-    # Narrative generation is cheap, live, and grounded in facts the rules already decided, so there
-    # is nothing to cache. These delegate.
+    # Narratives are not cached, and should not be: they are cheap, live, and grounded in facts the
+    # rules already decided, so a cache would only make them stale. But they should not silently be
+    # *templates* either. `narrator` is whatever can actually write them — the model chain when
+    # credentials exist, the deterministic templates when they do not — which is what makes
+    # `AI_PROVIDER=cached` a fully model-backed configuration rather than half of one.
+    #
+    # This is the combination worth running day to day: extraction replayed from a committed cache, so
+    # seeding is instant, offline and reproducible, with live model prose over the top.
     def summarize_simulation(self, context: SimulationSummaryContext) -> str | None:
-        return self._fallback.summarize_simulation(context)
+        return self._narrator.summarize_simulation(context)
 
     def explain_candidate(self, context: CandidateNarrativeContext) -> CandidateNarrative:
-        return self._fallback.explain_candidate(context)
+        return self._narrator.explain_candidate(context)
 
     def generate_mitigation_plan(self, context: PlanContext) -> PlanDraft:
-        return self._fallback.generate_mitigation_plan(context)
+        return self._narrator.generate_mitigation_plan(context)

@@ -59,7 +59,9 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    # Configurable via CORS_ORIGINS, because a hardcoded port 3000 turns an occupied port into a
+    # browser-only failure that never appears in this process's log. See app/core/config.py.
+    allow_origins=settings.cors_origin_list,
     allow_methods=["*"],
     allow_headers=["*"],
 )

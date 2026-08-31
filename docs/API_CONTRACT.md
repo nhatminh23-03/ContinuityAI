@@ -451,6 +451,7 @@ These DTOs describe the external API contract. Internal persistence models may d
   "description": "Customer payment and transaction services",
   "system_count": 3,
   "critical_gap_count": 1,
+  "single_expert_dependency_count": 4,
   "highest_system_risk_index": 74,
   "drift_status": "NEW_RISK"
 }
@@ -463,10 +464,28 @@ Required fields:
 - `description: string | null`
 - `system_count: integer >= 0`
 - `critical_gap_count: integer >= 0`
+- `single_expert_dependency_count: integer >= 0`
 - `highest_system_risk_index: integer 0..100 | null`
 - `drift_status: KnowledgeDriftStatus`
 
 `highest_system_risk_index` may be `null` if the platform contains no assessable systems.
+
+`single_expert_dependency_count` is the number of capabilities under the platform whose adequate
+coverage is exactly one engineer — the "one person away from a gap" count. Added by DEC-17 to close
+GAP-01; the dashboard card had no field carrying this number.
+
+Three things it is not, each of which would produce a different number:
+
+- **Not** `critical_gap_count`. That counts capabilities with *no* adequate engineer.
+- **Not** derivable from `degraded_capability_count`. Under DEC-07 a lower-criticality capability
+  with zero adequate engineers is `DEGRADED` rather than a critical gap, so the degraded count
+  includes both the one-expert and the no-expert cases.
+- **Not** a count of engineers. Two capabilities each held solely by Alex count as two.
+
+"Adequate" means readiness `PRACTICED` or `VALIDATED` with evidence that is not `STALE`, which is the
+same definition behind the `SOLE_EXPERT_CAPABILITY` and `MULTIPLE_SOLE_EXPERT_CAPABILITIES` reason
+codes in section 12.1 — deliberately, so a platform card cannot disagree with the reason codes shown
+on the systems beneath it.
 
 ---
 
@@ -823,6 +842,7 @@ Optional query parameters for MVP: none.
       "description": "Customer payment and transaction services",
       "system_count": 3,
       "critical_gap_count": 1,
+      "single_expert_dependency_count": 4,
       "highest_system_risk_index": 74,
       "drift_status": "NEW_RISK"
     },
@@ -832,6 +852,7 @@ Optional query parameters for MVP: none.
       "description": "Authentication and authorization services",
       "system_count": 2,
       "critical_gap_count": 1,
+      "single_expert_dependency_count": 2,
       "highest_system_risk_index": 68,
       "drift_status": "STABLE"
     }
