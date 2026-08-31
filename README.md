@@ -7,15 +7,41 @@
 > disappears — and prepare targeted knowledge-transfer work before the gap becomes an operational
 > problem.
 
-*Submission README. The technical sections are drafted; the product narrative, screenshots, and
-demo walkthrough are still to come (`TEAM_WORKFLOW_PERSON_A_B.md` section 27 splits the first
-drafts, then both developers cross-review).*
+**AI Builders Challenge with IBM Bob — Wildcard Challenge: Build Intelligent Systems for the
+Future of Work.**
+
+| Required section | |
+|---|---|
+| [Problem statement](#problem) | Critical technical knowledge concentrated in one person, invisible to every existing tool |
+| [Solution description](#solution) | One decision loop: see the exposure, simulate it, act on it |
+| [AI approach and architecture](#ai-approach-and-architecture) | Where the model works, where the rules decide, and how that boundary was measured |
+| [Selected challenge theme](#challenge-theme) | Wildcard — Future of Work |
+| [How IBM Bob was used](#how-ibm-bob-was-used) | Across planning, coding, testing, debugging and documentation |
+
+### Run it in about a minute
+
+```bash
+git clone https://github.com/nhatminh23-03/ContinuityAI && cd ContinuityAI
+cd backend && python3.11 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python -m uvicorn app.main:app          # seeds itself on first run; http://localhost:8000
+cd ../frontend && npm install && npm run dev      # http://localhost:3000
+```
+
+No API key is needed. The default provider is `deterministic`, both artifact corpora and the hidden
+ground truth are committed, and the demo reproduces offline and byte-identically from a clean
+clone. Open the dashboard and follow the **Start here** card.
+
+**What you are looking at.** 640 engineering artifacts — incidents, pull requests, code reviews,
+tickets, documents — become 133 evidence records and 56 typed coverage relationships across 2
+platforms, 5 systems, 25 capabilities and 11 engineers. 347 tests pass (316 backend, 31 frontend).
+Eight evaluation checks against hidden ground truth score 100%, including seven adversarial
+artifacts the rules are required to decline.
 
 ---
 
 ## Problem
 
-*Draft — product narrative to be expanded.* Engineering organisations eliminate infrastructure
+Engineering organisations eliminate infrastructure
 single points of failure while leaving a less visible failure mode untreated: critical technical
 knowledge concentrated in one person. A service may be redundant across regions, but the ability to
 recover it, deploy it, rotate its credentials, or diagnose its failures may still depend on one
@@ -27,12 +53,16 @@ trivial commits say less than two independent production recoveries. The evidenc
 the question is real but scattered across repositories, incident platforms, ticket systems, and
 runbooks, and it goes stale as architecture changes.
 
-*To expand: the trigger scenarios — resignation, leave during an incident, reorganisation,
-architecture migration.*
+The cost is not hypothetical and it does not arrive on a schedule. It arrives when someone resigns
+with two weeks' notice, when the one person who has recovered this service is on leave during the
+incident that needs recovering, when a reorganisation moves a team and nobody notices which
+capability moved with it, or when an architecture migration quietly strands the only engineer who
+understood the system being replaced. In each case the question is the same and is asked too late:
+*who else can actually do this?*
 
 ## Solution
 
-*Draft — screenshots and user journey to come.* One decision loop for an engineering manager:
+One decision loop for an engineering manager:
 
 ```
 Dashboard → System Detail → Graph + Evidence ("Why?") → Simulate engineer unavailable
@@ -112,6 +142,7 @@ provider that returns "STRONG" for a code review is corrected, not believed.
 | `openrouter` | An OpenAI-compatible gateway does both: model extraction *and* all three manager-facing narratives, each validated before use |
 | `chain` | Every configured model in preference order — watsonx first, then `openrouter` — with per-call failover, so a spent quota does not stop a run |
 | `cached` | Replays a committed extraction cache, so a model-derived graph seeds offline and instantly. Narratives still go live through the chain when credentials exist |
+| `hybrid` | **The arrangement the measurement selected.** Rule-based extraction, because it won; every narrative, taxonomy proposal and criticality suggestion goes to the model chain, because those it won. Not a compromise — each half assigned by evidence |
 
 `chain` is what makes the model path usable rather than theoretical. The two failure policies inside it
 are deliberately different: **extraction hands over between models and then raises**, never silently
@@ -151,9 +182,52 @@ provider: no `AIProvider` method exists through which a model could return one o
 "Where the boundary sits, and why", above), so this is a property of the interface shape rather than
 of provider configuration.
 
-`AI_PROVIDER` still defaults to `deterministic`. Nothing above is switched on by default; it
+`AI_PROVIDER` defaults to `deterministic`, so a clean clone with no credential reproduces the demo
+offline — that is the submission posture, not the recommendation. **The configuration the
+measurement argues for is `hybrid`**, and it is what this project runs when a key is present: the
+rules do the extraction they win at, the model writes every manager-facing sentence, and the
+validation gate falls back to a template whenever a model claim is not grounded in the record. It
 describes what runs when an operator explicitly configures a model provider and supplies credentials
 in `backend/.env`.
+
+### Where the model works, and how we decided
+
+The model does the work it measurably wins at, and does not do the work it measurably loses at. We
+know which is which because we tested it. That is a narrower boundary than the specification
+assumed, and it was drawn by measurement rather than preference.
+
+| A model does this | The rules do this |
+|---|---|
+| Simulation summary — `app/ai/openrouter.py` | Semantic extraction from artifacts — `app/ingestion/` |
+| Candidate strengths and gaps (FR-017) | Engineer-capability readiness — `app/continuity/` |
+| Mitigation plan tasks and acceptance criteria (FR-018) | Capability exposure and continuity risk — `app/continuity/exposure.py` |
+| Taxonomy proposals for concepts the org has no name for (FR-005) | Counterfactual simulation arithmetic — `app/simulation/` |
+| Suggested system criticality, a human confirms (FR-010) | Every number the interface displays |
+
+**One artefact you can open in thirty seconds.** This sentence is stored in the demo database,
+written by the model and passed by the validation gate:
+
+> *"If Alex Chen were unavailable for Payment Gateway, Incident Recovery and Certificate Management
+> would have no adequate demonstrated coverage, Provider Failover would lose redundancy, Retry
+> Logic and Monitoring would remain covered."*
+
+The deterministic fallback for the same event opens `"Without {engineer}, {scope} moves from
+{before} to {after}: N capability gaps…"`. The two are structurally different, which is how you can
+tell which path produced which.
+
+**The IBM model did real extraction work, and the cache proves it.**
+`data/extraction/watsonx_cache.json` holds 313 structured extractions from `ibm/granite-4-h-small`;
+`chain_cache.json` holds the full 640 across watsonx and a second model after the watsonx quota was
+reached. watsonx is deliberately first in the chain — using the IBM model where it works is the
+point — and the failover exists because the development account allowed two requests per second
+against a capped token quota, not because the model failed.
+
+**The validation gate is itself AI engineering.** `app/ai/validation.py` and `language_policy.py`
+check every model sentence against the record before it can reach the database or the wire: no
+capability the evidence does not support, no person the context did not name, no independence claim
+where the record holds assisted-only coverage, no probability language, no statement of inability.
+Their four known blind spots are documented in the module docstring and pinned by tests, because a
+gate whose failure modes are unpublished is a gate nobody can trust.
 
 ### A second provider: rule-based extraction, model-written narratives
 
@@ -447,7 +521,7 @@ key, only `app/evaluation/` resolves one, and a test parses every module under `
 any of them names the directory, imports the evaluation package, or reaches it through settings.
 Without that test the product's central claim would be unfalsifiable.
 
-Results on the seeded dataset — 640 artifacts, 126 evidence records, 56 coverage relationships:
+Results on the seeded dataset — 640 artifacts, 133 evidence records, 56 coverage relationships:
 
 | Check | Result |
 |---|---|
@@ -458,6 +532,7 @@ Results on the seeded dataset — 640 artifacts, 126 evidence records, 56 covera
 | Counterfactual simulation | 25 / 25 |
 | Backup candidate recommendation | 2 / 2 |
 | Evidence grounding (every coverage claim cites a source) | 56 / 56 |
+| Adversarial artifacts declined (traps the rules must refuse) | 7 / 7 |
 
 **These are not accuracy figures and must not be quoted as such.** The generator emits evidence
 patterns chosen to be classifiable, so what they measure is that the pipeline is self-consistent end
@@ -467,6 +542,15 @@ match real human expertise; those are prototype thresholds for transparent demo 
 calibrated competency standards. The caveat is printed inside the generated report.
 
 ### What real public data showed
+
+**The eighth check is the one that answers the obvious objection.** Seven perfect scores against a
+corpus whose generator you also wrote proves little on its own — the pipeline may only be agreeing
+with its own generator. So seven adversarial artifacts were added that the rules are required to
+*decline*: a reviewer with eight review records and no execution, who must stay `EXPOSED`; a
+write-up whose narrative credits one engineer while the participant record lists only another
+commenting; volume presented as if it were execution. Declining a trap is a stronger claim than
+reconstructing a label, and it is the same class of mistake the measured model extraction actually
+made.
 
 The corpus is hybrid, as the data strategy requires: 520 synthetic private enterprise records
 (incidents, tickets, runbooks) plus 120 real merged pull requests and reviews from a public
@@ -486,8 +570,7 @@ URLs — the attribution is what is synthetic, and the manifest says so.
 
 ## Challenge theme
 
-*Draft — judging-criteria mapping to be expanded jointly.* Wildcard Challenge — Build Intelligent
-Systems for the Future of Work.
+**Wildcard Challenge — Build Intelligent Systems for the Future of Work.**
 
 The product addresses the four capabilities the brief names: it **plans** targeted
 knowledge-transfer work for specific capability gaps, **coordinates** by identifying primary and
@@ -496,12 +579,45 @@ counterfactual simulator, and prepares **execution** as structured tasks a human
 decision support for an engineering manager, not workflow automation — every staffing decision
 stays human.
 
-## Development tooling
+### The theme's three questions, answered
 
-*Draft.* See [`BUILD_WITH_BOB.md`](BUILD_WITH_BOB.md) for the development log: what was built, which
-requirement each unit implements, how it was validated, and what remains open. It records the three
-specification defects the build surfaced, including a rule that made the frozen demo state
-unreachable.
+**How can AI reduce repetitive work?** The work removed is reconstruction, not clerical entry. A
+resilience review today means reading incident logs, scanning pull requests and asking around;
+here 640 artifacts are read once into 133 evidence records and 56 typed coverage relationships,
+and every conclusion opens back to the artifact that produced it. Being honest about the ceiling:
+of 120 real public GitHub pull requests, exactly one produced capability evidence. That is a
+measured finding about how little real-world engineering text states capability explicitly, and it
+is reported in [Evaluation](#evaluation) rather than hidden.
+
+**How can AI improve decision-making?** By answering a different question rather than summarising
+the existing one. "Alex is important" is an impression. "If Alex were unavailable, Incident
+Recovery and Certificate Management lose adequate coverage, Provider Failover loses redundancy,
+Retry Logic and Monitoring stay covered, and the system moves HIGH → CRITICAL" is a decision. The
+counterfactual runs the same assessment twice over different facts, so the before and after cannot
+structurally disagree.
+
+**How can AI help teams achieve outcomes faster?** The loop ends in something executable: a
+3–5 task knowledge-transfer plan, each task with acceptance criteria, the opening task citing the
+evidence records that justify it, and a human approving before anything is recorded. Not "cross-
+train more" — a specific person, a specific capability, a specific sequence.
+
+### Against the judging criteria
+
+| Criterion | Where to look |
+|---|---|
+| **Technical execution** | 347 passing tests; a test that fails if any module under `app/` can reach the ground-truth directory, making the evaluation's independence falsifiable rather than asserted |
+| **Innovation** | The extraction bake-off: the model and the rules were both run over the whole corpus and scored against hidden labels, and the losing configuration was published |
+| **Feasibility** | Clean clone runs offline with no credential; `uvicorn app.main:app` is a one-command start; backend suite green in about four seconds |
+| **Challenge fit** | Plan, coordinate, decide, execute — each mapped to a surface above, with the human decision preserved at the point it matters |
+| **Real-world impact** | The responsible-AI asymmetry: claiming coverage requires evidence, claiming exposure does not. Derived from two failures during the build, not from a template |
+
+## How IBM Bob was used
+
+The development record itself is [`BUILD_WITH_BOB.md`](BUILD_WITH_BOB.md): one entry per unit of
+work stating what was built, which requirement or contract clause it implements, how it was
+validated, and what stayed open. It records the three specification defects the build surfaced —
+including a rule that made the frozen demo state unreachable, described under
+[Continuity risk engine](#continuity-risk-engine).
 
 ## Setup
 
@@ -547,14 +663,15 @@ Neither regeneration command is needed for normal work: both corpora are committ
 |---|---|---|
 | `DATABASE_URL` | `sqlite:///backend/continuity.db` | Demo database |
 | `AUTO_SEED` | `true` | Seed automatically when the database is empty |
-| `AI_PROVIDER` | `deterministic` | `deterministic`, `watsonx`, `cached`, or `openrouter`. The offline provider ships as the default; the model-backed providers are implemented and credential-gated, and shipping with `deterministic` means nothing is switched on until an operator opts in |
+| `AI_PROVIDER` | `deterministic` | `deterministic`, `hybrid`, `watsonx`, `openrouter`, `chain`, or `cached`. The offline provider ships as the default so a clean clone reproduces with no credential; `hybrid` is the configuration the measurement selected and the one to run with a key present |
 | `API_TOKEN` | *(empty)* | When set, `/api/v1` requires `Authorization: Bearer <token>`. Empty leaves the API open, which is the local default |
 | `REFERENCE_DATE` | `2026-08-15` | The clock freshness is judged against, so a seeded demo cannot age into different classifications |
 
 ### Checks
 
 ```bash
-cd backend && .venv/bin/python -m pytest -q                 # 316 tests, ~5 seconds
+cd backend && .venv/bin/python -m pytest -q                 # 316 tests, ~4 seconds
+cd ../frontend && npm test                                  # 31 tests
 cd ../frontend && npm run build && npm run typecheck        # build first — see below
 ```
 
@@ -571,7 +688,7 @@ If `npm install` fails with `errno -13` on a root-owned npm cache — unrelated 
 ```bash
 git clone <repo> && cd ContinuityAI
 cd backend && python3.11 -m venv .venv && .venv/bin/pip install -r requirements.txt
-PYTHONPATH=. .venv/bin/python -m scripts.seed_demo          # 640 artifacts -> 126 evidence records
+PYTHONPATH=. .venv/bin/python -m scripts.seed_demo          # 640 artifacts -> 133 evidence records
 PYTHONPATH=. .venv/bin/python -m scripts.run_evaluation     # every check should pass
 .venv/bin/python -m uvicorn app.main:app --reload
 ```
@@ -589,16 +706,6 @@ migration step. The consequence worth knowing: a schema change requires a reseed
 any simulations and plans created through the API. Alembic is marked optional in
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) §5.2 and was deliberately not added
 ([`RECOMMENDATIONS.md`](RECOMMENDATIONS.md) R-15).
-
-## Demo
-
-*TODO.* Public demo video (≤ 3 minutes): link to be added.
-
-Hero scenario — NovaPay Payment Gateway. Jordan is the declared CODEOWNERS owner; the engineering
-evidence shows Alex has the strongest demonstrated Incident Recovery coverage. Simulating Alex as
-unavailable turns Incident Recovery and Certificate Management into critical coverage gaps while
-Retry Logic stays covered, moving the system from HIGH to CRITICAL. Maria returns as the strongest
-technical backup candidate; the manager selects her and approves a targeted transfer plan.
 
 ---
 
