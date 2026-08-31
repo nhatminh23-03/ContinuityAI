@@ -5,7 +5,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { DRIFT_COPY, MODIFIER_COPY, RULE_COPY, ruleCopy } from '../lib/copy';
+import { DRIFT_COPY, MODIFIER_COPY, RULE_COPY, ruleCopy, evidenceReference } from '../lib/copy';
 
 const PROHIBITED = /irreplaceable|critical employee|best employee|cannot|weak engineer|low-value/i;
 
@@ -36,5 +36,21 @@ describe('display copy maps', () => {
       'RISK_REDUCED',
       'STABLE',
     ]);
+  });
+});
+
+describe('evidenceReference', () => {
+  it('recovers the artifact reference the plan screen cites', () => {
+    expect(evidenceReference('evidence_inc_184')).toBe('INC-184');
+    expect(evidenceReference('evidence_tck_904')).toBe('TCK-904');
+    expect(evidenceReference('evidence_pr_402')).toBe('PR-402');
+  });
+
+  it('leaves anything of an unexpected shape exactly as received', () => {
+    // Better a raw id on screen than a mangled one that looks like a real
+    // reference and is not.
+    expect(evidenceReference('evidence_something')).toBe('evidence_something');
+    expect(evidenceReference('opaque')).toBe('opaque');
+    expect(evidenceReference('evidence__184')).toBe('evidence__184');
   });
 });

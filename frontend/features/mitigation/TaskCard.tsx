@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { evidenceReference } from '@/lib/copy';
 import type { MitigationTask } from '@/types/api';
 
 /**
@@ -134,7 +135,7 @@ export function TaskCard({
               key={evidenceId}
               className="rounded-full bg-white/50 px-2 py-0.5 text-[10px] font-medium text-slate-500 ring-1 ring-slate-900/5"
             >
-              {evidenceId}
+              {evidenceReference(evidenceId)}
             </span>
           ))}
         </div>

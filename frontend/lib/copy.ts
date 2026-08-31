@@ -303,6 +303,19 @@ export function modifierCopy(code: string): string {
   return MODIFIER_COPY[code] ?? code;
 }
 
+/**
+ * An evidence id is derived from the artifact reference it came from —
+ * `evidence_inc_184` is the record for incident INC-184 — so the reference can
+ * be recovered without a lookup. The plan screen cites these as the
+ * justification for its opening task, and a database key is not a citation.
+ * Anything that does not match the shape is left exactly as received.
+ */
+export function evidenceReference(evidenceId: string): string {
+  const parts = evidenceId.replace(/^evidence_/, '').split('_');
+  if (parts.length < 2 || !parts.every(Boolean)) return evidenceId;
+  return `${parts[0].toUpperCase()}-${parts.slice(1).join('-').toUpperCase()}`;
+}
+
 /** An unmapped source still reads as words rather than as a database key. */
 export function provenanceSourceCopy(source: string): string {
   const mapped = PROVENANCE_SOURCE_COPY[source];
